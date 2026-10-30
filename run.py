@@ -647,7 +647,11 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         """Role -> vendor that actually answered (first member before any call)."""
         return {r: v.served or v.members[0].name for r, v in vendor_objs.items()}
 
-    pack = packs.load_pack(root, team.get("pack", "software"))
+    try:
+        pack = packs.load_pack(root, team.get("pack", "software"))
+    except packs.DraftPack as exc:
+        print(f"run: refused: {exc}")
+        return 1
     charter = ""
     if (root / "program.md").exists():
         charter = (root / "program.md").read_text(encoding="utf-8")

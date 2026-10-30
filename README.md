@@ -9,7 +9,7 @@
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-0b0b0c?style=flat-square" alt="version 0.1.0"></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?style=flat-square" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/dependencies-0-0a8a4a?style=flat-square" alt="zero dependencies">
-  <img src="https://img.shields.io/badge/tests-138%20passing-0a8a4a?style=flat-square" alt="138 tests passing">
+  <img src="https://img.shields.io/badge/tests-158%20passing-0a8a4a?style=flat-square" alt="158 tests passing">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0b0b0c?style=flat-square" alt="MIT license"></a>
 </p>
 
@@ -392,6 +392,21 @@ New field? `python kl.py pack new NAME` scaffolds one, and your AI fills it
 in by interviewing you. The first question it must answer is the hard one:
 what automatic metric, and how was it checked against real outcomes?
 Without that, the loop has nothing to learn from.
+
+### Learn a pack from a link or a name
+
+Drop a link (a skill repo, a `SKILL.md`, a `.md` page) or a name, and your AI
+runs `python kl.py pack add <url-or-name>`. keeploop turns it into a pack
+under `packs/<name>/` as a **draft**, never as instant trust: a keeploop pack
+found in the repo is copied as is, otherwise the `SKILL.md` (or `README.md`)
+principles become `taste.md`, with a provenance header (source, time, sha256).
+Only `.md`, `.yaml` and `.csv` come in; code is reported, never copied. The
+import is refused, with nothing written, on a secret, a slop pattern, an
+oversized file, a rubric whose weights do not sum to 100, or a name clash. A
+bare name with several matches lists them for you to pick. A draft refuses to
+load until **you** review it, complete the rubric and run
+`python kl.py pack approve <name>`; `python kl.py pack list` shows each pack's
+status and source. Imported packs live in your project; they are not shipped.
 
 | Pack | For | Status |
 |---|---|---|

@@ -26,6 +26,26 @@ the entry says so under **Changed** with the migration step.
 
 ## [Unreleased]
 
+### Added
+
+- `kl pack add <url-or-name>`: import a profession pack from a skill repo, a
+  `SKILL.md`, a `README.md` or a `.md` link, or resolve a bare name with
+  GitHub search (several matches are listed, never picked). The result is a
+  **draft** with provenance (source, time, sha256); only `.md`/`.yaml`/`.csv`
+  are written, never code. Secrets, slop, oversized files, a rubric that does
+  not sum to 100 or a name clash refuse the import with nothing written.
+- `kl pack approve <name>` (human-only) re-runs the gates with a complete
+  rubric and flips the pack to active; `kl pack list` shows status and source.
+- A draft pack refuses to load (`packs.DraftPack`) in `kl`, `run.py` and the
+  scout until it is approved.
+
+### Fixed
+
+- `kl()` recognises a Windows-style argv0 (`C:\Scripts\kl.exe`) on Linux and
+  macOS; the suite now passes on POSIX too (#1).
+- The scout prints why a source was refused (the exception message), not
+  only its class. The SSRF guard is unchanged.
+
 ## [0.1.0] - 2026-10-29
 
 First public release.

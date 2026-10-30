@@ -25,6 +25,10 @@ from pathlib import Path
 from prepare import load_team
 
 
+class DraftPack(ValueError):
+    """The selected pack was imported by `kl pack add` and is not approved yet."""
+
+
 def discover(root: Path) -> list[str]:
     base = root / "packs"
     if not base.exists():
@@ -43,6 +47,8 @@ def load_pack(root: Path, name: str | None) -> dict | None:
               f"continuing without a pack")
         return None
     meta = load_team(meta_path)
+    if meta.get("status") == "draft":  # imported text is untrusted until a human approves it
+        raise DraftPack(f"pack {name!r} is a draft — run `kl pack approve {name}` after review")
     taste = ""
     for candidate in (meta.get("taste_file"), "taste.md", "SKILL.md"):
         if candidate and (pack_dir / candidate).exists():

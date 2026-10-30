@@ -464,6 +464,61 @@ only to `api.github.com`. `--dry-run` prints and writes nothing.
   outcomes; without a metric the loop cannot learn.
 - Optional `data/` and a search script (`packs/ui-design/search.py`, BM25).
 
+### Importing a pack (`packimport.py`)
+
+```
+kl pack add <source> [--name NAME]   source = https URL or bare name
+kl pack approve <name>               human-only: draft -> active
+kl pack list                         name, status (draft/active/...), source
+```
+
+- **Source.** A GitHub repository URL (`github.com/OWNER/REPO`, optionally
+  `/tree/REF/PATH`) is tried in order: (1) a keeploop pack (`pack.yaml` at
+  PATH, or one folder under PATH/`packs/`; several need `--name`) is copied
+  as is; (2) `SKILL.md` -> its principles section (the first heading naming
+  principles, rules, guidelines, standards, best practices, taste or a
+  checklist, up to the next heading of its level; else the whole body) ->
+  `taste.md`; (3) `README.md`, the same. A direct `.md` link (a GitHub `blob`
+  link is read from raw.githubusercontent.com) is read like (2)/(3); any
+  other page is refused. A bare name runs GitHub repository search for
+  `NAME skill`: exactly one repository whose name equals the name (ignoring
+  `claude-`/`agent-` prefixes and `-skill(s)`/`-pack` suffixes) is used;
+  otherwise up to 5 candidates are listed and the command refuses; none
+  refuses.
+- **Fetch.** Only through `scout._fetch` (https, public addresses on every
+  redirect, 2 MB, fixed User-Agent, 10 s, GITHUB_TOKEN to api.github.com
+  only). Only `.md`, `.yaml`, `.csv` files are written; others are listed in
+  the report as `not imported — code` (or the reason). At most 40 files and
+  two folder levels from one pack; hidden or unsafe names are skipped.
+  Fetched text loses C0/C1 controls (except tab and newline) and bidi
+  overrides.
+- **Draft.** `packs/<name>/`: `taste.md` topped with a provenance header
+  (source URL, fetched_at, sha256 of the fetched text; for a copied pack the
+  hash covers every fetched file and the header lives only in `pack.yaml`),
+  `rubric.md` (the source's own criteria table when it has one with a
+  Weight column, else a skeleton with `TODO` markers), `pack.yaml` with
+  `status: draft` and `source: {url, sha256, imported_at}` (a copied pack's
+  own `status:`/`source:` are replaced). One line is appended to
+  `.keeploop/proposals.md`; a source that never mentions a metric or
+  benchmark adds the metric question to `.keeploop/questions.md`.
+- **Gates** (all before any write; a refusal writes nothing): (1) rubric:
+  parses with `rubric.parse_rubric`, weights sum to 100 ±1 (a skeleton is
+  allowed for a draft); (2) secrets (`run.SECRET_PATTERNS` and secret file
+  names) over all fetched text, the active pack's slop rules over the prose
+  files (`.md`, `.csv`; a `pack.yaml`'s own slop regexes would match
+  themselves); the reason names the kind, never the value; (3) `taste` and
+  `rubric` files within `guardrail_max_chars`; (4) name: an existing active
+  pack, a non-pack folder, or a draft from another source URL is refused; a
+  draft from the same URL is re-imported.
+- **Lifecycle.** `packs.load_pack` raises `DraftPack` for `status: draft`;
+  every `kl` command except `kl pack ...` refuses, and so do `run.py` and the
+  scout. `kl pack approve` re-runs gates 1-3 with a complete rubric (no
+  `TODO`, weights 100 ±1, at least one gate criterion), refuses non-allowed
+  file types in the folder, then flips the `status:` line to `active` and
+  appends a line to `proposals.md`. It is the human's step: it is not in the
+  pre-approved commands. `packs/` is inside the fence, so after add or
+  approve the human runs `kl begin --accept-changes` between cycles.
+
 Shipped: `software` (security and performance specialists, slop markers),
 `ui-design` (searchable styles, palettes, fonts), `marketing-content` (stock
 filler slop patterns).

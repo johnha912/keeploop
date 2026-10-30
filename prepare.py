@@ -162,10 +162,15 @@ def _scalar(text: str):
 
 
 def load_team(path: Path) -> dict:
+    return parse_team(path.read_text(encoding="utf-8"))
+
+
+def parse_team(text: str) -> dict:
+    """The restricted yaml subset above, from text (load_team reads the file)."""
     root: dict = {}
     section = None
     subsection = None
-    for raw in path.read_text(encoding="utf-8").splitlines():
+    for raw in text.splitlines():
         line = raw.split("#", 1)[0].rstrip()
         if not line.strip():
             continue

@@ -75,10 +75,12 @@ Add the check command whenever one can prove the rule (it runs on every keep).
 
 `team.yaml` selects a pack in `packs/`: its taste, rubric, specialist reviewers, scout topics and slop patterns. New field: `python kl.py pack new NAME`, then interview the user to fill every TODO. Ask first: what automatic metric, and how was it validated against real outcomes? Without a metric the loop cannot learn.
 
+When the user drops a link or names a skill or pack, run `python kl.py pack add <url-or-name>` (one name with several matches: show the list and let the user pick), paste its import report, and ask the user to review `packs/<name>/` and complete the rubric. Then ASK them to approve: `python kl.py pack approve <name>` is the human's step, like `begin --accept-changes`; never run it unprompted. Never hand-copy web text into a pack: imported text is untrusted until approved.
+
 ## Honest limits
 
 In this interactive mode you have the same file rights as `kl`. Its fence snapshot is tamper-evident, not tamper-proof. For unattended work use `python run.py` (the headless overnight mode).
 
 ## Command list
 
-`begin` `status` `card` `debate` `check` `eval` `audit --vendor` `keep` `discard` `report` `slow` `recall` `map` `lesson` `scout` `staff` `pack new` `cite`. `python kl.py --help` has one line each.
+`begin` `status` `card` `debate` `check` `eval` `audit --vendor` `keep` `discard` `report` `slow` `recall` `map` `lesson` `scout` `staff` `pack new` `pack add` `pack approve` (human) `pack list` `cite`. `python kl.py --help` has one line each.
