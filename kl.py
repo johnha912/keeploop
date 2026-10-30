@@ -45,7 +45,7 @@ import math
 import re
 import statistics
 import time
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from types import SimpleNamespace
 
 import codemap
@@ -65,7 +65,9 @@ class Refuse(Exception):
 
 def kl() -> str:
     """How the user types this tool: `kl` when pip-installed, else `python kl.py`."""
-    return "kl" if Path(sys.argv[0]).name in ("kl", "kl.exe") else "python kl.py"
+    # PureWindowsPath splits on both "/" and "\", so a Windows-style argv0
+    # (C:\Scripts\kl.exe) is recognised on Linux/macOS too, not only on Windows.
+    return "kl" if PureWindowsPath(sys.argv[0]).name.lower() in ("kl", "kl.exe") else "python kl.py"
 
 
 # --- context and state ------------------------------------------------------
