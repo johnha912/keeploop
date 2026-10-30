@@ -1,0 +1,15 @@
+name: software
+profession: Software engineering
+description: Default pack. Metric from the test suite or benchmark; taste from mainstream engineering practice.
+metric_examples: test pass rate, benchmark score, defect escape rate, build time
+taste_file: taste.md
+rubric_file: rubric.md
+scout_topics: software testing practice, static analysis tools, secure coding, developer productivity, code review
+roles:
+  security:
+    checklist: no new network calls, shell or eval of untrusted input, path traversal, secrets or tokens in code or logs, weakened validation or auth, new dependency without a reason
+  performance:
+    checklist: no new loop-in-loop or per-item I/O or query, no unbounded memory or cache growth, no sync blocking call on a hot path, no work moved from build time to request time
+slop:
+  marker: \b(TODO|FIXME)\b => leftover marker added; finish it or put it in questions.md
+  boilerplate: \bas an ai\b => assistant boilerplate in the change

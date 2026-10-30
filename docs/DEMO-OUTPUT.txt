@@ -1,0 +1,133 @@
+keeploop 0.1.0 demo output. Everything below is real output, captured 2026-10-30 from a fresh
+temp copy of the repo with no .keeploop/, using the mock vendor (offline, no AI CLI needed).
+Statuses and metrics are deterministic across fresh runs; timestamps, hashes and times differ.
+The temp path is shown as <repo>; card files were written outside it, shown as <tmp>/.
+
+==================================================================================
+PART 1 - headless mode: PYTHONDONTWRITEBYTECODE=1 python prepare.py && python run.py --mock --iterations 5
+==================================================================================
+
+--- console ---
+prepare: created results.tsv, lessons.jsonl, guardrails.md, workspace, best.json, scout_seen.json in <repo>\.keeploop
+prepare: done. Next: python run.py --mock --iterations 3
+prepare: <repo>\.keeploop already initialized, nothing overwritten
+run: baseline metric = 0.828178  sigma = 0.000000 (3 runs)  holdout baseline recorded
+cycle 1: keep  metric=0.942  best=0.942000  tokens=3501  time a=0s e=0s v=0s q=0s
+cycle 2: keep  metric=0.992  best=0.992000  tokens=3568  time a=0s e=0s v=0s q=0s
+cycle 3: discard  metric=0.942  best=0.992000  tokens=2820  time a=0s e=0s v=0s q=0s
+cycle 4: crash  metric=None  best=0.992000  tokens=3510  lesson=L-001  time a=0s e=0s v=1s q=0s
+cycle 5: keep  metric=1.0  best=1.000000  tokens=3860  time a=0s e=0s v=0s q=0s
+holdout: 0.818178 -> 0.998000 (+0.179822); evaluation: 0.828178 -> 1.000000 (+0.171822)
+
+run complete: 3 keeps, 1 discards, 1 crashes, 1 lessons, 17259 tokens. Best metric: 1.000000
+time: analyst 1s, engineer 1s, eval 2s, audit 0s
+lessons: 0 enforced, 0 ineffective, 0 effective, 1 provisional
+ledger: <repo>\.keeploop\results.tsv
+
+--- .keeploop/results.tsv ---
+cycle	ts	role_vendors	metric	best_metric	status	tokens	lesson_id	description
+0	2026-10-30T00:05:30+00:00	analyst=mock,engineer=mock,auditor=mock	0.828178	0.828178	keep	0		baseline: untouched workspace
+1	2026-10-30T00:05:31+00:00	analyst=mock,engineer=mock,auditor=mock	0.942000	0.942000	keep	3501		card: Setting learning_rate to 0.03 helps. | verdict: supported | tier: light | audit: APPROVED: diff matches the card; nothing else touched. | rubric: 76 | audit: fresh-context (same vendor)
+2	2026-10-30T00:05:33+00:00	analyst=mock,engineer=mock,auditor=mock	0.992000	0.992000	keep	3568		card: Setting batch_size to 64 helps. | verdict: supported | tier: light | audit: APPROVED: diff matches the card; nothing else touched. | rubric: 76 | audit: fresh-context (same vendor)
+3	2026-10-30T00:05:35+00:00	analyst=mock,engineer=mock,auditor=mock	0.942000	0.992000	discard	2820		card: Setting optimizer to sgd helps. | verdict: rejected | tier: light
+4	2026-10-30T00:05:37+00:00	analyst=mock,engineer=mock,auditor=mock		0.992000	crash	3510	L-001	card: Setting dropout to 1.5 helps. | verdict: untested | engineer failed: INVALID WORKSPACE: dropout out of range [0, 0.9]: 1.5
+5	2026-10-30T00:05:39+00:00	analyst=mock,engineer=mock,auditor=mock	1.000000	1.000000	keep	3860		card: Setting dropout to 0.2 helps. | verdict: supported | tier: light | audit: APPROVED: diff matches the card; nothing else touched. | rubric: 76 | audit: fresh-context (same vendor)
+
+--- .keeploop/hypotheses.jsonl ---
+{"cycle": 1, "ts": "2026-10-30T00:05:31+00:00", "hypothesis": "Setting learning_rate to 0.03 helps.", "reject_if": "the metric does not beat the best so far.", "verdict": "supported", "metric": 0.942, "best_before": 0.828178}
+{"cycle": 2, "ts": "2026-10-30T00:05:33+00:00", "hypothesis": "Setting batch_size to 64 helps.", "reject_if": "the metric does not beat the best so far.", "verdict": "supported", "metric": 0.992, "best_before": 0.942}
+{"cycle": 3, "ts": "2026-10-30T00:05:35+00:00", "hypothesis": "Setting optimizer to sgd helps.", "reject_if": "the metric does not beat the best so far.", "verdict": "rejected", "metric": 0.942, "best_before": 0.992}
+{"cycle": 4, "ts": "2026-10-30T00:05:37+00:00", "hypothesis": "Setting dropout to 1.5 helps.", "reject_if": "the metric does not beat the best so far.", "verdict": "untested", "metric": null, "best_before": 0.992}
+{"cycle": 5, "ts": "2026-10-30T00:05:39+00:00", "hypothesis": "Setting dropout to 0.2 helps.", "reject_if": "the metric does not beat the best so far.", "verdict": "supported", "metric": 1.0, "best_before": 0.992}
+
+--- .keeploop/lessons.jsonl ---
+{"id": "L-001", "ts": "2026-10-30T00:05:37+00:00", "trigger_cycle": 4, "what": "Evaluation crashed: INVALID WORKSPACE: dropout out of range [0, 0.9]: 1.5", "root_cause": "The change left the valid region and nothing the engineer ran caught it first", "guardrail": "Run the project's own eval before finishing; an invalid change is a crash with a lesson, never a silent skip.", "check": null, "status": "active", "retired_ts": null}
+
+==================================================================================
+PART 2 - interactive mode: a real kl session (your AI is the CEO; kl only measures,
+gates, records and refuses). Same copy, state reset first (rm -rf .keeploop; python prepare.py).
+The workspace edits (sed on config.json) stand in for the Engineer.
+Cycle 1: a card that improves the metric, kept. Cycle 2: a card that worsens it
+(dropout 0.9): kl keep refuses, then discard, then report.
+==================================================================================
+
+$ python kl.py begin
+kl: baseline metric = 0.828178  sigma = 0.000000 (3 runs)  holdout baseline recorded
+best 0.828178  sigma 0.000000  keep-bar 0.828178  | cycles 0 (keep 0, discard 0, crash 0)
+workspace: <repo>\.keeploop\workspace
+pending card: none
+open lessons: none
+open questions: 0
+next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
+[exit 0]
+
+$ python kl.py recall "learning rate"
+nothing in memory matches; it is new
+[exit 0]
+
+$ python kl.py card <tmp>/c1.txt
+card 1 registered
+[exit 0]
+
+$ sed -i 's/"learning_rate": 0.01/"learning_rate": 0.03/' .keeploop/workspace/config.json && git -C .keeploop/workspace diff --stat
+ config.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ python kl.py check
+PASS tier=light files=1 lines=2 diff=be28f0079be6
+[exit 0]
+
+$ python kl.py eval
+metric 0.942000  keep-bar 0.828178  best 0.828178  -> beats the bar
+[exit 0]
+
+$ python kl.py keep
+KEPT cycle 1: metric 0.942000 (bar 0.828178); best is now 0.942000
+[exit 0]
+
+$ python kl.py card <tmp>/c2.txt
+card 2 registered
+[exit 0]
+
+$ sed -i 's/"dropout": 0.1/"dropout": 0.9/' .keeploop/workspace/config.json && git -C .keeploop/workspace diff --stat
+ config.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ python kl.py check
+PASS tier=light files=1 lines=2 diff=7ca4aee9b7cd
+[exit 0]
+
+$ python kl.py eval
+metric 0.558000  keep-bar 0.942000  best 0.942000  -> does not beat the bar (noise or worse)
+[exit 0]
+
+$ python kl.py keep
+kl: REFUSED: metric 0.558000 does not beat the keep bar 0.942000 (best 0.942000, sigma 0.000000)
+[exit 1]
+
+$ python kl.py discard --reason "dropout 0.9 lowers the metric"
+discarded cycle 2 (discard); workspace back at best 0.942000
+[exit 0]
+
+$ python kl.py report
+keeploop report (from .keeploop/, not from memory)
+cycles: 2  keeps: 1  discards: 1  crashes: 0
+baseline: 0.828178  best: 0.942000
+gain over baseline: +0.113822
+holdout: baseline recorded, final not scored yet (headless run.py scores it)
+hypotheses: rejected 1, supported 1
+lessons: none
+open questions: 0
+tokens recorded: 0
+time per phase: eval 1s, agent 7s  | slowest: agent (90%)  | last cycle: 4s
+[exit 0]
+
+--- .keeploop/results.tsv ---
+cycle	ts	role_vendors	metric	best_metric	status	tokens	lesson_id	description
+0	2026-10-30T00:05:42+00:00	interactive	0.828178	0.828178	keep	0		baseline: untouched workspace
+1	2026-10-30T00:05:48+00:00	interactive	0.942000	0.942000	keep	0		card: A learning rate near 0.03 scores higher than 0.01 because training converges faster. | verdict: supported | tier: light
+2	2026-10-30T00:05:53+00:00	interactive	0.558000	0.942000	discard	0		card: Heavy dropout (0.9) regularises the model and raises the metric. | verdict: rejected | discard: dropout 0.9 lowers the metric
+
+--- .keeploop/hypotheses.jsonl ---
+{"cycle": 1, "ts": "2026-10-30T00:05:48+00:00", "hypothesis": "A learning rate near 0.03 scores higher than 0.01 because training converges faster.", "reject_if": "the metric does not beat the keep bar.", "verdict": "supported", "metric": 0.942, "best_before": 0.942}
+{"cycle": 2, "ts": "2026-10-30T00:05:53+00:00", "hypothesis": "Heavy dropout (0.9) regularises the model and raises the metric.", "reject_if": "the metric is below the best so far.", "verdict": "rejected", "metric": 0.558, "best_before": 0.942}

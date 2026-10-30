@@ -1,0 +1,11 @@
+name: marketing-content
+profession: Marketing and content
+description: Content pack for research-driven marketing work. Metric from the channel (CTR, conversion, retention); taste from market-research practice.
+metric_examples: click-through rate, conversion rate, watch time, reply rate, qualified leads
+taste_file: taste.md
+rubric_file: rubric.md
+slop:
+  filler1: (?i)in today's fast-paced world => stock filler opener
+  filler2: (?i)unlock the power => stock filler
+  filler3: (?i)\bgame-?changer\b => empty superlative
+  filler4: (?i)\bdelve\b => stock filler verb
