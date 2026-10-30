@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python kl.py status)",
+      "Bash(python kl.py report)",
+      "Bash(python kl.py report *)",
+      "Bash(python kl.py slow)",
+      "Bash(python kl.py recall *)",
+      "Bash(python kl.py map)",
+      "Bash(python kl.py map *)",
+      "Bash(python kl.py card *)",
+      "Bash(python kl.py debate *)",
+      "Bash(python kl.py check)",
+      "Bash(python kl.py eval)",
+      "Bash(python kl.py keep)",
+      "Bash(python kl.py keep *)",
+      "Bash(python kl.py discard *)",
+      "Bash(python kl.py staff)",
+      "Bash(python kl.py staff --goal *)",
+      "Bash(python kl.py scout)",
+      "Bash(python kl.py scout --dry-run)"
+    ],
+    "ask": [
+      "Bash(python kl.py begin --accept-changes*)",
+      "Bash(python kl.py staff --apply*)",
+      "Bash(python kl.py staff * --apply*)",
+      "Bash(python kl.py lesson *)",
+      "Bash(python kl.py audit *)",
+      "Bash(python kl.py cite *)"
+    ]
+  }
+}

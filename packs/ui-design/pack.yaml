@@ -1,0 +1,6 @@
+name: ui-design
+profession: UI/UX design
+description: Design pack pairing craft principles (taste) with a searchable reference base of styles, palettes, and font pairings, in the spirit of data-driven design skills.
+metric_examples: task completion rate, time on task, accessibility audit score, design rubric score
+taste_file: taste.md
+rubric_file: rubric.md

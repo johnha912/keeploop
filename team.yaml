@@ -1,0 +1,64 @@
+# team.yaml — the one config file you edit.
+# Roles -> vendors -> budgets. Vendor names: mock, claude-cli, codex-cli,
+# gemini-cli (api:* lands in v0.2). The auditor must not be the vendor that
+# engineered the change; if both name the same vendor, the loop runs the
+# audit in a fresh context and flags the verdict (see docs/SPEC.md).
+
+pack: software
+
+# The git repository the team edits (relative to this folder, or absolute).
+# It must be a clean git repo: the loop resets
+# and cleans it after every cycle. The demo workspace is created by prepare.py.
+workspace: .keeploop/workspace
+
+# Comma-separated paths or globs inside the workspace that no change may touch
+# (a diff touching one is a crash plus a lesson). Case-insensitive; no absolute
+# paths or `..`. Example:
+# protect: tests, evaluate.py, *.lock
+
+# Globs (same rules as protect) that make a change "heavy": the confirm re-run
+# is forced and the auditor uses its heavy_model. A diff over loop heavy_diff_lines
+# lines is heavy too. Default when absent: manifests, lockfiles, Dockerfile, CI,
+# migrations. `heavy:` with no value means size only.
+# heavy: requirements*.txt, pyproject.toml, *.lock, migrations/*
+
+# Per role, optional: model (passed to the CLI as --model) and, for the auditor,
+# heavy_model. Letters, digits and . _ : / - only. Applies to every CLI in a
+# `vendor: a, b` fallback list, so set it for single-vendor roles.
+# Any other CLI can serve a role with no code change. The prompt goes on stdin,
+# no shell is used, secret-looking env vars are scrubbed except those under
+# env_keep prefixes (the CLI's own API key). The flags below are placeholders:
+# CHECK YOUR CLI'S DOCS for its non-interactive flag, its edit-permission flag
+# and its model flag. Then use `vendor: myvendor` in a role.
+# vendors:
+#   myvendor:
+#     cmd: mycli --print          # binary plus the flag that reads stdin and prints
+#     edit_args: --allow-edits    # added for the engineer only
+#     model_flag: --model
+#     env_keep: MYVENDOR_
+
+# Staffing (used only by `kl staff --apply`; delete to forbid auto-edits). It may
+# set roles.<name>.model / heavy_model from allow_models and token_budget up to
+# max_tokens_per_role. It never touches loop.max_run_tokens or anything else.
+# staffing:
+#   allow_models: model-a, model-b     # cheapest first
+#   max_tokens_per_role: 60000
+
+roles:
+  analyst:
+    vendor: mock
+    token_budget: 30000
+  engineer:
+    vendor: mock
+    token_budget: 50000
+  auditor:
+    vendor: mock
+    token_budget: 30000
+
+loop:
+  max_iterations: 20
+  keep_threshold: 0.0
+
+# Optional: flag cycles slower than this many seconds in `kl report`, and use it as
+# the target `kl slow` proposes for a lesson check. Default: none.
+# cycle_time_budget_s: 300

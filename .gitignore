@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.keeploop/
+.venv/
+venv/
+dist/
+*.egg-info/
+.DS_Store
+.playwright-mcp/

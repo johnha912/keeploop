@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keeploop"
+dynamic = ["version"]
+description = "An autoresearch-style keep/discard loop for any git repo, with cross-vendor audit, deterministic QC gates, a never-repeat lesson engine and a trend scout."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+kl = "kl:main"
+
+[tool.setuptools]
+py-modules = ["prepare", "run", "kl", "vendors", "ledger", "lessons", "scout",
+              "packs", "rubric", "evaluate", "bm25", "codemap", "holdout"]
+
+[tool.setuptools.dynamic]
+version = { attr = "prepare.__version__" }
