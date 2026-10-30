@@ -33,8 +33,13 @@ GATE_CAP = 49.0
 def load_rubric(path: Path | None) -> list[dict] | None:
     if path is None or not Path(path).exists():
         return None
+    return parse_rubric(Path(path).read_text(encoding="utf-8"))
+
+
+def parse_rubric(text: str) -> list[dict] | None:
+    """The criteria rows of a rubric.md text (the loader `load_rubric` uses)."""
     criteria = []
-    for line in Path(path).read_text(encoding="utf-8").splitlines():
+    for line in text.splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) < 3 or not cells[1].isdigit():
             continue

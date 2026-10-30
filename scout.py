@@ -225,7 +225,11 @@ def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
 
     # a pack's scout_topics replace the generic AI-workflow queries and terms
     team = load_team(root / "team.yaml") if (root / "team.yaml").exists() else {}
-    topics = packs.scout_topics(packs.load_pack(root, team.get("pack", "software")))
+    try:
+        topics = packs.scout_topics(packs.load_pack(root, team.get("pack", "software")))
+    except packs.DraftPack as exc:
+        print(f"scout: refused: {exc}")
+        return 1
     base_terms = [w for t in topics for w in re.findall(r"[a-z0-9]{3,}", t.lower())] or TERMS
     fetched = {i["url"]: i for i in
                (fetch_hn(topics) if topics else fetch_hn()) + fetch_arxiv()

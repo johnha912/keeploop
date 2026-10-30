@@ -21,6 +21,9 @@ every command except `kl audit --vendor` runs with no AI CLI installed.
     python kl.py cite FILE              opt-in network: dead links, missing quotes
     python kl.py staff [--apply]        staffing proposal from the ledger
     python kl.py pack new NAME          scaffold a profession pack
+    python kl.py pack add SOURCE        import a pack from a link or a name, as a DRAFT
+    python kl.py pack approve NAME      human-only: re-run the gates, draft -> active
+    python kl.py pack list              packs with status and source
 
 HONEST LIMIT: in interactive mode the user's AI has the same file rights as kl.
 The fence snapshot and the best.json seal in .keeploop/ are TAMPER-EVIDENT (a
@@ -51,6 +54,7 @@ from types import SimpleNamespace
 import codemap
 import ledger
 import lessons
+import packimport
 import packs
 import rubric as rubric_mod
 import run as R
@@ -72,7 +76,9 @@ def kl() -> str:
 
 # --- context and state ------------------------------------------------------
 
-def load(root: Path) -> SimpleNamespace:
+def load(root: Path, need_pack: bool = True) -> SimpleNamespace:
+    """need_pack=False (the `pack` commands): a draft pack selected in team.yaml
+    is tolerated, so `kl pack approve` can still run."""
     root = root.resolve()
     with contextlib.redirect_stdout(io.StringIO()):
         state = setup(root)
@@ -82,7 +88,12 @@ def load(root: Path) -> SimpleNamespace:
         raise Refuse(str(exc))
     c = SimpleNamespace(root=root, state=state, **cfg)
     c.roles = c.team.get("roles") if isinstance(c.team.get("roles"), dict) else {}
-    c.pack = packs.load_pack(root, c.team.get("pack", "software"))
+    try:
+        c.pack = packs.load_pack(root, c.team.get("pack", "software"))
+    except packs.DraftPack as exc:
+        if need_pack:
+            raise Refuse(str(exc))
+        c.pack = None
     c.criteria = rubric_mod.load_rubric(c.pack["rubric_path"]) if c.pack else None
     return c
 
@@ -882,6 +893,23 @@ Anchors: TODO 90+ = ..., 70 = ..., 50 = ..., below 50 on a gate = hard fail.
 
 
 def cmd_pack(c, a) -> int:
+    if a.action == "list":
+        print("\n".join(packimport.listing(c.root)))
+        return 0
+    if not a.name:
+        raise Refuse(f"`{kl()} pack {a.action}` needs " + ("a source (https URL or name)"
+                                                            if a.action == "add" else "a NAME"))
+    if a.action in ("add", "approve"):
+        slop, cap = packs.slop_rules(c.pack), c.loop_cfg.get(
+            "guardrail_max_chars", packimport.CONFIG["guardrail_max_chars"])
+        try:
+            lines = (packimport.add(c.root, c.state, a.name, a.as_name, slop=slop, cap=cap)
+                     if a.action == "add" else
+                     packimport.approve(c.root, c.state, a.name, slop=slop, cap=cap))
+        except packimport.ImportRefused as exc:
+            raise Refuse(f"pack {a.action}: {exc}")
+        print("\n".join(lines))
+        return 0
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,40}", a.name):
         raise Refuse("pack name: lowercase letters, digits and - only")
     if re.fullmatch(r"(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?", a.name, re.I):
@@ -939,9 +967,10 @@ def parser() -> argparse.ArgumentParser:
     s = sub.add_parser("recall", help="BM25 over lessons, hypotheses, debates, questions, ledger")
     s.add_argument("query")
     s.add_argument("--top", type=int, default=5)
-    s = sub.add_parser("pack", help="pack new NAME")
-    s.add_argument("action", choices=["new"])
-    s.add_argument("name")
+    s = sub.add_parser("pack", help="pack new NAME | add SOURCE [--name N] | approve NAME | list")
+    s.add_argument("action", choices=["new", "add", "approve", "list"])
+    s.add_argument("name", nargs="?", help="pack name, or for `add` an https URL or a bare name")
+    s.add_argument("--name", dest="as_name", help="add: the pack folder name (default: from the source)")
     return p
 
 
@@ -962,7 +991,7 @@ def main(argv: list[str] | None = None) -> int:
             return (lessons.main(argv[1:], c.state, c.loop_cfg) if argv[0] == "lesson"
                     else scout.main(argv[1:], c.root))
         a = parser().parse_args(argv)
-        return COMMANDS[a.cmd](load(root), a)
+        return COMMANDS[a.cmd](load(root, need_pack=a.cmd != "pack"), a)
     except Refuse as exc:
         print(f"kl: REFUSED: {exc}")
         return 1

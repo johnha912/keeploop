@@ -19,7 +19,7 @@ kl = "kl:main"
 
 [tool.setuptools]
 py-modules = ["prepare", "run", "kl", "vendors", "ledger", "lessons", "scout",
-              "packs", "rubric", "evaluate", "bm25", "codemap", "holdout"]
+              "packs", "packimport", "rubric", "evaluate", "bm25", "codemap", "holdout"]
 
 [tool.setuptools.dynamic]
 version = { attr = "prepare.__version__" }
