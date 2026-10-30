@@ -103,7 +103,7 @@ def _fetch(url: str, as_json: bool = True):
         return json.loads(body) if as_json else body
     except Exception as exc:  # offline, blocked, malformed — all survivable
         print(f"scout: source unavailable ({urllib.parse.urlsplit(url).hostname}): "
-              f"{exc.__class__.__name__}")
+              f"{exc.__class__.__name__}: {exc}")
         return None
 
 
