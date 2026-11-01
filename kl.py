@@ -45,7 +45,7 @@ import math
 import re
 import statistics
 import time
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from types import SimpleNamespace
 
 import codemap
@@ -65,7 +65,8 @@ class Refuse(Exception):
 
 def kl() -> str:
     """How the user types this tool: `kl` when pip-installed, else `python kl.py`."""
-    return "kl" if Path(sys.argv[0]).name in ("kl", "kl.exe") else "python kl.py"
+    # PureWindowsPath splits on both / and \ on every OS (Path does not on POSIX)
+    return "kl" if PureWindowsPath(sys.argv[0]).name in ("kl", "kl.exe") else "python kl.py"
 
 
 # --- context and state ------------------------------------------------------
@@ -210,12 +211,17 @@ def _learn(c, lesson, n) -> str:
 def _evaluate(c, script="evaluate.py"):
     return R.guarded(c.root, c.workspace, "evaluate",
                      lambda: R.evaluate_workspace(c.root, c.workspace, script,
-                                                  c.loop_cfg["eval_timeout_s"]))
+                                                  c.loop_cfg["eval_timeout_s"],
+                                                  eval_cmd=c.team.get("eval_cmd")))
 
 
-def _gates(c, best):
+def _gates(c, best, parsed=None):
     changed, diff, heavy, fail = R.qc_gates(c.workspace, best["commit"], c.protect,
                                             c.heavy_globs, c.loop_cfg, packs.slop_rules(c.pack))
+    if R.is_measurement(parsed):  # tested by measurement alone: an empty diff is the point
+        if changed:
+            fail = ("crash", "measurement card must not edit files", R.L_MEASURE_EDIT)
+        return changed, diff, heavy, fail
     if not changed and not fail:
         fail = ("crash", "no files were changed", R.L_NO_CHANGE)
     return changed, diff, heavy, fail
@@ -378,13 +384,20 @@ def cmd_debate(c, a) -> int:
 
 def cmd_check(c, a) -> int:
     best = _best(c)
+    cy = _cycle(c)
+    if "card" not in cy:
+        print(f"FAIL no open card: run `{kl()} card FILE` first")
+        return 1
     _fence_check(c)
-    changed, diff, heavy, fail = _gates(c, best)
+    changed, diff, heavy, fail = _gates(c, best, cy["parsed"])
     if fail:
         _put(c, fail=list(fail))
         print(f"FAIL {fail[1]}")
         return 1
     _put(c, fail=None)
+    if R.is_measurement(cy["parsed"]):
+        print("PASS measurement card, no diff expected")
+        return 0
     print(f"PASS tier={'heavy' if heavy else 'light'} files={len(changed)} "
           f"lines={R.diff_size(c.workspace)} diff={hashlib.sha256(diff.encode()).hexdigest()[:12]}")
     return 0
@@ -414,6 +427,8 @@ def cmd_audit(c, a) -> int:
     cy = _cycle(c)
     if "card" not in cy:
         raise Refuse("no registered card: `kl card` first")
+    if R.is_measurement(cy["parsed"]):
+        raise Refuse(f"measurement card: no diff to audit; `{kl()} discard --reason \"<evidence>\"`")
     _fence_check(c)
     changed, diff, heavy, fail = _gates(c, best)
     if fail:
@@ -451,6 +466,8 @@ def cmd_keep(c, a) -> int:
     if a.card is not None and a.card != cy["n"]:
         raise Refuse(f"open card is {cy['n']}, not {a.card}")
     n, parsed = cy["n"], cy["parsed"]
+    if R.is_measurement(parsed):
+        raise Refuse("measurement card: nothing to keep; `kl discard` it (verdict refuted)")
     _fence_check(c)
     changed, diff, heavy, fail = _gates(c, best)
     if fail:
@@ -510,8 +527,12 @@ def cmd_keep(c, a) -> int:
 
 def cmd_discard(c, a) -> int:
     best = _best(c)
+    if a.refuted and not a.reason.strip():
+        raise Refuse("--refuted needs --reason \"<the evidence>\"")
     _fence_check(c)  # never run git in a workspace whose config may be poisoned
     cy = _cycle(c)
+    if a.refuted and (cy.get("fail") or ["discard"])[0] == "crash":
+        raise Refuse("a crash is not evidence: discard it without --refuted")
     R._revert(c.workspace, best["commit"])
     fail = cy.get("fail")
     if "card" not in cy and not fail:
@@ -525,7 +546,8 @@ def cmd_discard(c, a) -> int:
     notes = [f"card: {cy['parsed']['hypothesis'][:90]}"] if "card" in cy else []
     notes += ([fail[1]] if fail else []) + ([f"discard: {a.reason}"] if a.reason else [])
     if "card" in cy:
-        verdict = R.verdict_of(status, metric, _bar(c, best))
+        verdict = R.verdict_of(status, metric, _bar(c, best),
+                               a.refuted or R.is_measurement(cy["parsed"]))
         notes.insert(1, f"verdict: {verdict}")
         R.record_hypothesis(c.state, n, cy["parsed"], verdict, metric, best["metric"])
     _log_time(c, n)
@@ -916,6 +938,8 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--tokens", type=int, default=0)
     s = sub.add_parser("discard", help="reset to best + ledger row")
     s.add_argument("--reason", default="")
+    s.add_argument("--refuted", action="store_true",
+                   help="examined and rejected on evidence without an eval (needs --reason)")
     s.add_argument("--tokens", type=int, default=0)
     s = sub.add_parser("debate", help="record the one critic round of a heavy card")
     s.add_argument("card_id", type=int)
