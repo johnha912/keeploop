@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Language line: to add a language, append ` | <a href="README.xx.md">Name</a>` here and in every README.*.md -->
-  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a>
+  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a>
 </p>
 
 <p align="center">

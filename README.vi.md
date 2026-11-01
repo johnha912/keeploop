@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Dòng ngôn ngữ: muốn thêm ngôn ngữ, nối thêm ` | <a href="README.xx.md">Tên</a>` ở đây và trong mọi README.*.md -->
-  <a href="README.md">English</a> | <b>Tiếng Việt</b>
+  <a href="README.md">English</a> | <b>Tiếng Việt</b> | <a href="README.zh-CN.md">简体中文</a>
 </p>
 
 <p align="center">
