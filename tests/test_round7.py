@@ -271,8 +271,8 @@ class TestC1LoopOverrides(Base):
         with mock.patch.object(vendors, "MockVendor", Spy), \
                 mock.patch.object(vendors, "get_vendor", lambda n, timeout_s=0, **k: (
                     got["vt"].add(timeout_s), gv(n, timeout_s=timeout_s, **k))[1]), \
-                mock.patch.object(run_mod, "evaluate_workspace", lambda r, w, s="evaluate.py", t=None: (
-                    got["et"].add(t), ew(r, w, s, t))[1]), \
+                mock.patch.object(run_mod, "evaluate_workspace", lambda r, w, s="evaluate.py", t=None, **k: (
+                    got["et"].add(t), ew(r, w, s, t, **k))[1]), \
                 contextlib.redirect_stdout(io.StringIO()):
             run_mod.run(p.work, mock=True, iterations=1)
         self.assertEqual((got["budget"], got["vt"], got["et"]), ({12000}, {11}, {7}))

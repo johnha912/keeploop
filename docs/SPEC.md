@@ -66,8 +66,13 @@ Headless (`run.py`, `cycle()`); the interactive mapping follows.
               the next human hypotheses). A lesson with a check is not
               injected; its check runs on every keep.
               Card = labelled lines: HYPOTHESIS, ALTERNATIVES, CHANGE, EXPECT,
-              REJECT IF, MISSING, optional DIFFERENT and TIER. Workspace
-              reverted after the call.
+              REJECT IF, MISSING, optional DIFFERENT, TIER and MEASUREMENT.
+              Workspace reverted after the call.
+              `MEASUREMENT: yes` (interactive `kl` only; run.py ignores it):
+              tested by measuring, no diff expected. `kl check` passes an
+              empty diff and fails any edit ("measurement card must not edit
+              files"); `kl keep` refuses it; `kl discard` records status
+              `discard`, verdict `refuted`, no lesson.
               - HYPOTHESIS, CHANGE, REJECT IF or MISSING missing -> crash + lesson.
               - REJECT IF not falsifiable (names `metric`, or a number with
                 < > <= >= below above under over at least at most fewer more)
@@ -93,6 +98,14 @@ Headless (`run.py`, `cycle()`); the interactive mapping follows.
               Tier: heavy if lines > heavy_diff_lines or a changed path
               matches the heavy globs, else light.
 4. EVALUATE   python evaluate.py <workspace> -> one float, or crash.
+              Optional team.yaml `eval_cmd` replaces that command in every
+              evaluation (baseline, eval, keep, confirm, audit, run.py):
+              shlex-split argv, no shell, cwd = workspace, same timeout, fence
+              and scrubbed env; the metric is the last non-empty stdout line.
+              Non-zero exit, timeout, a program that cannot start or an
+              unparsable last line = evaluation crash. holdout.py is not
+              replaced. Value starting and ending with a quote: wrap it in
+              one more pair. On Windows use / in paths (shlex eats `\`).
               Repairable (empty diff, evaluation crash): up to engineer_repairs
               more Engineer calls with the error. Still failing -> crash +
               lesson. Repaired -> the first failure still gets its lesson.
@@ -153,7 +166,7 @@ the fence snapshot; every later command refuses (exit 2) if it changed.
 | 4-5 Evaluate | `eval` | Fenced `evaluate.py` against the keep bar. |
 | 6 Audit | (fresh-context Auditor) or `audit --vendor NAME [--model M]` | The only command that needs an AI CLI. Output ends with `DIFF: <id>`. |
 | 7 Decide | `keep [--audit-verdict FILE]` | Re-runs fence, gates, evaluation, bar, audit verdict (diff id must match; heavy requires it), rubric regression, confirm, lesson replay; commits only if all hold. |
-| 7 Decide | `discard [--reason]` | Reset to best, ledger row, verdict, lesson if a gate failed. |
+| 7 Decide | `discard [--refuted] [--reason]` | Reset to best, ledger row, verdict, lesson if a gate failed. `--refuted` (needs `--reason`, refused after a crash) records verdict `refuted`. |
 | 8 Record | `report`, `slow` | Facts from the ledger; bottleneck phase and levers. |
 | Staffing | `staff [--goal speed\|quality\|cost] [--apply]` | Section 4. |
 | Packs, memory | `pack new NAME`, `lesson ...`, `scout ...`, `cite FILE` | |
@@ -247,8 +260,10 @@ value.
 Verdicts (`verdict_of`, plus the duplicate path): `supported` (keep),
 `rejected` (metric did not beat the bar), `inconclusive` (metric beat the
 bar, keep blocked by audit, rubric, confirm or replay), `untested` (crash,
-or no metric), `duplicate` (refused by the precheck, `metric` null). The last
-20 rejected or inconclusive rows (2000 chars max) are shown to the Analyst
+or no metric), `refuted` (`kl discard --refuted`, or a measurement card:
+examined and rejected on evidence without an eval; never a crash),
+`duplicate` (refused by the precheck, `metric` null). The last
+20 rejected, inconclusive or refuted rows (2000 chars max) are shown to the Analyst
 as "already tested". Bullets under `## Hypotheses to test` in `program.md`
 that no registry hypothesis contains (case-insensitive, whitespace
 collapsed) are offered first, five at most.

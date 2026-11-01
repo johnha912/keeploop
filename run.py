@@ -36,6 +36,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import statistics
 import subprocess
 import sys
@@ -77,6 +78,10 @@ L_NO_CARD = ("Analyst gave no pre-registered card",
 L_NO_CHANGE = ("Engineer made no change",
                "The card was not turned into a file edit",
                "The Engineer must edit files in the workspace; an empty diff is a failure.")
+L_MEASURE_EDIT = ("Measurement card edited files",
+                  "The card said MEASUREMENT: yes (no diff expected) but the workspace changed",
+                  "A measurement card is tested by measuring only: never edit files for it; "
+                  "drop the label if the card needs a change.")
 L_TAMPER = ("Agent-run code changed files outside the workspace or hid a change from git",
             "Nothing but the fingerprint fence stops code with write access",
             "Change files only inside the workspace; evaluation, charter, config "
@@ -122,7 +127,7 @@ def _write_json(path: Path, data: dict) -> None:
 
 
 CARD_LABEL = re.compile(
-    r"^[ \t>*#-]*(HYPOTHESIS|ALTERNATIVES|CHANGE|EXPECT|REJECT IF|MISSING|DIFFERENT|TIER)"
+    r"^[ \t>*#-]*(HYPOTHESIS|ALTERNATIVES|CHANGE|EXPECT|REJECT IF|MISSING|DIFFERENT|TIER|MEASUREMENT)"
     r"[ \t]*\**[ \t]*:[ \t]*\**", re.I | re.M)
 NO_QUESTION = ("", "none", "n/a", "-")
 # Manifests, lockfiles, CI and migrations: a change here is heavy whatever its size.
@@ -148,7 +153,8 @@ def parse_card(text: str) -> dict | None:
     """Labelled card -> {hypothesis, alternatives, change, expect, reject_if,
     missing, different}; None unless HYPOTHESIS, CHANGE, REJECT IF and MISSING
     are all there. DIFFERENT (what is new about a re-proposed card) and TIER
-    (`heavy` when the card declares a heavy change) are optional."""
+    (`heavy` when the card declares a heavy change) and MEASUREMENT (`yes`: tested by
+    measurement alone, no diff expected) are optional."""
     hits = list(CARD_LABEL.finditer(text))
     card = {}
     for m, nxt in zip(hits, hits[1:] + [None]):
@@ -158,7 +164,11 @@ def parse_card(text: str) -> dict | None:
         return None
     return {k: card.get(k, "") for k in
             ("hypothesis", "alternatives", "change", "expect", "reject_if", "missing",
-             "different", "tier")}
+             "different", "tier", "measurement")}
+
+
+def is_measurement(parsed: dict | None) -> bool:
+    return bool(parsed) and parsed.get("measurement", "").strip().lower().startswith(("yes", "true"))
 
 
 _COMPARE = re.compile(r"<=|>=|<|>|\b(below|above|under|over|at least|at most|fewer|more)\b", re.I)
@@ -206,10 +216,13 @@ def read_hypotheses(state: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
+REJECTED = ("rejected", "inconclusive", "refuted")  # verdicts that mean "examined, not repeated"
+
+
 def already_tested(rows: list[dict]) -> str:
-    """Last 20 rejected/inconclusive hypotheses, newest first, capped at 2000 chars."""
+    """Last 20 rejected/inconclusive/refuted hypotheses, newest first, capped at 2000 chars."""
     out, used = [], 0
-    for r in [r for r in rows if r["verdict"] in ("rejected", "inconclusive")][-20:][::-1]:
+    for r in [r for r in rows if r["verdict"] in REJECTED][-20:][::-1]:
         line = f"- cycle {r['cycle']} [{r['verdict']}]: {r['hypothesis']}"
         if used + len(line) > 2000:
             break
@@ -371,20 +384,32 @@ def keep_bar(best: float, keep_threshold: float, noise_z: float, sigma: float) -
 
 
 def evaluate_workspace(root: Path, workspace: Path, script: str = "evaluate.py",
-                       timeout: int | None = None) -> tuple[float | None, str]:
+                       timeout: int | None = None,
+                       eval_cmd: str | None = None) -> tuple[float | None, str]:
     """Run a fixed scorer (evaluate.py, or holdout.py) on the workspace.
     Returns (metric, error); the error text is stripped of control characters.
     run() calls this inside guard(); no secrets in its environment, and no
-    .pyc written next to the scorer (that would trip the fence)."""
+    .pyc written next to the scorer (that would trip the fence).
+    `eval_cmd` (team.yaml, callers pass the merged value) replaces evaluate.py only:
+    shlex-split argv, no shell, cwd = workspace; holdout.py is never replaced."""
     timeout = timeout or CONFIG["eval_timeout_s"]  # callers pass the project's merged value
+    argv, cwd = [sys.executable, str(root / script), str(workspace)], None
+    if eval_cmd and script == "evaluate.py":
+        try:
+            argv, cwd = shlex.split(str(eval_cmd)), workspace
+        except ValueError as exc:
+            return None, f"eval_cmd is not parseable: {exc}"
+        if not argv:
+            return None, "eval_cmd is empty"
     try:
         proc = subprocess.run(
-            [sys.executable, str(root / script), str(workspace)],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=timeout,
+            argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=timeout, cwd=cwd,
             env={**safe_env(), "PYTHONDONTWRITEBYTECODE": "1", "PYTHONUTF8": "1"})
     except subprocess.TimeoutExpired:
         return None, f"evaluation timed out after {timeout}s"
+    except OSError as exc:  # eval_cmd names a program that cannot start
+        return None, re.sub(CONTROL_RX, " ", f"eval_cmd could not start: {exc}")
     if proc.returncode != 0:
         err = (proc.stderr.strip().splitlines() or ["evaluation crashed"])[-1]
         return None, re.sub(CONTROL_RX, " ", err)
@@ -501,7 +526,7 @@ def duplicate_of(parsed: dict, rows: list[dict], threshold: float) -> int | None
     if parsed["different"].strip(" .").lower() not in NO_QUESTION:
         return None
     twin = max(((jaccard(parsed["hypothesis"], r["hypothesis"]), r["cycle"])
-                for r in rows if r["verdict"] in ("rejected", "inconclusive")),
+                for r in rows if r["verdict"] in REJECTED),
                default=(0.0, 0))
     return twin[1] if twin[0] >= threshold else None
 
@@ -583,8 +608,11 @@ def record_hypothesis(state: Path, n: int, parsed: dict, verdict: str,
             "metric": metric, "best_before": best_before}) + "\n")
 
 
-def verdict_of(status: str, metric: float | None, bar_before: float) -> str:
+def verdict_of(status: str, metric: float | None, bar_before: float,
+               refuted: bool = False) -> str:
+    """`refuted` = examined and rejected on evidence without an eval; a crash never is."""
     return ("supported" if status == "keep"
+            else "refuted" if refuted and status != "crash"
             else "untested" if status == "crash" or metric is None
             else "inconclusive" if metric > bar_before else "rejected")
 
@@ -685,7 +713,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
     def evaluate(script="evaluate.py", part=None):
         return timed("v", lambda: guard(
             "evaluate", lambda: evaluate_workspace(
-                root, workspace, script, loop_cfg["eval_timeout_s"])), part)
+                root, workspace, script, loop_cfg["eval_timeout_s"],
+                eval_cmd=team.get("eval_cmd"))), part)
 
     def call(role, prompt, heavy=False, part=None):
         v = heavy_auditor if heavy and role == "auditor" and heavy_auditor else vendor_objs[role]
