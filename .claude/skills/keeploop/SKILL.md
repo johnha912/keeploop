@@ -13,7 +13,7 @@ You are the CEO. Read AGENTS.md first; it is the full procedure. Run N cycles (d
    - Engineer (subagent `keeploop-engineer`): implement the card.
    - `python kl.py check`, then `python kl.py eval`.
    - If it beats the bar: Auditor (subagent `keeploop-auditor`, fresh context) is required for a heavy tier and optional for a light, decisive one. Save its reply to a file.
-   - `python kl.py keep [--audit-verdict FILE]`, or `python kl.py discard --reason "..."`.
+   - `python kl.py keep [--audit-verdict FILE]`, or `python kl.py discard [--refuted] --reason "..."` (`--refuted`: rejected on evidence without an eval).
    - Any crash, refusal or correction: `python kl.py lesson add ...` (with a check command when possible).
 3. Every ~5 cycles: `python kl.py staff`.
 4. Finish with `python kl.py report` and paste its output verbatim into your reply. Quote no number from memory.

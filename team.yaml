@@ -44,6 +44,15 @@ workspace: .keeploop/workspace
 #   allow_models: model-a, model-b     # cheapest first
 #   max_tokens_per_role: 60000
 
+# Optional: run this command instead of `python evaluate.py <workspace>` (JS, Go,
+# Rust, ...). argv via shlex, no shell, cwd = the workspace, same timeout, fence and
+# scrubbed env. The metric is the LAST non-empty stdout line (a float, higher is
+# better); non-zero exit, timeout or anything else is an evaluation crash. holdout.py
+# is not replaced. No `#` in the value; on Windows write paths with /. If the value
+# starts and ends with a quote, wrap all of it in one more pair of quotes. On
+# Windows, launchers such as npm need their full name (npm.cmd).
+# eval_cmd: npm test --silent
+
 roles:
   analyst:
     vendor: mock

@@ -1018,8 +1018,8 @@ class AuditorCount(vendors.MockVendor):
 def count_evaluations(fn):
     """Run fn(); return how many times evaluate.py (not holdout.py) was run."""
     calls, orig = [], run_mod.evaluate_workspace
-    run_mod.evaluate_workspace = lambda r, w, script="evaluate.py", timeout=None: (
-        calls.append(script), orig(r, w, script, timeout))[1]
+    run_mod.evaluate_workspace = lambda r, w, script="evaluate.py", timeout=None, **kw: (
+        calls.append(script), orig(r, w, script, timeout, **kw))[1]
     try:
         fn()
     finally:

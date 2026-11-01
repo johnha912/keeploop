@@ -1,4 +1,9 @@
 <p align="center">
+  <!-- Language line: to add a language, append ` | <a href="README.xx.md">Name</a>` here and in every README.*.md -->
+  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a>
+</p>
+
+<p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.png">
     <img src="docs/assets/banner-light.png" width="100%" alt="keeploop: AI agents propose, build and audit. Only changes that beat the metric are kept.">
@@ -9,12 +14,13 @@
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-0b0b0c?style=flat-square" alt="version 0.1.0"></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?style=flat-square" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/dependencies-0-0a8a4a?style=flat-square" alt="zero dependencies">
-  <img src="https://img.shields.io/badge/tests-138%20passing-0a8a4a?style=flat-square" alt="138 tests passing">
+  <a href="https://github.com/johnha912/keeploop/actions/workflows/tests.yml"><img src="https://github.com/johnha912/keeploop/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0b0b0c?style=flat-square" alt="MIT license"></a>
 </p>
 
 <p align="center">
   <a href="#quickstart">Quickstart</a> ·
+  <a href="#use-it-with-a-chat-ai-no-install">Chat AI</a> ·
   <a href="#how-a-cycle-works">How it works</a> ·
   <a href="#where-the-rules-come-from">Field-tested</a> ·
   <a href="#use-it-on-your-own-repo">Your repo</a> ·
@@ -48,6 +54,9 @@ refuses. Your AI does the thinking. Only a better number gets committed.
 
 About 3,500 lines of standard-library Python. No dependencies, no
 telemetry, no API keys stored.
+
+No clone? A chat AI that cannot open links or run commands can still use
+it: see [Use it with a chat AI (no install)](#use-it-with-a-chat-ai-no-install).
 
 ## Quickstart
 
@@ -137,6 +146,26 @@ git -C .keeploop/workspace log --oneline   # 3 keep commits on top of the initia
 cat .keeploop/results.tsv                  # one row per cycle; kl only appends
 python kl.py recall "crash"                # L-001: what crashed, and the rule it left behind
 ```
+
+## Use it with a chat AI (no install)
+
+Consumer chat apps (the Gemini app, ChatGPT and similar) cannot open a
+GitHub link, read your files or run a terminal. For them, keeploop ships
+[`BOOTSTRAP.md`](BOOTSTRAP.md): one self-contained file that says what
+keeploop does, when it triggers, carries `AGENTS.md` verbatim and adds
+chat-mode rules.
+
+1. Open `BOOTSTRAP.md`, copy the whole file and paste it into a new chat.
+2. The AI summarises the cycle and the hard rules, then asks what you want
+   to improve.
+3. You stay in the loop: the AI cannot run anything, so it gives you one
+   `python kl.py ...` command at a time. You run it in a clone of this repo
+   and paste the output back. It never invents a command or a number; what
+   it does not know goes under `MISSING:` for you to answer.
+
+This needs Python 3.10+ and git on your machine for the commands, but no
+AI tool with file access. `BOOTSTRAP.md` is regenerated whenever
+`AGENTS.md` changes (the steps are at the bottom of that file).
 
 ## How a cycle works
 

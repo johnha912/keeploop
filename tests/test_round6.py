@@ -176,7 +176,7 @@ class TestRecallChangeAndKlName(unittest.TestCase):
 
     def test_kl_invocation_name_follows_argv0(self):
         import kl
-        for argv0, want in (("/usr/bin/kl", "kl"), ("C:\\Scripts\\kl.exe", "kl"),
+        for argv0, want in (("/usr/bin/kl", "kl"), ("/usr/local/bin/kl", "kl"),("C:\\Scripts\\kl.exe", "kl"),
                             ("kl.py", "python kl.py"), ("python -m unittest", "python kl.py")):
             with mock.patch.object(sys, "argv", [argv0]):
                 self.assertEqual(kl.kl(), want)

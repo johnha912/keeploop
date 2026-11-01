@@ -158,6 +158,8 @@ def _scalar(text: str):
         return float(text)
     except ValueError:
         pass
+    if len(text) > 1 and text[0] == text[-1] and text[0] in "'\"":
+        return text[1:-1]  # one matching pair only: eval_cmd may end in a quote of its own
     return text.strip("'\"")
 
 
