@@ -36,6 +36,10 @@
 
 ---
 
+<p align="center"><img src="docs/demo.gif" alt="Bản ghi terminal chạy mock của keeploop: đo mức gốc, hai lần giữ, một lần bỏ, một lần crash thành bài học, rồi giữ lần cuối." width="853"></p>
+
+<p align="center"><sub>Ghi lại từ đầu ra thật của bản demo mock chạy offline (có thêm màu). Thích đọc chữ hơn? Bản ghi đầy đủ nằm ở mục <a href="#quickstart">Bắt đầu nhanh</a>, phần "Chạy qua đêm, không cần chat".</sub></p>
+
 Dự án [autoresearch](https://github.com/karpathy/autoresearch) của Karpathy
 đã cho thấy một agent có thể cải thiện code qua đêm nếu bạn cho nó một chỉ
 số cố định, một quy tắc giữ/bỏ và git.

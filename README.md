@@ -31,6 +31,10 @@
 
 ---
 
+<p align="center"><img src="docs/demo.gif" alt="Terminal recording of keeploop's mock run: baseline, two keeps, a discard, a crash that becomes a lesson, then a final keep." width="853"></p>
+
+<p align="center"><sub>Recorded from the real output of the offline mock demo (colours added). Prefer text? The full transcript is in <a href="#quickstart">Quickstart</a>, under "Overnight, without a chat".</sub></p>
+
 Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) showed
 that an agent can improve code overnight if you give it a fixed metric, a
 keep/discard rule and git.
