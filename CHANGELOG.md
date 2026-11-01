@@ -26,6 +26,11 @@ the entry says so under **Changed** with the migration step.
 
 ## [Unreleased]
 
+### Added
+
+- README demo GIF of the offline mock run (baseline, keeps, a discard, a
+  crash that becomes a lesson), re-recorded with `python docs/record_demo.py`.
+
 ## [0.1.0] - 2026-10-29
 
 First public release.
