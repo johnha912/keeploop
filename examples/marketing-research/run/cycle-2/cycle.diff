@@ -1,0 +1,22 @@
+diff --git a/report.md b/report.md
+index 11c1c93..8759e91 100644
+--- a/report.md
++++ b/report.md
+@@ -40,7 +40,7 @@ So what: The values are small by construction and the five intervals overlap, so
+ 
+ Recommendation: Fieldnote should not claim a penetration gap against any competitor from this data and should measure claimed ownership in the survey.
+ 
+-## 3. Profiling: Few authors report an age, and those who do skew Gen Z, so the audience cannot be described reliably
++## 3. Profiling: Few authors report an age, and among those who do, the Gen Z and Millennial shares overlap, so the audience cannot be described reliably
+ 
+ Question: Who is talking, by age, gender and country?
+ 
+@@ -142,7 +142,7 @@ Evidence is social listening, not a survey: public Reddit posts and comments fro
+ 
+ Limits to keep in mind:
+ 
+-- Social media is not a representative sample of North American Gen Z and Millennial shoppers; Reddit is self-selected and skews young, male and US.
++- Social media is not a representative sample of North American Gen Z and Millennial shoppers; Reddit is self-selected, and who posts there is not measured in this data.
+ - The collection was time-boxed and partial. The general-subreddit sample is mainly femalefashionadvice keyword search plus recommendation-thread replies, and 10 time windows were given up after retries.
+ - 48 of the 60 recommendation threads are menswear, so top-of-mind results lean to menswear-friendly brands.
+ - Top-of-mind, penetration and positioning are proxies, not survey measures.

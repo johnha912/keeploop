@@ -1,0 +1,172 @@
+diff --git a/questionnaire.md b/questionnaire.md
+index 30dcfad..c13767a 100644
+--- a/questionnaire.md
++++ b/questionnaire.md
+@@ -214,15 +214,6 @@ Analysis: Mean ratings per brand plotted on perceptual maps (price vs quality, t
+     - H&M
+     - Uniqlo
+     - Shein
+-    - Temu
+-    - Abercrombie & Fitch
+-    - Hollister
+-    - American Eagle
+-    - Urban Outfitters
+-    - Princess Polly
+-    - Garage
+-    - Old Navy
+-    - Lululemon
+     - Fieldnote Apparel
+ 23. [grid] How would you rate the quality of each brand?
+     Scale: Very poor | Poor | Average | Good | Very good
+@@ -231,15 +222,6 @@ Analysis: Mean ratings per brand plotted on perceptual maps (price vs quality, t
+     - H&M
+     - Uniqlo
+     - Shein
+-    - Temu
+-    - Abercrombie & Fitch
+-    - Hollister
+-    - American Eagle
+-    - Urban Outfitters
+-    - Princess Polly
+-    - Garage
+-    - Old Navy
+-    - Lululemon
+     - Fieldnote Apparel
+ 24. [grid] How trendy is each brand?
+     Scale: unipolar: Not at all | Slightly | Moderately | Very | Extremely
+@@ -248,15 +230,6 @@ Analysis: Mean ratings per brand plotted on perceptual maps (price vs quality, t
+     - H&M
+     - Uniqlo
+     - Shein
+-    - Temu
+-    - Abercrombie & Fitch
+-    - Hollister
+-    - American Eagle
+-    - Urban Outfitters
+-    - Princess Polly
+-    - Garage
+-    - Old Navy
+-    - Lululemon
+     - Fieldnote Apparel
+ 25. [grid] How well do the clothes from each brand last over time?
+     Scale: Very badly | Badly | Average | Well | Very well
+@@ -265,15 +238,6 @@ Analysis: Mean ratings per brand plotted on perceptual maps (price vs quality, t
+     - H&M
+     - Uniqlo
+     - Shein
+-    - Temu
+-    - Abercrombie & Fitch
+-    - Hollister
+-    - American Eagle
+-    - Urban Outfitters
+-    - Princess Polly
+-    - Garage
+-    - Old Navy
+-    - Lululemon
+     - Fieldnote Apparel
+ 26. [single] Which brand do you think is the best value for money?
+     - Aritzia
+@@ -294,9 +258,9 @@ Analysis: Mean ratings per brand plotted on perceptual maps (price vs quality, t
+     - None of these
+ 
+ ## Brand perception
+-Objective: Understand the image attributes and overall opinion of the brands the respondent knows.
++Objective: Understand the image attributes of Fieldnote and the overall opinion of Fieldnote, Aritzia and Zara.
+ Decision: Shows which image strengths to build on and which weaknesses to fix in Fieldnote's brand message.
+-Analysis: Top-2-box agreement per attribute and brand; key driver analysis of overall opinion; Fieldnote vs competitor gap table.
++Analysis: Top-2-box agreement per attribute for Fieldnote; key driver analysis of overall opinion; Fieldnote vs competitor gap table on overall opinion.
+ 
+ 27. [scale] What is your overall opinion of Fieldnote Apparel?
+     Scale: Very bad | Bad | Neither good nor bad | Good | Very good
+@@ -314,34 +278,14 @@ Analysis: Top-2-box agreement per attribute and brand; key driver analysis of ov
+     - Cares about the environment
+     - Has a good range of sizes
+     - Is exciting
+-31. [grid] How much do you agree that each statement describes Aritzia?
+-    Scale: Strongly disagree | Disagree | Neither agree nor disagree | Agree | Strongly agree
+-    - Is stylish
+-    - Is good value for money
+-    - Is well made
+-    - Is for people like me
+-    - Is a brand I trust
+-    - Cares about the environment
+-    - Has a good range of sizes
+-    - Is exciting
+-32. [grid] How much do you agree that each statement describes Zara?
+-    Scale: Strongly disagree | Disagree | Neither agree nor disagree | Agree | Strongly agree
+-    - Is stylish
+-    - Is good value for money
+-    - Is well made
+-    - Is for people like me
+-    - Is a brand I trust
+-    - Cares about the environment
+-    - Has a good range of sizes
+-    - Is exciting
+-33. [open] In a few words, what do you like or dislike most about the brand you buy from most often?
++31. [open] In a few words, what do you like or dislike most about the brand you buy from most often?
+ 
+ ## Segmentation inputs
+ Objective: Collect attitudes that group shoppers into segments such as value seekers, trend chasers, quality investors and resale-first.
+ Decision: Chooses which shopper segment Fieldnote targets first in 2027.
+ Analysis: Factor analysis and cluster analysis on the attitude grid; segment profiles by channel use, brand penetration, country and generation.
+ 
+-34. [grid] How much do you agree with each statement about shopping for clothes?
++32. [grid] How much do you agree with each statement about shopping for clothes?
+     Scale: Strongly disagree | Disagree | Neither agree nor disagree | Agree | Strongly agree
+     - I always look for the lowest price
+     - I wait for sales before I buy
+@@ -355,19 +299,19 @@ Analysis: Factor analysis and cluster analysis on the attitude grid; segment pro
+     - I like to try clothes on in a store
+     - I am worried about the cost of living
+     - Shopping for clothes is a hobby for me
+-35. [single] Which one of these describes you best?
++33. [single] Which one of these describes you best?
+     - I look for the best price
+     - I like to be first with new trends
+     - I invest in quality pieces that last
+     - I buy second-hand first
+     - I buy what I need when I need it
+-36. [single] How have your clothing purchases changed over the past year?
++34. [single] How have your clothing purchases changed over the past year?
+     - I buy much more
+     - I buy somewhat more
+     - About the same
+     - I buy somewhat less
+     - I buy much less
+-37. [multi] Which of these have changed how you shop for clothing in the past year? Select all that apply.
++35. [multi] Which of these have changed how you shop for clothing in the past year? Select all that apply.
+     - Higher prices
+     - Tariffs or import fees
+     - Delivery delays from overseas
+@@ -381,27 +325,27 @@ Objective: Describe the sample for weighting and segment profiling.
+ Decision: Supports sizing and profiling of the chosen target segment.
+ Analysis: Sample profile and weighting; segment cross-tabs by income, gender and household.
+ 
+-38. [single] How do you describe your gender?
++36. [single] How do you describe your gender?
+     - Woman
+     - Man
+     - Non-binary
+     - Prefer to self-describe
+     - Prefer not to say
+-39. [single] What is your approximate annual household income before tax?
++37. [single] What is your approximate annual household income before tax?
+     - Under $40,000
+     - $40,000 to $79,999
+     - $80,000 to $119,999
+     - $120,000 to $159,999
+     - $160,000 or more
+     - Prefer not to say
+-40. [single] Which best describes your current work status?
++38. [single] Which best describes your current work status?
+     - Employed full time
+     - Employed part time
+     - Self-employed
+     - Student
+     - Not working
+     - Other
+-41. [single] Which best describes where you live?
++39. [single] Which best describes where you live?
+     - Large city
+     - Suburb
+     - Small town
