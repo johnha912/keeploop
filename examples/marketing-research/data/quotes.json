@@ -1,0 +1,737 @@
+{
+ "rule": "per brand x attribute cell with >= 10 single-brand sentences: the up-to-3 sentences (5-25 words, no age/gender/country self-report, no username/permalink) whose VADER compound is closest to the cell median; ties broken by sha1 of the text; one quote per author",
+ "cells": {
+  "Aritzia": {
+   "price/value": {
+    "cell_n": 28,
+    "cell_median_compound": 0.171,
+    "quotes": [
+     {
+      "text": "If you want to splurge (200$ range per piece), try Aritzia!",
+      "vader_compound": 0.151,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     },
+     {
+      "text": "I also don’t wanna spend loads of money, aritzia has cute stuff for this but I can’t afford new aritzia.",
+      "vader_compound": 0.25,
+      "subreddit_type": "general",
+      "month": "2026-07"
+     },
+     {
+      "text": "I feel the same way about the Aritzia Lodge pants and they are only $138.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     }
+    ]
+   },
+   "quality/durability": {
+    "cell_n": 20,
+    "cell_median_compound": 0.159,
+    "quotes": [
+     {
+      "text": "I bought their puffer (dupe for super puff, long, aritzia) and the external material is horrible.",
+      "vader_compound": 0.103,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     },
+     {
+      "text": "For work, aritzia effortless pants, crepette fabric.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "I bought a Babaton-Aritzia long Connor coat 4 years ago for $400 that started pilling after 1 season, I think it's about 85% wool.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-01"
+     }
+    ]
+   },
+   "fit/sizing": {
+    "cell_n": 20,
+    "cell_median_compound": 0.077,
+    "quotes": [
+     {
+      "text": "Aritzia has cute low rise work pants, but I believe they only come in one length.",
+      "vader_compound": 0.115,
+      "subreddit_type": "general",
+      "month": "2026-08"
+     },
+     {
+      "text": "I was eyeing Aritzia's Effortless pleated pants, but unfortunately none of the sizes fit me (they were either too big or too small).",
+      "vader_compound": 0.039,
+      "subreddit_type": "general",
+      "month": "2026-01"
+     },
+     {
+      "text": "Aritzia has all of their tanks in a hip length",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-04"
+     }
+    ]
+   },
+   "style/trend": {
+    "cell_n": 21,
+    "cell_median_compound": 0.483,
+    "quotes": [
+     {
+      "text": "Aritzia has some great cotton basics, but must check those labels!!",
+      "vader_compound": 0.483,
+      "subreddit_type": "general",
+      "month": "2026-01"
+     },
+     {
+      "text": "I really like the style of pepper mayo and aritzia.",
+      "vader_compound": 0.42,
+      "subreddit_type": "general",
+      "month": "2026-02"
+     },
+     {
+      "text": "Aritzia and Classic Six NY keep coming up, both do that structured but not stuffy thing rlly well.",
+      "vader_compound": 0.392,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     }
+    ]
+   }
+  },
+  "Zara": {
+   "price/value": {
+    "cell_n": 70,
+    "cell_median_compound": 0.072,
+    "quotes": [
+     {
+      "text": "Personally I like their confusion as I stumble upon more and more zara clothes at ridicilous prices in TJ Maxx that I can experiment with.",
+      "vader_compound": 0.077,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "I still wear Zara and Banana Republic stuff from 20 years sgo because I don't treat any of my clothes like they're cheap.",
+      "vader_compound": 0.062,
+      "subreddit_type": "general",
+      "month": "2026-09"
+     },
+     {
+      "text": "Inditex, the multinational company that owns Zara, has also launched Lefties, which is basically their version of Primark, with very inexpensive clothing.",
+      "vader_compound": 0.128,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     }
+    ]
+   },
+   "quality/durability": {
+    "cell_n": 54,
+    "cell_median_compound": 0.0,
+    "quotes": [
+     {
+      "text": "Why are so many blouses and skirts at Zara now see through?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     },
+     {
+      "text": "Zara is...okay but they are not quality and tend to be too trendy.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-07"
+     },
+     {
+      "text": "Hasn't Zara always been about trendiness over quality?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     }
+    ]
+   },
+   "fit/sizing": {
+    "cell_n": 34,
+    "cell_median_compound": 0.0,
+    "quotes": [
+     {
+      "text": "Zara sizing is all over the place, I can be a S in one item and XL in another 🙄",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "If youre petite try Zara for kids.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "They use standard Euro alpha sizing, similar to Zara.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     }
+    ]
+   },
+   "style/trend": {
+    "cell_n": 51,
+    "cell_median_compound": 0.318,
+    "quotes": [
+     {
+      "text": "I am curious what your field is where designer labels and zara are both things you'll find at a professional (networking?) event.",
+      "vader_compound": 0.318,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     },
+     {
+      "text": "Sadly I have big calves and tried some on in Zara that were the right style but didn’t fit my calves 😭.",
+      "vader_compound": 0.329,
+      "subreddit_type": "general",
+      "month": "2026-01"
+     },
+     {
+      "text": "Zara makes some really pretty skirts that feel trendy but still wearable for everyday life.",
+      "vader_compound": 0.306,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     }
+    ]
+   },
+   "sustainability/ethics": {
+    "cell_n": 17,
+    "cell_median_compound": 0.238,
+    "quotes": [
+     {
+      "text": "I did mention I do not want Fast Fashion or brands like Zara, Quince, etc.",
+      "vader_compound": 0.313,
+      "subreddit_type": "general",
+      "month": "2025-11"
+     },
+     {
+      "text": "Manteco is this cool recycled wool plant that supplies mango and zara with wool for their higher end coats.",
+      "vader_compound": 0.387,
+      "subreddit_type": "general",
+      "month": "2025-11"
+     },
+     {
+      "text": "Somehow, I have a couple of fast fashion (Zara) pants/slacks that have this really nice fitted, tapered look.",
+      "vader_compound": 0.475,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     }
+    ]
+   },
+   "store experience": {
+    "cell_n": 16,
+    "cell_median_compound": 0.077,
+    "quotes": [
+     {
+      "text": "What happens if I don't pick up the order that was delivered to the ZARA store after 15 days?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-01"
+     },
+     {
+      "text": "I raided all the mall brands (Zara/Bershka/Reserved) but literally every single pant was made of trash materials.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-02"
+     },
+     {
+      "text": "You need to go to a Zara store and actually try things on.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     }
+    ]
+   }
+  },
+  "H&M": {
+   "price/value": {
+    "cell_n": 38,
+    "cell_median_compound": 0.116,
+    "quotes": [
+     {
+      "text": "I have one acrylic sweater that I sort of like, but it was a $15 H&M buy.",
+      "vader_compound": 0.154,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     },
+     {
+      "text": "Avoid H&M at all cost, the styles are nice but all of their clothing shrinks and piles at the first wash, it’s disposable clothing.",
+      "vader_compound": 0.077,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     },
+     {
+      "text": "It's basically overpriced fast fashion now and if you look at the fabric content, they're not far off from H&M.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     }
+    ]
+   },
+   "quality/durability": {
+    "cell_n": 29,
+    "cell_median_compound": 0.44,
+    "quotes": [
+     {
+      "text": "Walmart T-shirt is way better quality than H&M.",
+      "vader_compound": 0.44,
+      "subreddit_type": "general",
+      "month": "2026-02"
+     },
+     {
+      "text": "Their modal fabric is genuinely better than what you'd get at H&M or Target.",
+      "vader_compound": 0.44,
+      "subreddit_type": "general",
+      "month": "2026-04"
+     },
+     {
+      "text": "Their modal fabric is genuinely better than what you'd get at H&M or Target.",
+      "vader_compound": 0.44,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     }
+    ]
+   },
+   "fit/sizing": {
+    "cell_n": 22,
+    "cell_median_compound": 0.371,
+    "quotes": [
+     {
+      "text": "H&M only has dresses in 32 ( that fit ).",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     },
+     {
+      "text": "I love H&M but I'm just too short for their clothes.",
+      "vader_compound": 0.382,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "Check out H&M Black Jumpsuit Womens Size 8 Gold Hook Front Wide Leg Elegant 60” Length on eBay!",
+      "vader_compound": 0.525,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     }
+    ]
+   },
+   "style/trend": {
+    "cell_n": 31,
+    "cell_median_compound": 0.414,
+    "quotes": [
+     {
+      "text": "I’ve only been seeing the excessive selection of backless/thigh high/cropped stuff from really trendy places like H&M, Nordstrom, etc.",
+      "vader_compound": 0.414,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "I’ve gone from basic H&M tights to more expensive ones(Vogue, Wolford which I managed to get on sales) and oh boy does it feel nice!",
+      "vader_compound": 0.475,
+      "subreddit_type": "general",
+      "month": "2025-11"
+     },
+     {
+      "text": "If cost is a factor, H&M has totes that hold up really well over time in classic 'corporate' styles and trendier shapes.",
+      "vader_compound": 0.338,
+      "subreddit_type": "general",
+      "month": "2026-08"
+     }
+    ]
+   },
+   "sustainability/ethics": {
+    "cell_n": 10,
+    "cell_median_compound": 0.364,
+    "quotes": [
+     {
+      "text": "I agree about baby H&M being good, the baby clothes also seem to be mostly made in 100% organic cotton.",
+      "vader_compound": 0.66,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     },
+     {
+      "text": "It's basically overpriced fast fashion now and if you look at the fabric content, they're not far off from H&M.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "H&M has different collaborations every year",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-04"
+     }
+    ]
+   },
+   "store experience": {
+    "cell_n": 10,
+    "cell_median_compound": 0.515,
+    "quotes": [
+     {
+      "text": "Getting my fav H&M cargos remade should i go with men’s tailor or boutique?",
+      "vader_compound": 0.459,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     },
+     {
+      "text": "I used to walk past the store but now I have really nice blazers, pants and jeans from H&M!",
+      "vader_compound": 0.663,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "This is from H&M, mostly sold out online, but you could check your local store.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-08"
+     }
+    ]
+   }
+  },
+  "Shein": {
+   "price/value": {
+    "cell_n": 54,
+    "cell_median_compound": 0.077,
+    "quotes": [
+     {
+      "text": "There are even lead concerns with clothes from shein so I figured it’s not worth the risk.",
+      "vader_compound": 0.038,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     },
+     {
+      "text": "I do think SHEIN overall has much lower quality far more consistently, but I agree that mainstream retail quality has declined aggressively while prices climb.",
+      "vader_compound": 0.025,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     },
+     {
+      "text": "so many mid range companies are making shein quality clothes but charging the same prices they always have.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     }
+    ]
+   },
+   "quality/durability": {
+    "cell_n": 62,
+    "cell_median_compound": 0.0,
+    "quotes": [
+     {
+      "text": "so many mid range companies are making shein quality clothes but charging the same prices they always have.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "I have never received an order from SHEIN where I thought the quality was decent.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-04"
+     },
+     {
+      "text": "There are high-quality brands/sellers on Taobao, Shein.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     }
+    ]
+   },
+   "fit/sizing": {
+    "cell_n": 20,
+    "cell_median_compound": 0.328,
+    "quotes": [
+     {
+      "text": "I'm looking for a pair of baggy jeans from Shein; I don't care about the quality and they have to be super cheap.",
+      "vader_compound": 0.312,
+      "subreddit_type": "general",
+      "month": "2026-02"
+     },
+     {
+      "text": "I have surprisingly found nice-fitting tops on SHEIN, but I do not want to be a fast fashion girly.",
+      "vader_compound": 0.344,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "Any Stores for Plus Sized Women Like Shein?",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-07"
+     }
+    ]
+   },
+   "style/trend": {
+    "cell_n": 41,
+    "cell_median_compound": 0.318,
+    "quotes": [
+     {
+      "text": "SHEIN and CIDER are one of the only brands that i actually like the clothes (designs) of.",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-07"
+     },
+     {
+      "text": "I like the variety design on Shein and similar sites but for ethical reasons and the fabric they use I avoid buying there.",
+      "vader_compound": 0.527,
+      "subreddit_type": "general",
+      "month": "2026-07"
+     },
+     {
+      "text": "I understand you want trendy clothes & Shein seems to have endless variety.",
+      "vader_compound": 0.077,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     }
+    ]
+   },
+   "sustainability/ethics": {
+    "cell_n": 45,
+    "cell_median_compound": 0.0,
+    "quotes": [
+     {
+      "text": "Does Shein still use child labor and exploitative practices?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     },
+     {
+      "text": "Shopping at Shein and Anthro have the same ethics.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     },
+     {
+      "text": "Does anyone know where I can find such shoes and belts/buckles that isn't fast fashion or shein?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     }
+    ]
+   },
+   "shipping/returns": {
+    "cell_n": 11,
+    "cell_median_compound": -0.273,
+    "quotes": [
+     {
+      "text": "Cider is basically in the same category of drop shipping as Shein",
+      "vader_compound": -0.273,
+      "subreddit_type": "general",
+      "month": "2026-04"
+     },
+     {
+      "text": "Photo of a skin rash following a Shein package",
+      "vader_compound": -0.402,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     },
+     {
+      "text": "i have problems breathing after ordering my shein package today.",
+      "vader_compound": -0.402,
+      "subreddit_type": "general",
+      "month": "2025-11"
+     }
+    ]
+   },
+   "store experience": {
+    "cell_n": 29,
+    "cell_median_compound": 0.178,
+    "quotes": [
+     {
+      "text": "Stores that sell non-SHEIN versions of these dresses?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "There's so much shein at the thrift stores now too 😩 there's just so much...",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "Mall brands and shein will never be an option unless I find them in the $2 bin.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     }
+    ]
+   }
+  },
+  "Uniqlo": {
+   "price/value": {
+    "cell_n": 67,
+    "cell_median_compound": 0.44,
+    "quotes": [
+     {
+      "text": "I saw a video describing the expensive Uniqlo and it's the truest thing ever.",
+      "vader_compound": 0.44,
+      "subreddit_type": "general",
+      "month": "2025-11"
+     },
+     {
+      "text": "SUGGESTION: Anything in the Uniqlo family (GU, Helmut, Theory, etc) is gonna be a good starting point at various price points.",
+      "vader_compound": 0.44,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "Uniqlo mini tee is my favorite at an affordable price point",
+      "vader_compound": 0.459,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     }
+    ]
+   },
+   "quality/durability": {
+    "cell_n": 57,
+    "cell_median_compound": 0.361,
+    "quotes": [
+     {
+      "text": "Aren’t that shiny over 60 percent polyester material like Uniqlo",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "Jennifer has been promoting uniqlo a lot despite their declining quality.",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     },
+     {
+      "text": "Uniqlo, J.Crew, Banana Republic: reliable basics if you buy the better fabrics (cotton, wool, linen).",
+      "vader_compound": 0.44,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     }
+    ]
+   },
+   "fit/sizing": {
+    "cell_n": 44,
+    "cell_median_compound": 0.366,
+    "quotes": [
+     {
+      "text": "I'm looking for recommendations for ankle length chino/similar type trousers for work, much like the Uniqlo ones pictures here.",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "Same, also wear a 32D and none of the Uniqlo bra tanks fit me.",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "I like the uniqlo sweatshirts as they are a little more fitted and in multiple colors so they look professional.",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     }
+    ]
+   },
+   "style/trend": {
+    "cell_n": 76,
+    "cell_median_compound": 0.485,
+    "quotes": [
+     {
+      "text": "there’s lots of layering options too, so you can keep it as exposured as conservative as you want long live UNIQLO for queer basics lol",
+      "vader_compound": 0.477,
+      "subreddit_type": "general",
+      "month": "2026-08"
+     },
+     {
+      "text": "I get most basics from Uniqlo and have found them very good for the price.",
+      "vader_compound": 0.493,
+      "subreddit_type": "general",
+      "month": "2026-02"
+     },
+     {
+      "text": "Otherwise, as others have said, Uniqlo makes some pretty damn good shirts for a reasonable price.",
+      "vader_compound": 0.527,
+      "subreddit_type": "general",
+      "month": "2026-10"
+     }
+    ]
+   },
+   "sustainability/ethics": {
+    "cell_n": 10,
+    "cell_median_compound": 0.439,
+    "quotes": [
+     {
+      "text": "Aren’t that shiny over 60 percent polyester material like Uniqlo",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-06"
+     },
+     {
+      "text": "huh, for years  JW anderson for uniqlo women has been acrylic, nylon, polyester, etc.",
+      "vader_compound": 0.516,
+      "subreddit_type": "general",
+      "month": "2025-11"
+     },
+     {
+      "text": "Uniqlo's \"best selling\" Uniqlo U Tee Shirt is literally 50% Polyester.",
+      "vader_compound": 0.637,
+      "subreddit_type": "general",
+      "month": "2026-03"
+     }
+    ]
+   },
+   "store experience": {
+    "cell_n": 11,
+    "cell_median_compound": 0.556,
+    "quotes": [
+     {
+      "text": "I am noticing this in general, but two stores/brands it seems especially true are Uniqlo and Quince.",
+      "vader_compound": 0.63,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "First, you go with the absolute basics - mall brands like Uniqlo, etc, where you can realistically stock up on basics without much thought.",
+      "vader_compound": 0.361,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "For affordable basics I like Uniqlo (especially on sale) but sometimes the off price stores have equal or better stuff if you're lucky.",
+      "vader_compound": 0.852,
+      "subreddit_type": "general",
+      "month": "2025-12"
+     }
+    ]
+   }
+  },
+  "Everlane": {
+   "price/value": {
+    "cell_n": 19,
+    "cell_median_compound": 0.0,
+    "quotes": [
+     {
+      "text": "- Everlane — budget option.",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-04"
+     },
+     {
+      "text": "not quite on the level of quince or everlane, but for $25?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     },
+     {
+      "text": "now that everlane quality is inevitably going to take a nosedive, wondering what other clothings brands are stylistically similar/in roughly the same price strata?",
+      "vader_compound": 0.0,
+      "subreddit_type": "general",
+      "month": "2026-05"
+     }
+    ]
+   }
+  }
+ }
+}

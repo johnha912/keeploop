@@ -1,0 +1,14 @@
+APPROVED
+- EXPECT met: metric 1.000000 is above the keep bar 0.979700, and U1 is no longer flagged. I did not re-run the scorer, so "no other check gets worse" rests on the reported 1.000000.
+- REJECT IF: none triggered. The staged git diff is byte-identical to diff2.txt (same md5). It is 1 file, 2 insertions and 2 deletions in report.md, nothing in brief.md or data/.
+- Scope: both edits match the CHANGE text word for word, with no other lines touched.
+- Intervals verified in metrics.json profiling.generation_of_brand_mentioning_authors: Gen Z 19/33 = 57.6%, CI 40.8 to 72.8; Millennial 13/33 = 39.4%, CI 24.7 to 56.3. They overlap from 40.8 to 56.3, so the new heading does not claim more than the data. Minor point: the intervals overlap, not the point shares (57.6 vs 39.4). The card's wording says "shares", but the body says "intervals" correctly. Not blocking.
+- The deleted "skews young, male and US" had no source in metrics.json and pointed the wrong way: 11 of the 13 authors who gave a gender are female. Removing it loses nothing a Decision needs. Module 3's Decision still has its coverage, generation, gender and country lines and its survey recommendation.
+- Minor tension, not blocking: "who posts there is not measured in this data" is slightly too absolute. Age, gender and country are self-reported by a few authors, as the next limits bullet and module 3 say. "Barely measured" would be more exact.
+- Outside this card: the Summary still says "positioned on trend" while module 4 ties style/trend to Uniqlo. The card's ALTERNATIVES already names this as the next card.
+Criterion: Clear research objectives (each module states its business question and the decision it informs): 95
+Criterion: Non-leading, unbiased evidence (neutral search terms, every brand measured the same way, quotes chosen by a stated rule, headlines no stronger than the data): 90
+Criterion: Correct measure choice (the right metric for the question, proxies named as proxies, base size and confidence interval on every share, no share reported on a base under 30): 90
+Criterion: Logical flow (answer first, modules in funnel order: awareness, penetration, profile, positioning, perception, segmentation; method and limits after the findings): 90
+Criterion: Decision-ready insight output (each module ends in a so-what and a recommendation for the client): 85
+DIFF: 171e030b8149

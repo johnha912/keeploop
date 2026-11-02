@@ -1,0 +1,38 @@
+# team.yaml - marketing research example (consumer insight report).
+# Set up: copy this folder's evaluate.py to the keeploop root as evaluate.py
+# (it replaces the demo), delete the demo holdout.py (it imports the demo
+# scorer; lesson L-001, see run/LOG.md and run/cycle-1/transcript.txt), make a
+# fresh git repo for the workspace holding brief.md, report.md and a data/
+# folder (copy data/metrics.json and data/quotes.json from this folder), and
+# point `workspace:` at it (relative to the keeploop folder, or absolute).
+# Then: python kl.py begin
+# The report writer sees only FORMAT.md, never evaluate.py.
+# Format of report.md: examples/marketing-research/FORMAT.md
+
+pack: marketing-research
+
+# CHANGE ME: your own folder, a clean git repo with brief.md, report.md and data/.
+workspace: ../mr-workspace
+
+# Nobody may rewrite the objectives or the evidence to win the score.
+protect: brief.md, data
+
+# Vendors are used by the headless loop (`python run.py`) and `kl audit --vendor`.
+# The worked example ran in interactive mode: the roles were played by Claude Code
+# (Analyst = main session, Engineer and Auditor = separate fresh subagents).
+roles:
+  analyst:
+    vendor: claude-cli
+    token_budget: 30000
+  engineer:
+    vendor: claude-cli
+    token_budget: 50000
+  auditor:
+    vendor: claude-cli      # same CLI is allowed only as a fresh context (AGENTS.md)
+    token_budget: 30000
+
+# The score is deterministic, so noise is zero; 1% relative gain keeps a
+# single fixed check from being kept on rounding alone.
+loop:
+  max_iterations: 20
+  keep_threshold: 0.01

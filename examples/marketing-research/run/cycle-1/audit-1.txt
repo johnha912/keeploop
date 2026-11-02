@@ -1,0 +1,12 @@
+CHANGES REQUESTED
+EXPECT not met: F4 is 0.51458/1, not 1/1. The estimate is about 1166 s, well above 600 s, so the REJECT IF "estimated length above 600 s" condition triggers even though the metric (0.959319) clears the keep bar.
+Scope breach: the card said to keep every Objective, Decision and Analysis line unchanged, but the diff rewrote the Brand perception Objective and Analysis lines. It also narrowed the stated analysis to Fieldnote-only attribute top-2-box. The competitor gap table now works on overall opinion only.
+Craft: dropping the Aritzia and Zara attribute grids (Q31-Q32) removes the attribute-level Fieldnote vs competitor comparison. The module's Decision ("which image strengths to build on and which weaknesses to fix") needs that comparison, so information was lost for a stated Decision. The cut also did not get the survey near budget.
+Minor, no score impact: N1 dropped to 38/39, but this is not a worse result than before (it was 38/41). L1 stayed at 1/2 and S2 at 9/11.
+
+Criterion: Clear research objectives (each module has an objective and every question serves one): 80
+Criterion: Non-leading, unbiased wording (neutral stems, one idea per question): 75
+Criterion: Correct scale choice (labelled, balanced, consistent direction, 4-7 points, type fits the stem, answer lists complete and non-overlapping): 80
+Criterion: Logical question flow (screener first, demographics last, unaided before aided, length within budget): 55
+Criterion: Decision-ready insight output (each module states the decision it informs and how it will be analysed): 72
+DIFF: 7b13480e9567
