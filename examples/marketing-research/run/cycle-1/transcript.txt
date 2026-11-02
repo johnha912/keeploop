@@ -1,0 +1,128 @@
+# Real transcript of one keeploop cycle (interactive mode), 2026-11-01.
+# Only change to real output: the sandbox folder path is shown as <sandbox>.
+# Lines starting with # are notes added by the person running the cycle.
+
+$ python kl.py begin
+kl: REFUSED: baseline holdout failed: ImportError: cannot import name 'validate' from 'evaluate' (<sandbox>\control\evaluate.py)
+
+# The demo holdout.py imports the demo scorer; a survey project has no holdout metric, so the human removes it.
+$ rm holdout.py
+
+$ python kl.py begin
+kl: baseline metric = 0.949106  sigma = 0.000000 (3 runs)
+best 0.949106  sigma 0.000000  keep-bar 0.958597  | cycles 0 (keep 0, discard 0, crash 0)
+workspace: <sandbox>\workspace
+pending card: none
+open lessons: none
+open questions: 0
+next hypothesis to test: Adding a Decision and an Analysis line to every module raises the score.
+
+$ python kl.py lesson add kl begin refused: the demo holdout.py imports validate() from the demo evaluate.py evaluate.py was replaced with the questionnaire scorer but the demo holdout.py was left in place When evaluate.py is replaced with a profession scorer, delete the demo holdout.py or write a real holdout metric for that field
+recorded L-001
+
+# Analyst reads the per-check breakdown (stderr) before writing a card.
+$ python evaluate.py ../workspace
+O1 10  8/8  Clear research objectives: every module has an Objective line
+O2 10  41/41  Clear research objectives: every question sits under a module
+N1 15  38/41  Non-leading wording: no leading or loaded phrase in a stem or option
+N2 10  41/41  Non-leading wording: no double-barreled stem (cue word joined by 'and')
+S1  4  13/13  Correct scale choice: every scale point has a word label
+S2  4  11/13  Correct scale choice: scale is balanced (equal positive and negative points)
+S3  3  13/13  Correct scale choice: same direction in every scale
+S4  2  13/13  Correct scale choice: 4 to 7 points
+S5  2  24/24  Correct scale choice: question type matches 'select all' / 'select one' wording
+F1  4  1/1  Logical question flow: first module is the screener
+F2  4  1/1  Logical question flow: last module is demographics
+F3  4  1/1  Logical question flow: an unaided question precedes every aided one
+F4  3  0.374532/1  Logical question flow: estimated length within 10 min
+D1 10  8/8  Decision-ready output: every module has a Decision line
+D2 10  8/8  Decision-ready output: every module has an Analysis line
+L1  3  1/2  Correct scale choice: aided lists offer None of these and Other (specify)
+L2  2  4/4  Correct scale choice: numeric ranges do not overlap
+0.949106
+
+$ python kl.py recall shorten the questionnaire to fit the length budget
+  lesson L-001: kl begin refused: the demo holdout.py imports validate() from the demo evaluate.py evaluate.py was replaced with the questionnaire scorer but the demo holdout.p
+
+$ python kl.py card ../card1.md
+card 1 registered
+
+$ python kl.py status
+best 0.949106  sigma 0.000000  keep-bar 0.958597  | cycles 0 (keep 0, discard 0, crash 0)
+workspace: <sandbox>\workspace
+pending card: 1  The first draft runs about 27 minutes against the brief's 10-minute limit, mainl
+open lessons: 
+  L-001 [provisional] When evaluate.py is replaced with a profession scorer, delete the demo holdout.py or write a real holdout metric for that field
+open questions: 1 (ask the human)
+  - (cycle 1) Real completion time from a soft launch (about 30 completes) would show whether the rule-of-thumb timings (single 15 s, multi 25
+next hypothesis to test: Adding a Decision and an Analysis line to every module raises the score.
+
+# Engineer edited questionnaire.md to implement card 1 (positioning grids cut to six brands; per-brand perception grids for Aritzia and Zara removed).
+$ python kl.py check
+PASS tier=light files=1 lines=78 diff=7b13480e9567
+
+$ python kl.py eval
+metric 0.959319  keep-bar 0.958597  best 0.949106  -> beats the bar
+
+# Analyst re-reads the per-check breakdown after the edit.
+$ python evaluate.py ../workspace
+O1 10  8/8  Clear research objectives: every module has an Objective line
+O2 10  39/39  Clear research objectives: every question sits under a module
+N1 15  38/39  Non-leading wording: no leading or loaded phrase in a stem or option
+N2 10  39/39  Non-leading wording: no double-barreled stem (cue word joined by 'and')
+S1  4  11/11  Correct scale choice: every scale point has a word label
+S2  4  9/11  Correct scale choice: scale is balanced (equal positive and negative points)
+S3  3  11/11  Correct scale choice: same direction in every scale
+S4  2  11/11  Correct scale choice: 4 to 7 points
+S5  2  24/24  Correct scale choice: question type matches 'select all' / 'select one' wording
+F1  4  1/1  Logical question flow: first module is the screener
+F2  4  1/1  Logical question flow: last module is demographics
+F3  4  1/1  Logical question flow: an unaided question precedes every aided one
+F4  3  0.51458/1  Logical question flow: estimated length within 10 min
+D1 10  8/8  Decision-ready output: every module has a Decision line
+D2 10  8/8  Decision-ready output: every module has an Analysis line
+L1  3  1/2  Correct scale choice: aided lists offer None of these and Other (specify)
+L2  2  4/4  Correct scale choice: numeric ranges do not overlap
+0.959319
+
+# A fresh-context Auditor judged the card, the diff and the metric; its reply was saved to verdict1.txt (first line: CHANGES REQUESTED).
+$ python kl.py keep --audit-verdict ../verdict1.txt
+kl: REFUSED: audit: CHANGES REQUESTED EXPECT not met: F4 is 0.51458/1, not 1/1. The estimate is abou
+
+$ python kl.py status
+best 0.949106  sigma 0.000000  keep-bar 0.958597  | cycles 0 (keep 0, discard 0, crash 0)
+workspace: <sandbox>\workspace
+pending card: 1  The first draft runs about 27 minutes against the brief's 10-minute limit, mainl
+open lessons: 
+  L-001 [provisional] When evaluate.py is replaced with a profession scorer, delete the demo holdout.py or write a real holdout metric for that field
+open questions: 1 (ask the human)
+  - (cycle 1) Real completion time from a soft launch (about 30 completes) would show whether the rule-of-thumb timings (single 15 s, multi 25
+next hypothesis to test: Adding a Decision and an Analysis line to every module raises the score.
+
+$ python kl.py discard --reason metric 0.959319 beat the bar 0.958597, but the pre-registered REJECT IF triggered: estimated length about 1166 s, still above the 600 s budget; the audit also found lost competitor attribute data
+discarded cycle 1 (discard); workspace back at best 0.949106; lesson L-002
+
+$ python kl.py report
+keeploop report (from .keeploop/, not from memory)
+cycles: 1  keeps: 0  discards: 1  crashes: 0
+baseline: 0.949106  best: 0.949106
+gain over baseline: +0.000000
+hypotheses: inconclusive 1
+lessons: 2 provisional
+open questions: 1
+tokens recorded: 0
+time per phase: eval 0s, agent 120s  | slowest: agent (100%)  | last cycle: 121s
+
+$ python kl.py status
+best 0.949106  sigma 0.000000  keep-bar 0.958597  | cycles 1 (keep 0, discard 1, crash 0)
+workspace: <sandbox>\workspace
+pending card: none
+open lessons: 
+  L-001 [provisional] When evaluate.py is replaced with a profession scorer, delete the demo holdout.py or write a real holdout metric for that field
+  L-002 [provisional] An improving metric never overrides a failed audit; fix the cause and re-propose.
+open questions: 1 (ask the human)
+  - (cycle 1) Real completion time from a soft launch (about 30 completes) would show whether the rule-of-thumb timings (single 15 s, multi 25
+recently rejected (do not repeat):
+  - cycle 1 [inconclusive]: The first draft runs about 27 minutes against the brief's 10-minute limit, mainly because the four brand-positioning grids (
+next hypothesis to test: Adding a Decision and an Analysis line to every module raises the score.
+

@@ -1,0 +1,7423 @@
+{
+ "meta": {
+  "collection_started_utc": "2026-11-02T05:08:41+00:00",
+  "collection_finished_utc": "2026-11-02T07:24:21+00:00",
+  "analysis_utc": "2026-11-02T07:26:26+00:00",
+  "window": [
+   "2025-11-01",
+   "2026-11-01",
+   "[start, end)"
+  ],
+  "core_brands": [
+   "Aritzia",
+   "Zara",
+   "H&M",
+   "Shein",
+   "Uniqlo"
+  ],
+  "caps": {
+   "brand_sub_posts_per_month": 125,
+   "brand_sub_comments_per_month": 250,
+   "keyword_posts_per_sub_term_half": 100,
+   "keyword_comments_per_sub_term_half": 200,
+   "thread_title_hits_per_sub_term_half": 100,
+   "threads_total": 60,
+   "comments_per_thread": 300
+  },
+  "pct_rule": "percent reported only when base n >= 30, else 'base too small'",
+  "sandbox_note": "raw data outside the repo; authors replaced by salted hash; salt not committed",
+  "failure_records_all_sources": 21,
+  "arctic_shift_windows_given_up": 10,
+  "failures_by_source": {
+   "arctic_shift": 10,
+   "appstore": 11
+  },
+  "crawl_scope_note": "time-boxed crawl: 14 of 30 thread-discovery tasks, 6 of 120 keyword tasks and no wider-brand keyword tasks completed; see data/README.md",
+  "comparison_basis": "all cross-brand modules use general subreddits only"
+ },
+ "formulas": {
+  "wilson_95": "centre=(p+z^2/2n)/(1+z^2/n); half=z*sqrt(p(1-p)/n+z^2/4n^2)/(1+z^2/n); z=1.96",
+  "net_sentiment": "(pos - neg) / (pos + neg + neu), VADER compound: pos >= 0.05, neg <= -0.05, else neu",
+  "top_of_mind_first": "k = top-level replies whose first-named brand (earliest text position) is b; base = replies naming any brand; one reply per author per thread",
+  "top_of_mind_total": "k = replies naming b at least once; base = replies naming any brand (multiple response, shares sum >100%)",
+  "penetration_proxy": "k = distinct authors with >= 1 ownership/purchase phrase in a sentence naming b; base = distinct authors with >= 1 brand mention",
+  "correspondence_analysis": "P=N/n; r,c = margins; S=(P-rc^T)/sqrt(rc^T); S=U*D*V^T; row coords=U*D/sqrt(r); col coords=V*D/sqrt(c); axis inertia=D^2; total inertia=chi2/n",
+  "chi_square": "sum (O-E)^2/E, df=(R-1)(C-1), E=row*col/n",
+  "adjusted_std_residual": "(O-E)/sqrt(E*(1-row/n)*(1-col/n)); flagged |z|>1.96 and, stricter, |z|> Bonferroni z for alpha=.05/cells",
+  "kmeans": "repertoire vector = share of author's brand-mention sentences per brand (+ 'other') and share touching each attribute; KMeans n_init=10 seed 0; k in 2..6 by silhouette"
+ },
+ "dictionaries": {
+  "attributes": {
+   "price/value": "pric(e|es|ed|ey|ing)|expensive|cheap(er)?\\b|afford|\\bcost(s|ly)?\\b|worth|\\bvalue\\b|budget|\\$\\d|\\bsales?\\b|discount|overpriced|bargain|\\bdeals?\\b|splurge",
+   "quality/durability": "quality|durab|well[- ]made|falls? apart|fell apart|pill(s|ed|ing)\\b|shrunk|shrinks?\\b|seams?\\b|stitch|fabric|material|flimsy|cheaply made|holds? up|wear and tear|lasted|last(s)? (long|years|forever)|\\bthin\\b|see[- ]through",
+   "fit/sizing": "\\bfit(s|ted|ting)?\\b|\\bsiz(e|es|ed|ing)\\b|runs? (small|large|big|true)|\\btts\\b|petite|inseam|baggy|too tight|too (short|long)|length\\b",
+   "style/trend": "\\bstyle(s|d)?\\b|stylish|trend(y|s|ing)?\\b|\\bcute\\b|aesthetic|fashionable|\\bchic\\b|classic|design(s|er)?\\b|versatile|basics?\\b|gorgeous|pretty|elevated",
+   "sustainability/ethics": "sustainab|ethic(al|s)?\\b|fast fashion|\\beco\\b|environment|\\bwaste\\b|labou?r|sweatshop|greenwash|recycl|organic|polyester|landfill|exploit|microplastic",
+   "shipping/returns": "\\bship(s|ping|ped)?\\b|deliver|\\barriv|\\breturn(s|ed|ing)?\\b|refund|exchange|tracking|package|customs|\\bduty\\b|duties|tariff|delayed|\\bdelay",
+   "customer service": "customer (service|care|support)|\\bsupport\\b|\\brude\\b|helpful|\\bchat\\b|complain|resolved|\\bcs\\b|contacted|called them|emailed (them|aritzia|zara|shein)",
+   "store experience": "in[- ]store|\\bstores?\\b|fitting rooms?|sales associate|\\bstaff\\b|\\bmall\\b|boutique|checkout line|\\blocation\\b|try (it|them|on) in"
+  },
+  "brands": {
+   "Aritzia": [
+    "\\baritzia\\b"
+   ],
+   "Zara": [
+    "\\bzara\\b"
+   ],
+   "H&M": [
+    "\\bH ?& ?M\\b|\\bH ?&amp; ?M\\b|\\bH and M\\b",
+    "\\bHM\\b"
+   ],
+   "Shein": [
+    "\\bshein\\b"
+   ],
+   "Uniqlo": [
+    "\\buniqlo\\b"
+   ],
+   "Forever 21": [
+    "\\bforever ?21\\b|\\bf21\\b"
+   ],
+   "Garage": [
+    "\\bGarage\\b"
+   ],
+   "Abercrombie": [
+    "\\babercrombie\\b",
+    "\\bA&F\\b"
+   ],
+   "Lululemon": [
+    "\\blululemon\\b"
+   ],
+   "Old Navy": [
+    "\\bold navy\\b"
+   ],
+   "Gap": [
+    "\\bGap\\b"
+   ],
+   "Mango": [
+    "\\bMango\\b"
+   ],
+   "Urban Outfitters": [
+    "\\burban outfitters\\b",
+    "\\bUO\\b"
+   ],
+   "Brandy Melville": [
+    "\\bbrandy melville\\b",
+    "\\bBrandy\\b"
+   ],
+   "Princess Polly": [
+    "\\bprincess polly\\b"
+   ],
+   "Temu": [
+    "\\btemu\\b"
+   ],
+   "Dynamite": [
+    "\\bDynamite\\b"
+   ],
+   "Simons": [
+    "\\bSimons\\b|\\bLa Maison Simons\\b"
+   ],
+   "Edikted": [
+    "\\bedikted\\b"
+   ],
+   "Hollister": [
+    "\\bhollister\\b"
+   ],
+   "American Eagle": [
+    "\\bamerican eagle\\b",
+    "\\bAE\\b"
+   ],
+   "Free People": [
+    "\\bfree people\\b"
+   ],
+   "Everlane": [
+    "\\beverlane\\b"
+   ],
+   "COS": [
+    "\\bCOS\\b"
+   ],
+   "Madewell": [
+    "\\bmadewell\\b"
+   ],
+   "Reformation": [
+    "\\bReformation\\b"
+   ]
+  },
+  "brand_modes": {
+   "Aritzia": [
+    "ci"
+   ],
+   "Zara": [
+    "ci"
+   ],
+   "H&M": [
+    "cap",
+    "ctx"
+   ],
+   "Shein": [
+    "ci"
+   ],
+   "Uniqlo": [
+    "ci"
+   ],
+   "Forever 21": [
+    "ci"
+   ],
+   "Garage": [
+    "ctx"
+   ],
+   "Abercrombie": [
+    "ci",
+    "cap"
+   ],
+   "Lululemon": [
+    "ci"
+   ],
+   "Old Navy": [
+    "ci"
+   ],
+   "Gap": [
+    "ctx"
+   ],
+   "Mango": [
+    "ctx"
+   ],
+   "Urban Outfitters": [
+    "ci",
+    "ctx"
+   ],
+   "Brandy Melville": [
+    "ci",
+    "ctx"
+   ],
+   "Princess Polly": [
+    "ci"
+   ],
+   "Temu": [
+    "ci"
+   ],
+   "Dynamite": [
+    "ctx"
+   ],
+   "Simons": [
+    "ctx"
+   ],
+   "Edikted": [
+    "ci"
+   ],
+   "Hollister": [
+    "ci"
+   ],
+   "American Eagle": [
+    "ci",
+    "ctx"
+   ],
+   "Free People": [
+    "ci"
+   ],
+   "Everlane": [
+    "ci"
+   ],
+   "COS": [
+    "ctx"
+   ],
+   "Madewell": [
+    "ci"
+   ],
+   "Reformation": [
+    "ctx"
+   ]
+  },
+  "ownership_phrases": "\\b(?:i|we|i['’]ve|ive)\\b[^.!?]{0,40}\\b(?:bought|ordered|purchased|picked up|snagged|got|own|owned|returned)\\b|\\bmy\\b[^.!?]{0,40}\\bfrom\\b|\\bhaul\\b|\\b(?:ordered|bought|purchased|got)\\b[^.!?]{0,30}\\bfrom\\b",
+  "context_words": "\\b(jeans?|dress(es)?|tops?|shirts?|sweaters?|clothes|clothing|stores?|shop(s|ping)?|bought|buy|ordered|orders?|brands?|outfits?|haul|fits?|sizing|sizes?|pants|jackets?|coats?|skirts?|hoodies?|returns?|sale|mall|online|wear|wearing|collection|quality|cheap|affordable)\\b"
+ },
+ "sample": {
+  "reddit_items": 29507,
+  "reddit_posts": 9987,
+  "reddit_comments": 19520,
+  "reddit_authors": 16697,
+  "by_subreddit": {
+   "Aritzia": {
+    "posts": 1481,
+    "comments": 2670
+   },
+   "BrandyMelville": {
+    "posts": 1447,
+    "comments": 2434
+   },
+   "FrugalFemaleFashion": {
+    "posts": 2
+   },
+   "OUTFITS": {
+    "posts": 18
+   },
+   "Oldnavy": {
+    "posts": 1483,
+    "comments": 2965
+   },
+   "PetiteFashionAdvice": {
+    "posts": 23
+   },
+   "PlusSizeFashion": {
+    "posts": 9
+   },
+   "Shein": {
+    "posts": 1462,
+    "comments": 2079
+   },
+   "femalefashion": {
+    "posts": 7
+   },
+   "femalefashionadvice": {
+    "posts": 582,
+    "comments": 1878
+   },
+   "findfashion": {
+    "posts": 45
+   },
+   "frugalmalefashion": {
+    "posts": 2
+   },
+   "lululemon": {
+    "posts": 1475,
+    "comments": 2762
+   },
+   "malefashionadvice": {
+    "posts": 462,
+    "comments": 1772
+   },
+   "uniqlo": {
+    "posts": 1489,
+    "comments": 2960
+   }
+  },
+  "items_mentioning_a_brand": 1865,
+  "authors_mentioning_a_brand": 1453,
+  "mention_sentences": 2779,
+  "single_brand_sentences": 2100,
+  "multi_brand_sentences_excluded_from_sentiment": 679,
+  "items_per_brand": {
+   "Aritzia": 260,
+   "Zara": 403,
+   "H&M": 312,
+   "Shein": 382,
+   "Uniqlo": 538,
+   "Forever 21": 22,
+   "Garage": 1,
+   "Abercrombie": 74,
+   "Lululemon": 42,
+   "Old Navy": 89,
+   "Gap": 33,
+   "Mango": 6,
+   "Urban Outfitters": 13,
+   "Brandy Melville": 2,
+   "Princess Polly": 3,
+   "Temu": 39,
+   "Simons": 3,
+   "Edikted": 1,
+   "Hollister": 11,
+   "American Eagle": 19,
+   "Free People": 28,
+   "Everlane": 85,
+   "COS": 25,
+   "Madewell": 52,
+   "Reformation": 18
+  },
+  "sentences_per_brand": {
+   "Aritzia": 284,
+   "Zara": 473,
+   "H&M": 339,
+   "Shein": 441,
+   "Uniqlo": 584,
+   "Forever 21": 25,
+   "Garage": 1,
+   "Abercrombie": 87,
+   "Lululemon": 47,
+   "Old Navy": 113,
+   "Gap": 33,
+   "Mango": 6,
+   "Urban Outfitters": 13,
+   "Brandy Melville": 2,
+   "Princess Polly": 3,
+   "Temu": 40,
+   "Simons": 3,
+   "Edikted": 1,
+   "Hollister": 14,
+   "American Eagle": 24,
+   "Free People": 31,
+   "Everlane": 113,
+   "COS": 26,
+   "Madewell": 52,
+   "Reformation": 24
+  },
+  "authors_per_brand": {
+   "Aritzia": 209,
+   "Zara": 331,
+   "H&M": 251,
+   "Shein": 327,
+   "Uniqlo": 443,
+   "Forever 21": 22,
+   "Garage": 1,
+   "Abercrombie": 68,
+   "Lululemon": 40,
+   "Old Navy": 82,
+   "Gap": 32,
+   "Mango": 6,
+   "Urban Outfitters": 12,
+   "Brandy Melville": 2,
+   "Princess Polly": 3,
+   "Temu": 38,
+   "Simons": 3,
+   "Edikted": 1,
+   "Hollister": 11,
+   "American Eagle": 19,
+   "Free People": 27,
+   "Everlane": 70,
+   "COS": 24,
+   "Madewell": 46,
+   "Reformation": 14
+  },
+  "comparison_basis": "general subreddits only; per-brand counts below are general-sub counts",
+  "mention_sentences_by_sub_type_before_filter": {
+   "brand": 5830,
+   "general": 2779
+  },
+  "appstore_reviews": {},
+  "apps": {
+   "Aritzia": {
+    "id": 6742152082,
+    "name": "Aritzia",
+    "seller": "Aritzia LP",
+    "rating_count_us": 39526,
+    "avg_rating_us": 4.91188,
+    "rating_count_ca": 45954,
+    "avg_rating_ca": 4.82953
+   },
+   "Zara": {
+    "id": 547951480,
+    "name": "ZARA",
+    "seller": "Industria de Diseno Textil, S.A.",
+    "rating_count_us": 413358,
+    "avg_rating_us": 4.8227,
+    "rating_count_ca": 68116,
+    "avg_rating_ca": 4.76334
+   },
+   "H&M": {
+    "id": 834465911,
+    "name": "H&M",
+    "seller": "H & M Hennes & Mauritz AB",
+    "rating_count_us": 243350,
+    "avg_rating_us": 4.83844,
+    "rating_count_ca": 96794,
+    "avg_rating_ca": 4.81867
+   },
+   "Shein": {
+    "id": 878577184,
+    "name": "SHEIN - Shopping Online",
+    "seller": "ROADGET BUSINESS PTE. LTD.",
+    "rating_count_us": 4046959,
+    "avg_rating_us": 4.73343,
+    "rating_count_ca": 392635,
+    "avg_rating_ca": 4.69607
+   },
+   "Uniqlo": {
+    "id": 1284609872,
+    "name": "UNIQLO: Clothes Shopping",
+    "seller": "UNIQLO CO., LTD.",
+    "rating_count_us": 115718,
+    "avg_rating_us": 4.78488,
+    "rating_count_ca": 5108,
+    "avg_rating_ca": 4.78974
+   }
+  },
+  "wikipedia_series": {
+   "Aritzia": 12,
+   "Zara": 12,
+   "H&M": 12,
+   "Shein": 12,
+   "Uniqlo": 12,
+   "Temu": 12,
+   "Forever 21": 12,
+   "Lululemon": 12,
+   "Old Navy": 12,
+   "Gap": 12,
+   "Brandy Melville": 12
+  },
+  "thread_ids_selected": 60
+ },
+ "modules": {
+  "top_of_mind": {
+   "question": "Which brands come to mind first when shoppers are asked where to shop / what to buy? (unaided awareness proxy)",
+   "caveat": "replies to recommendation threads in general fashion subs; recommenders answer for the asker, so this is a proxy for salience, not self-reported unaided awareness",
+   "threads_by_subreddit": {
+    "malefashionadvice": 48,
+    "femalefashionadvice": 12
+   },
+   "sample_composition_warning": "thread selection is by reply count; the most-replied recommendation threads are mostly menswear (malefashionadvice), so brand shares lean to menswear-friendly brands (Uniqlo, Old Navy, Abercrombie, Lululemon) and cannot be read as the Gen Z / Millennial women's market",
+   "threads_with_replies": 60,
+   "top_level_replies": 2140,
+   "replies_naming_a_brand": 217,
+   "first_mention": {
+    "Uniqlo": {
+     "k": 92,
+     "base": 217,
+     "pct": 42.4,
+     "ci95": [
+      36.0,
+      49.0
+     ]
+    },
+    "Lululemon": {
+     "k": 22,
+     "base": 217,
+     "pct": 10.1,
+     "ci95": [
+      6.8,
+      14.9
+     ]
+    },
+    "Abercrombie": {
+     "k": 19,
+     "base": 217,
+     "pct": 8.8,
+     "ci95": [
+      5.7,
+      13.3
+     ]
+    },
+    "Old Navy": {
+     "k": 17,
+     "base": 217,
+     "pct": 7.8,
+     "ci95": [
+      4.9,
+      12.2
+     ]
+    },
+    "Madewell": {
+     "k": 10,
+     "base": 217,
+     "pct": 4.6,
+     "ci95": [
+      2.5,
+      8.3
+     ]
+    },
+    "American Eagle": {
+     "k": 9,
+     "base": 217,
+     "pct": 4.1,
+     "ci95": [
+      2.2,
+      7.7
+     ]
+    },
+    "Everlane": {
+     "k": 8,
+     "base": 217,
+     "pct": 3.7,
+     "ci95": [
+      1.9,
+      7.1
+     ]
+    },
+    "Gap": {
+     "k": 8,
+     "base": 217,
+     "pct": 3.7,
+     "ci95": [
+      1.9,
+      7.1
+     ]
+    },
+    "Zara": {
+     "k": 7,
+     "base": 217,
+     "pct": 3.2,
+     "ci95": [
+      1.6,
+      6.5
+     ]
+    },
+    "COS": {
+     "k": 6,
+     "base": 217,
+     "pct": 2.8,
+     "ci95": [
+      1.3,
+      5.9
+     ]
+    },
+    "H&M": {
+     "k": 4,
+     "base": 217,
+     "pct": 1.8,
+     "ci95": [
+      0.7,
+      4.6
+     ]
+    },
+    "Shein": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Aritzia": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Free People": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Urban Outfitters": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Reformation": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Simons": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Temu": {
+     "k": 1,
+     "base": 217,
+     "pct": 0.5,
+     "ci95": [
+      0.1,
+      2.6
+     ]
+    },
+    "Hollister": {
+     "k": 1,
+     "base": 217,
+     "pct": 0.5,
+     "ci95": [
+      0.1,
+      2.6
+     ]
+    },
+    "Mango": {
+     "k": 1,
+     "base": 217,
+     "pct": 0.5,
+     "ci95": [
+      0.1,
+      2.6
+     ]
+    }
+   },
+   "total_mention": {
+    "Uniqlo": {
+     "k": 95,
+     "base": 217,
+     "pct": 43.8,
+     "ci95": [
+      37.3,
+      50.4
+     ]
+    },
+    "Old Navy": {
+     "k": 25,
+     "base": 217,
+     "pct": 11.5,
+     "ci95": [
+      7.9,
+      16.5
+     ]
+    },
+    "Abercrombie": {
+     "k": 25,
+     "base": 217,
+     "pct": 11.5,
+     "ci95": [
+      7.9,
+      16.5
+     ]
+    },
+    "Lululemon": {
+     "k": 23,
+     "base": 217,
+     "pct": 10.6,
+     "ci95": [
+      7.2,
+      15.4
+     ]
+    },
+    "Gap": {
+     "k": 12,
+     "base": 217,
+     "pct": 5.5,
+     "ci95": [
+      3.2,
+      9.4
+     ]
+    },
+    "Everlane": {
+     "k": 12,
+     "base": 217,
+     "pct": 5.5,
+     "ci95": [
+      3.2,
+      9.4
+     ]
+    },
+    "Madewell": {
+     "k": 11,
+     "base": 217,
+     "pct": 5.1,
+     "ci95": [
+      2.9,
+      8.8
+     ]
+    },
+    "American Eagle": {
+     "k": 9,
+     "base": 217,
+     "pct": 4.1,
+     "ci95": [
+      2.2,
+      7.7
+     ]
+    },
+    "Zara": {
+     "k": 8,
+     "base": 217,
+     "pct": 3.7,
+     "ci95": [
+      1.9,
+      7.1
+     ]
+    },
+    "COS": {
+     "k": 7,
+     "base": 217,
+     "pct": 3.2,
+     "ci95": [
+      1.6,
+      6.5
+     ]
+    },
+    "H&M": {
+     "k": 5,
+     "base": 217,
+     "pct": 2.3,
+     "ci95": [
+      1.0,
+      5.3
+     ]
+    },
+    "Aritzia": {
+     "k": 4,
+     "base": 217,
+     "pct": 1.8,
+     "ci95": [
+      0.7,
+      4.6
+     ]
+    },
+    "Shein": {
+     "k": 3,
+     "base": 217,
+     "pct": 1.4,
+     "ci95": [
+      0.5,
+      4.0
+     ]
+    },
+    "Reformation": {
+     "k": 3,
+     "base": 217,
+     "pct": 1.4,
+     "ci95": [
+      0.5,
+      4.0
+     ]
+    },
+    "Free People": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Mango": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Urban Outfitters": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Simons": {
+     "k": 2,
+     "base": 217,
+     "pct": 0.9,
+     "ci95": [
+      0.3,
+      3.3
+     ]
+    },
+    "Temu": {
+     "k": 1,
+     "base": 217,
+     "pct": 0.5,
+     "ci95": [
+      0.1,
+      2.6
+     ]
+    },
+    "Hollister": {
+     "k": 1,
+     "base": 217,
+     "pct": 0.5,
+     "ci95": [
+      0.1,
+      2.6
+     ]
+    }
+   }
+  },
+  "penetration_proxy": {
+   "question": "What share of brand-mentioning authors say they own or bought each brand?",
+   "disclosure": "A proxy, NOT true penetration: only authors who talked about a brand are in the base, brand subreddits over-represent their own brand, and phrase matching misses and over-catches.",
+   "general_subreddits_only": {
+    "base_authors": 1453,
+    "by_brand": {
+     "H&M": {
+      "k": 34,
+      "base": 1453,
+      "pct": 2.3,
+      "ci95": [
+       1.7,
+       3.3
+      ]
+     },
+     "Zara": {
+      "k": 33,
+      "base": 1453,
+      "pct": 2.3,
+      "ci95": [
+       1.6,
+       3.2
+      ]
+     },
+     "Uniqlo": {
+      "k": 33,
+      "base": 1453,
+      "pct": 2.3,
+      "ci95": [
+       1.6,
+       3.2
+      ]
+     },
+     "Shein": {
+      "k": 29,
+      "base": 1453,
+      "pct": 2.0,
+      "ci95": [
+       1.4,
+       2.9
+      ]
+     },
+     "Aritzia": {
+      "k": 25,
+      "base": 1453,
+      "pct": 1.7,
+      "ci95": [
+       1.2,
+       2.5
+      ]
+     },
+     "Old Navy": {
+      "k": 6,
+      "base": 1453,
+      "pct": 0.4,
+      "ci95": [
+       0.2,
+       0.9
+      ]
+     },
+     "Forever 21": {
+      "k": 4,
+      "base": 1453,
+      "pct": 0.3,
+      "ci95": [
+       0.1,
+       0.7
+      ]
+     },
+     "Abercrombie": {
+      "k": 4,
+      "base": 1453,
+      "pct": 0.3,
+      "ci95": [
+       0.1,
+       0.7
+      ]
+     },
+     "Lululemon": {
+      "k": 4,
+      "base": 1453,
+      "pct": 0.3,
+      "ci95": [
+       0.1,
+       0.7
+      ]
+     },
+     "Everlane": {
+      "k": 4,
+      "base": 1453,
+      "pct": 0.3,
+      "ci95": [
+       0.1,
+       0.7
+      ]
+     },
+     "COS": {
+      "k": 3,
+      "base": 1453,
+      "pct": 0.2,
+      "ci95": [
+       0.1,
+       0.6
+      ]
+     },
+     "Gap": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     },
+     "Urban Outfitters": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     },
+     "Temu": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     },
+     "Simons": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     },
+     "American Eagle": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     },
+     "Free People": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     },
+     "Reformation": {
+      "k": 1,
+      "base": 1453,
+      "pct": 0.1,
+      "ci95": [
+       0.0,
+       0.4
+      ]
+     }
+    }
+   }
+  },
+  "profiling": {
+   "question": "Who is talking: self-reported age, gender, country, and how does the brand mix differ by generation?",
+   "definitions": "Gen Z = age 14-29, Millennial = 30-45 (in 2026), Older = 46+; first self-report by an author wins; age from '(24F)', 'I'm 24', '24 y/o', 'born in 1998'",
+   "coverage_all_authors": {
+    "base": 16697,
+    "age": {
+     "k": 98,
+     "base": 16697,
+     "pct": 0.6,
+     "ci95": [
+      0.5,
+      0.7
+     ]
+    },
+    "gender": {
+     "k": 63,
+     "base": 16697,
+     "pct": 0.4,
+     "ci95": [
+      0.3,
+      0.5
+     ]
+    },
+    "country": {
+     "k": 140,
+     "base": 16697,
+     "pct": 0.8,
+     "ci95": [
+      0.7,
+      1.0
+     ]
+    }
+   },
+   "coverage_brand_mentioning_authors": {
+    "base": 1453,
+    "age": {
+     "k": 33,
+     "base": 1453,
+     "pct": 2.3,
+     "ci95": [
+      1.6,
+      3.2
+     ]
+    },
+    "gender": {
+     "k": 13,
+     "base": 1453,
+     "pct": 0.9,
+     "ci95": [
+      0.5,
+      1.5
+     ]
+    },
+    "country": {
+     "k": 21,
+     "base": 1453,
+     "pct": 1.4,
+     "ci95": [
+      0.9,
+      2.2
+     ]
+    }
+   },
+   "generation_of_brand_mentioning_authors": {
+    "Millennial (30-45)": {
+     "k": 13,
+     "base": 33,
+     "pct": 39.4,
+     "ci95": [
+      24.7,
+      56.3
+     ]
+    },
+    "Gen Z (14-29)": {
+     "k": 19,
+     "base": 33,
+     "pct": 57.6,
+     "ci95": [
+      40.8,
+      72.8
+     ]
+    },
+    "Older (46+)": {
+     "k": 1,
+     "base": 33,
+     "pct": 3.0,
+     "ci95": [
+      0.5,
+      15.3
+     ]
+    }
+   },
+   "gender_of_brand_mentioning_authors": {
+    "female": {
+     "k": 11,
+     "base": 13,
+     "pct": null,
+     "status": "base too small"
+    },
+    "male": {
+     "k": 2,
+     "base": 13,
+     "pct": null,
+     "status": "base too small"
+    }
+   },
+   "country_of_brand_mentioning_authors": {
+    "US": {
+     "k": 10,
+     "base": 21,
+     "pct": null,
+     "status": "base too small"
+    },
+    "Canada": {
+     "k": 11,
+     "base": 21,
+     "pct": null,
+     "status": "base too small"
+    }
+   },
+   "median_age_known": 25.0,
+   "brand_mix_by_generation": {
+    "Gen Z (14-29)": {
+     "mention_sentences": 31,
+     "authors": 19,
+     "brand_share": {
+      "Zara": {
+       "k": 8,
+       "base": 31,
+       "pct": 25.8,
+       "ci95": [
+        13.7,
+        43.2
+       ]
+      },
+      "Aritzia": {
+       "k": 4,
+       "base": 31,
+       "pct": 12.9,
+       "ci95": [
+        5.1,
+        28.9
+       ]
+      },
+      "Old Navy": {
+       "k": 4,
+       "base": 31,
+       "pct": 12.9,
+       "ci95": [
+        5.1,
+        28.9
+       ]
+      },
+      "Uniqlo": {
+       "k": 4,
+       "base": 31,
+       "pct": 12.9,
+       "ci95": [
+        5.1,
+        28.9
+       ]
+      },
+      "Shein": {
+       "k": 4,
+       "base": 31,
+       "pct": 12.9,
+       "ci95": [
+        5.1,
+        28.9
+       ]
+      },
+      "Forever 21": {
+       "k": 4,
+       "base": 31,
+       "pct": 12.9,
+       "ci95": [
+        5.1,
+        28.9
+       ]
+      },
+      "H&M": {
+       "k": 2,
+       "base": 31,
+       "pct": 6.5,
+       "ci95": [
+        1.8,
+        20.7
+       ]
+      },
+      "Abercrombie": {
+       "k": 1,
+       "base": 31,
+       "pct": 3.2,
+       "ci95": [
+        0.6,
+        16.2
+       ]
+      }
+     }
+    },
+    "Millennial (30-45)": {
+     "mention_sentences": 40,
+     "authors": 13,
+     "brand_share": {
+      "Zara": {
+       "k": 8,
+       "base": 40,
+       "pct": 20.0,
+       "ci95": [
+        10.5,
+        34.8
+       ]
+      },
+      "Reformation": {
+       "k": 7,
+       "base": 40,
+       "pct": 17.5,
+       "ci95": [
+        8.7,
+        32.0
+       ]
+      },
+      "Aritzia": {
+       "k": 7,
+       "base": 40,
+       "pct": 17.5,
+       "ci95": [
+        8.7,
+        32.0
+       ]
+      },
+      "H&M": {
+       "k": 5,
+       "base": 40,
+       "pct": 12.5,
+       "ci95": [
+        5.5,
+        26.1
+       ]
+      },
+      "Uniqlo": {
+       "k": 4,
+       "base": 40,
+       "pct": 10.0,
+       "ci95": [
+        4.0,
+        23.1
+       ]
+      },
+      "Shein": {
+       "k": 3,
+       "base": 40,
+       "pct": 7.5,
+       "ci95": [
+        2.6,
+        19.9
+       ]
+      },
+      "Free People": {
+       "k": 2,
+       "base": 40,
+       "pct": 5.0,
+       "ci95": [
+        1.4,
+        16.5
+       ]
+      },
+      "Old Navy": {
+       "k": 1,
+       "base": 40,
+       "pct": 2.5,
+       "ci95": [
+        0.4,
+        12.9
+       ]
+      },
+      "Everlane": {
+       "k": 1,
+       "base": 40,
+       "pct": 2.5,
+       "ci95": [
+        0.4,
+        12.9
+       ]
+      },
+      "COS": {
+       "k": 1,
+       "base": 40,
+       "pct": 2.5,
+       "ci95": [
+        0.4,
+        12.9
+       ]
+      },
+      "American Eagle": {
+       "k": 1,
+       "base": 40,
+       "pct": 2.5,
+       "ci95": [
+        0.4,
+        12.9
+       ]
+      }
+     }
+    }
+   }
+  },
+  "positioning": {
+   "question": "How do brands differ on what people talk about (price, quality, fit, ...)?",
+   "unit": "single-brand sentences containing an attribute keyword (a sentence can hit several attributes)",
+   "brands_in_matrix": [
+    "Aritzia",
+    "Zara",
+    "H&M",
+    "Shein",
+    "Uniqlo",
+    "Old Navy",
+    "Everlane"
+   ],
+   "attributes": [
+    "price/value",
+    "quality/durability",
+    "fit/sizing",
+    "style/trend",
+    "sustainability/ethics",
+    "shipping/returns",
+    "customer service",
+    "store experience"
+   ],
+   "min_attribute_hits_per_brand": 30,
+   "core_brands_excluded_base_too_small": {},
+   "counts": {
+    "Aritzia": {
+     "price/value": 28,
+     "quality/durability": 20,
+     "fit/sizing": 20,
+     "style/trend": 21,
+     "sustainability/ethics": 3,
+     "shipping/returns": 1,
+     "customer service": 1,
+     "store experience": 7
+    },
+    "Zara": {
+     "price/value": 70,
+     "quality/durability": 54,
+     "fit/sizing": 34,
+     "style/trend": 51,
+     "sustainability/ethics": 17,
+     "shipping/returns": 7,
+     "customer service": 2,
+     "store experience": 16
+    },
+    "H&M": {
+     "price/value": 38,
+     "quality/durability": 29,
+     "fit/sizing": 22,
+     "style/trend": 31,
+     "sustainability/ethics": 10,
+     "shipping/returns": 2,
+     "customer service": 1,
+     "store experience": 10
+    },
+    "Shein": {
+     "price/value": 54,
+     "quality/durability": 62,
+     "fit/sizing": 20,
+     "style/trend": 41,
+     "sustainability/ethics": 45,
+     "shipping/returns": 11,
+     "customer service": 5,
+     "store experience": 29
+    },
+    "Uniqlo": {
+     "price/value": 67,
+     "quality/durability": 57,
+     "fit/sizing": 44,
+     "style/trend": 76,
+     "sustainability/ethics": 10,
+     "shipping/returns": 2,
+     "customer service": 3,
+     "store experience": 11
+    },
+    "Old Navy": {
+     "price/value": 8,
+     "quality/durability": 7,
+     "fit/sizing": 6,
+     "style/trend": 6,
+     "sustainability/ethics": 1,
+     "shipping/returns": 1,
+     "customer service": 0,
+     "store experience": 1
+    },
+    "Everlane": {
+     "price/value": 19,
+     "quality/durability": 8,
+     "fit/sizing": 4,
+     "style/trend": 4,
+     "sustainability/ethics": 3,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "row_share_pct": {
+    "Aritzia": {
+     "price/value": 27.7,
+     "quality/durability": 19.8,
+     "fit/sizing": 19.8,
+     "style/trend": 20.8,
+     "sustainability/ethics": 3.0,
+     "shipping/returns": 1.0,
+     "customer service": 1.0,
+     "store experience": 6.9
+    },
+    "Zara": {
+     "price/value": 27.9,
+     "quality/durability": 21.5,
+     "fit/sizing": 13.5,
+     "style/trend": 20.3,
+     "sustainability/ethics": 6.8,
+     "shipping/returns": 2.8,
+     "customer service": 0.8,
+     "store experience": 6.4
+    },
+    "H&M": {
+     "price/value": 26.6,
+     "quality/durability": 20.3,
+     "fit/sizing": 15.4,
+     "style/trend": 21.7,
+     "sustainability/ethics": 7.0,
+     "shipping/returns": 1.4,
+     "customer service": 0.7,
+     "store experience": 7.0
+    },
+    "Shein": {
+     "price/value": 20.2,
+     "quality/durability": 23.2,
+     "fit/sizing": 7.5,
+     "style/trend": 15.4,
+     "sustainability/ethics": 16.9,
+     "shipping/returns": 4.1,
+     "customer service": 1.9,
+     "store experience": 10.9
+    },
+    "Uniqlo": {
+     "price/value": 24.8,
+     "quality/durability": 21.1,
+     "fit/sizing": 16.3,
+     "style/trend": 28.1,
+     "sustainability/ethics": 3.7,
+     "shipping/returns": 0.7,
+     "customer service": 1.1,
+     "store experience": 4.1
+    },
+    "Old Navy": {
+     "price/value": 26.7,
+     "quality/durability": 23.3,
+     "fit/sizing": 20.0,
+     "style/trend": 20.0,
+     "sustainability/ethics": 3.3,
+     "shipping/returns": 3.3,
+     "customer service": 0.0,
+     "store experience": 3.3
+    },
+    "Everlane": {
+     "price/value": 50.0,
+     "quality/durability": 21.1,
+     "fit/sizing": 10.5,
+     "style/trend": 10.5,
+     "sustainability/ethics": 7.9,
+     "shipping/returns": 0.0,
+     "customer service": 0.0,
+     "store experience": 0.0
+    }
+   },
+   "n_sentence_attribute_hits": 1100,
+   "attributes_used": [
+    "price/value",
+    "quality/durability",
+    "fit/sizing",
+    "style/trend",
+    "sustainability/ethics",
+    "shipping/returns",
+    "customer service",
+    "store experience"
+   ],
+   "chi_square": {
+    "chi2": 100.75,
+    "df": 42,
+    "p": 9.80069723638243e-07,
+    "n": 1100,
+    "cells_expected_lt_5": 16,
+    "cells": 56,
+    "note": "hits are not fully independent (one author can contribute many); treat p as indicative"
+   },
+   "correspondence_analysis": {
+    "total_inertia": 0.0916,
+    "check_chi2_over_n": 0.0916,
+    "axis_inertia": [
+     0.0702,
+     0.0148,
+     0.0039
+    ],
+    "axis_inertia_pct": [
+     76.7,
+     16.1,
+     4.3
+    ],
+    "row_coords_dim1_2": {
+     "Aritzia": [
+      0.22,
+      0.015
+     ],
+     "Zara": [
+      0.031,
+      -0.04
+     ],
+     "H&M": [
+      0.073,
+      0.002
+     ],
+     "Shein": [
+      -0.445,
+      0.022
+     ],
+     "Uniqlo": [
+      0.245,
+      0.095
+     ],
+     "Old Navy": [
+      0.211,
+      -0.025
+     ],
+     "Everlane": [
+      0.159,
+      -0.591
+     ]
+    },
+    "col_coords_dim1_2": {
+     "price/value": [
+      0.108,
+      -0.179
+     ],
+     "quality/durability": [
+      -0.043,
+      0.002
+     ],
+     "fit/sizing": [
+      0.272,
+      0.059
+     ],
+     "style/trend": [
+      0.176,
+      0.141
+     ],
+     "sustainability/ethics": [
+      -0.635,
+      -0.045
+     ],
+     "shipping/returns": [
+      -0.568,
+      0.049
+     ],
+     "customer service": [
+      -0.358,
+      0.226
+     ],
+     "store experience": [
+      -0.369,
+      0.126
+     ]
+    }
+   },
+   "adjusted_std_residuals": {
+    "Aritzia": {
+     "price/value": 0.46,
+     "quality/durability": -0.45,
+     "fit/sizing": 1.89,
+     "style/trend": -0.03,
+     "sustainability/ethics": -1.98,
+     "shipping/returns": -0.86,
+     "customer service": -0.1,
+     "store experience": 0.09
+    },
+    "Zara": {
+     "price/value": 0.85,
+     "quality/durability": -0.01,
+     "fit/sizing": -0.05,
+     "style/trend": -0.26,
+     "sustainability/ethics": -0.87,
+     "shipping/returns": 0.75,
+     "customer service": -0.51,
+     "store experience": -0.25
+    },
+    "H&M": {
+     "price/value": 0.22,
+     "quality/durability": -0.39,
+     "fit/sizing": 0.65,
+     "style/trend": 0.24,
+     "sustainability/ethics": -0.52,
+     "shipping/returns": -0.69,
+     "customer service": -0.48,
+     "store experience": 0.14
+    },
+    "Shein": {
+     "price/value": -2.4,
+     "quality/durability": 0.77,
+     "fit/sizing": -3.36,
+     "style/trend": -2.56,
+     "sustainability/ethics": 6.03,
+     "shipping/returns": 2.49,
+     "customer service": 1.41,
+     "store experience": 3.1
+    },
+    "Uniqlo": {
+     "price/value": -0.43,
+     "quality/durability": -0.2,
+     "fit/sizing": 1.47,
+     "style/trend": 3.37,
+     "sustainability/ethics": -3.04,
+     "shipping/returns": -1.87,
+     "customer service": 0.04,
+     "store experience": -2.0
+    },
+    "Old Navy": {
+     "price/value": 0.11,
+     "quality/durability": 0.24,
+     "fit/sizing": 1.03,
+     "style/trend": -0.12,
+     "sustainability/ethics": -0.97,
+     "shipping/returns": 0.44,
+     "customer service": -0.58,
+     "store experience": -0.75
+    },
+    "Everlane": {
+     "price/value": 3.47,
+     "quality/durability": -0.08,
+     "fit/sizing": -0.57,
+     "style/trend": -1.6,
+     "sustainability/ethics": -0.05,
+     "shipping/returns": -0.94,
+     "customer service": -0.66,
+     "store experience": -1.68
+    }
+   },
+   "bonferroni_z": 3.32,
+   "significant_cells": [
+    {
+     "brand": "Aritzia",
+     "attribute": "sustainability/ethics",
+     "observed": 3,
+     "expected": 8.2,
+     "z": -1.98,
+     "direction": "under",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Shein",
+     "attribute": "price/value",
+     "observed": 54,
+     "expected": 68.9,
+     "z": -2.4,
+     "direction": "under",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Shein",
+     "attribute": "fit/sizing",
+     "observed": 20,
+     "expected": 36.4,
+     "z": -3.36,
+     "direction": "under",
+     "survives_bonferroni": true
+    },
+    {
+     "brand": "Shein",
+     "attribute": "style/trend",
+     "observed": 41,
+     "expected": 55.8,
+     "z": -2.56,
+     "direction": "under",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Shein",
+     "attribute": "sustainability/ethics",
+     "observed": 45,
+     "expected": 21.6,
+     "z": 6.03,
+     "direction": "over",
+     "survives_bonferroni": true
+    },
+    {
+     "brand": "Shein",
+     "attribute": "shipping/returns",
+     "observed": 11,
+     "expected": 5.8,
+     "z": 2.49,
+     "direction": "over",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Shein",
+     "attribute": "store experience",
+     "observed": 29,
+     "expected": 18.0,
+     "z": 3.1,
+     "direction": "over",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Uniqlo",
+     "attribute": "style/trend",
+     "observed": 76,
+     "expected": 56.5,
+     "z": 3.37,
+     "direction": "over",
+     "survives_bonferroni": true
+    },
+    {
+     "brand": "Uniqlo",
+     "attribute": "sustainability/ethics",
+     "observed": 10,
+     "expected": 21.8,
+     "z": -3.04,
+     "direction": "under",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Uniqlo",
+     "attribute": "store experience",
+     "observed": 11,
+     "expected": 18.2,
+     "z": -2.0,
+     "direction": "under",
+     "survives_bonferroni": false
+    },
+    {
+     "brand": "Everlane",
+     "attribute": "price/value",
+     "observed": 19,
+     "expected": 9.8,
+     "z": 3.47,
+     "direction": "over",
+     "survives_bonferroni": true
+    }
+   ]
+  },
+  "perception": {
+   "question": "How positive or negative is talk about each brand, and on which attributes?",
+   "method": "VADER (Hutto & Gilbert 2014) compound score on each single-brand sentence; thresholds +/-0.05",
+   "by_brand": {
+    "Uniqlo": {
+     "base": 504,
+     "net_sentiment": 0.435,
+     "pos": {
+      "k": 257,
+      "base": 504,
+      "pct": 51.0,
+      "ci95": [
+       46.6,
+       55.3
+      ]
+     },
+     "neg": {
+      "k": 38,
+      "base": 504,
+      "pct": 7.5,
+      "ci95": [
+       5.5,
+       10.2
+      ]
+     },
+     "neu_pct": 41.5
+    },
+    "Zara": {
+     "base": 392,
+     "net_sentiment": 0.265,
+     "pos": {
+      "k": 176,
+      "base": 392,
+      "pct": 44.9,
+      "ci95": [
+       40.0,
+       49.8
+      ]
+     },
+     "neg": {
+      "k": 72,
+      "base": 392,
+      "pct": 18.4,
+      "ci95": [
+       14.8,
+       22.5
+      ]
+     },
+     "neu_pct": 36.7
+    },
+    "Shein": {
+     "base": 356,
+     "net_sentiment": 0.202,
+     "pos": {
+      "k": 156,
+      "base": 356,
+      "pct": 43.8,
+      "ci95": [
+       38.8,
+       49.0
+      ]
+     },
+     "neg": {
+      "k": 84,
+      "base": 356,
+      "pct": 23.6,
+      "ci95": [
+       19.5,
+       28.3
+      ]
+     },
+     "neu_pct": 32.6
+    },
+    "H&M": {
+     "base": 252,
+     "net_sentiment": 0.329,
+     "pos": {
+      "k": 110,
+      "base": 252,
+      "pct": 43.7,
+      "ci95": [
+       37.7,
+       49.8
+      ]
+     },
+     "neg": {
+      "k": 27,
+      "base": 252,
+      "pct": 10.7,
+      "ci95": [
+       7.5,
+       15.1
+      ]
+     },
+     "neu_pct": 45.6
+    },
+    "Aritzia": {
+     "base": 221,
+     "net_sentiment": 0.412,
+     "pos": {
+      "k": 106,
+      "base": 221,
+      "pct": 48.0,
+      "ci95": [
+       41.5,
+       54.5
+      ]
+     },
+     "neg": {
+      "k": 15,
+      "base": 221,
+      "pct": 6.8,
+      "ci95": [
+       4.2,
+       10.9
+      ]
+     },
+     "neu_pct": 45.2
+    },
+    "Old Navy": {
+     "base": 76,
+     "net_sentiment": 0.329,
+     "pos": {
+      "k": 30,
+      "base": 76,
+      "pct": 39.5,
+      "ci95": [
+       29.2,
+       50.7
+      ]
+     },
+     "neg": {
+      "k": 5,
+      "base": 76,
+      "pct": 6.6,
+      "ci95": [
+       2.8,
+       14.5
+      ]
+     },
+     "neu_pct": 53.9
+    },
+    "Everlane": {
+     "base": 67,
+     "net_sentiment": 0.134,
+     "pos": {
+      "k": 14,
+      "base": 67,
+      "pct": 20.9,
+      "ci95": [
+       12.9,
+       32.1
+      ]
+     },
+     "neg": {
+      "k": 5,
+      "base": 67,
+      "pct": 7.5,
+      "ci95": [
+       3.2,
+       16.3
+      ]
+     },
+     "neu_pct": 71.6
+    },
+    "Abercrombie": {
+     "base": 50,
+     "net_sentiment": 0.32,
+     "pos": {
+      "k": 22,
+      "base": 50,
+      "pct": 44.0,
+      "ci95": [
+       31.2,
+       57.7
+      ]
+     },
+     "neg": {
+      "k": 6,
+      "base": 50,
+      "pct": 12.0,
+      "ci95": [
+       5.6,
+       23.8
+      ]
+     },
+     "neu_pct": 44.0
+    },
+    "Lululemon": {
+     "base": 40,
+     "net_sentiment": 0.5,
+     "pos": {
+      "k": 21,
+      "base": 40,
+      "pct": 52.5,
+      "ci95": [
+       37.5,
+       67.1
+      ]
+     },
+     "neg": {
+      "k": 1,
+      "base": 40,
+      "pct": 2.5,
+      "ci95": [
+       0.4,
+       12.9
+      ]
+     },
+     "neu_pct": 45.0
+    },
+    "Madewell": {
+     "base": 30,
+     "net_sentiment": 0.433,
+     "pos": {
+      "k": 17,
+      "base": 30,
+      "pct": 56.7,
+      "ci95": [
+       39.2,
+       72.6
+      ]
+     },
+     "neg": {
+      "k": 4,
+      "base": 30,
+      "pct": 13.3,
+      "ci95": [
+       5.3,
+       29.7
+      ]
+     },
+     "neu_pct": 30.0
+    },
+    "Forever 21": {
+     "base": 20,
+     "status": "base too small"
+    },
+    "American Eagle": {
+     "base": 15,
+     "status": "base too small"
+    },
+    "Free People": {
+     "base": 15,
+     "status": "base too small"
+    },
+    "COS": {
+     "base": 15,
+     "status": "base too small"
+    },
+    "Reformation": {
+     "base": 15,
+     "status": "base too small"
+    },
+    "Gap": {
+     "base": 13,
+     "status": "base too small"
+    },
+    "Temu": {
+     "base": 6,
+     "status": "base too small"
+    },
+    "Hollister": {
+     "base": 6,
+     "status": "base too small"
+    },
+    "Urban Outfitters": {
+     "base": 3,
+     "status": "base too small"
+    },
+    "Mango": {
+     "base": 2,
+     "status": "base too small"
+    },
+    "Garage": {
+     "base": 1,
+     "status": "base too small"
+    },
+    "Simons": {
+     "base": 1,
+     "status": "base too small"
+    }
+   },
+   "by_brand_x_attribute": {
+    "Aritzia": {
+     "price/value": {
+      "base": 28,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 20,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 20,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 21,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "customer service": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 7,
+      "status": "base too small"
+     }
+    },
+    "Zara": {
+     "price/value": {
+      "base": 70,
+      "net_sentiment": 0.357,
+      "pos": {
+       "k": 37,
+       "base": 70,
+       "pct": 52.9,
+       "ci95": [
+        41.3,
+        64.1
+       ]
+      },
+      "neg": {
+       "k": 12,
+       "base": 70,
+       "pct": 17.1,
+       "ci95": [
+        10.1,
+        27.6
+       ]
+      },
+      "neu_pct": 30.0
+     },
+     "quality/durability": {
+      "base": 54,
+      "net_sentiment": 0.204,
+      "pos": {
+       "k": 26,
+       "base": 54,
+       "pct": 48.1,
+       "ci95": [
+        35.4,
+        61.1
+       ]
+      },
+      "neg": {
+       "k": 15,
+       "base": 54,
+       "pct": 27.8,
+       "ci95": [
+        17.6,
+        40.9
+       ]
+      },
+      "neu_pct": 24.1
+     },
+     "fit/sizing": {
+      "base": 34,
+      "net_sentiment": 0.088,
+      "pos": {
+       "k": 12,
+       "base": 34,
+       "pct": 35.3,
+       "ci95": [
+        21.5,
+        52.1
+       ]
+      },
+      "neg": {
+       "k": 9,
+       "base": 34,
+       "pct": 26.5,
+       "ci95": [
+        14.6,
+        43.1
+       ]
+      },
+      "neu_pct": 38.2
+     },
+     "style/trend": {
+      "base": 51,
+      "net_sentiment": 0.627,
+      "pos": {
+       "k": 37,
+       "base": 51,
+       "pct": 72.5,
+       "ci95": [
+        59.1,
+        82.9
+       ]
+      },
+      "neg": {
+       "k": 5,
+       "base": 51,
+       "pct": 9.8,
+       "ci95": [
+        4.3,
+        21.0
+       ]
+      },
+      "neu_pct": 17.6
+     },
+     "sustainability/ethics": {
+      "base": 17,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 7,
+      "status": "base too small"
+     },
+     "customer service": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 16,
+      "status": "base too small"
+     }
+    },
+    "H&M": {
+     "price/value": {
+      "base": 38,
+      "net_sentiment": 0.421,
+      "pos": {
+       "k": 20,
+       "base": 38,
+       "pct": 52.6,
+       "ci95": [
+        37.3,
+        67.5
+       ]
+      },
+      "neg": {
+       "k": 4,
+       "base": 38,
+       "pct": 10.5,
+       "ci95": [
+        4.2,
+        24.1
+       ]
+      },
+      "neu_pct": 36.8
+     },
+     "quality/durability": {
+      "base": 29,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 22,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 31,
+      "net_sentiment": 0.548,
+      "pos": {
+       "k": 19,
+       "base": 31,
+       "pct": 61.3,
+       "ci95": [
+        43.8,
+        76.3
+       ]
+      },
+      "neg": {
+       "k": 2,
+       "base": 31,
+       "pct": 6.5,
+       "ci95": [
+        1.8,
+        20.7
+       ]
+      },
+      "neu_pct": 32.3
+     },
+     "sustainability/ethics": {
+      "base": 10,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "customer service": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 10,
+      "status": "base too small"
+     }
+    },
+    "Shein": {
+     "price/value": {
+      "base": 54,
+      "net_sentiment": 0.278,
+      "pos": {
+       "k": 27,
+       "base": 54,
+       "pct": 50.0,
+       "ci95": [
+        37.1,
+        62.9
+       ]
+      },
+      "neg": {
+       "k": 12,
+       "base": 54,
+       "pct": 22.2,
+       "ci95": [
+        13.2,
+        34.9
+       ]
+      },
+      "neu_pct": 27.8
+     },
+     "quality/durability": {
+      "base": 62,
+      "net_sentiment": 0.161,
+      "pos": {
+       "k": 27,
+       "base": 62,
+       "pct": 43.5,
+       "ci95": [
+        31.9,
+        55.9
+       ]
+      },
+      "neg": {
+       "k": 17,
+       "base": 62,
+       "pct": 27.4,
+       "ci95": [
+        17.9,
+        39.6
+       ]
+      },
+      "neu_pct": 29.0
+     },
+     "fit/sizing": {
+      "base": 20,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 41,
+      "net_sentiment": 0.512,
+      "pos": {
+       "k": 26,
+       "base": 41,
+       "pct": 63.4,
+       "ci95": [
+        48.1,
+        76.4
+       ]
+      },
+      "neg": {
+       "k": 5,
+       "base": 41,
+       "pct": 12.2,
+       "ci95": [
+        5.3,
+        25.5
+       ]
+      },
+      "neu_pct": 24.4
+     },
+     "sustainability/ethics": {
+      "base": 45,
+      "net_sentiment": 0.222,
+      "pos": {
+       "k": 21,
+       "base": 45,
+       "pct": 46.7,
+       "ci95": [
+        32.9,
+        60.9
+       ]
+      },
+      "neg": {
+       "k": 11,
+       "base": 45,
+       "pct": 24.4,
+       "ci95": [
+        14.2,
+        38.7
+       ]
+      },
+      "neu_pct": 28.9
+     },
+     "shipping/returns": {
+      "base": 11,
+      "status": "base too small"
+     },
+     "customer service": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 29,
+      "status": "base too small"
+     }
+    },
+    "Uniqlo": {
+     "price/value": {
+      "base": 67,
+      "net_sentiment": 0.612,
+      "pos": {
+       "k": 44,
+       "base": 67,
+       "pct": 65.7,
+       "ci95": [
+        53.7,
+        75.9
+       ]
+      },
+      "neg": {
+       "k": 3,
+       "base": 67,
+       "pct": 4.5,
+       "ci95": [
+        1.5,
+        12.4
+       ]
+      },
+      "neu_pct": 29.9
+     },
+     "quality/durability": {
+      "base": 57,
+      "net_sentiment": 0.596,
+      "pos": {
+       "k": 39,
+       "base": 57,
+       "pct": 68.4,
+       "ci95": [
+        55.5,
+        79.0
+       ]
+      },
+      "neg": {
+       "k": 5,
+       "base": 57,
+       "pct": 8.8,
+       "ci95": [
+        3.8,
+        18.9
+       ]
+      },
+      "neu_pct": 22.8
+     },
+     "fit/sizing": {
+      "base": 44,
+      "net_sentiment": 0.682,
+      "pos": {
+       "k": 34,
+       "base": 44,
+       "pct": 77.3,
+       "ci95": [
+        63.0,
+        87.2
+       ]
+      },
+      "neg": {
+       "k": 4,
+       "base": 44,
+       "pct": 9.1,
+       "ci95": [
+        3.6,
+        21.2
+       ]
+      },
+      "neu_pct": 13.6
+     },
+     "style/trend": {
+      "base": 76,
+      "net_sentiment": 0.697,
+      "pos": {
+       "k": 57,
+       "base": 76,
+       "pct": 75.0,
+       "ci95": [
+        64.2,
+        83.4
+       ]
+      },
+      "neg": {
+       "k": 4,
+       "base": 76,
+       "pct": 5.3,
+       "ci95": [
+        2.1,
+        12.8
+       ]
+      },
+      "neu_pct": 19.7
+     },
+     "sustainability/ethics": {
+      "base": 10,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "customer service": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 11,
+      "status": "base too small"
+     }
+    },
+    "Forever 21": {
+     "price/value": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Abercrombie": {
+     "price/value": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 8,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 7,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 3,
+      "status": "base too small"
+     }
+    },
+    "Lululemon": {
+     "price/value": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 8,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Old Navy": {
+     "price/value": {
+      "base": 8,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 7,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Gap": {
+     "price/value": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Mango": {
+     "price/value": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Urban Outfitters": {
+     "customer service": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Temu": {
+     "quality/durability": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Simons": {
+     "fit/sizing": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Hollister": {
+     "fit/sizing": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "American Eagle": {
+     "price/value": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "customer service": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Free People": {
+     "price/value": {
+      "base": 7,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Everlane": {
+     "price/value": {
+      "base": 19,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 8,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 3,
+      "status": "base too small"
+     }
+    },
+    "COS": {
+     "price/value": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 8,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Madewell": {
+     "price/value": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "store experience": {
+      "base": 1,
+      "status": "base too small"
+     }
+    },
+    "Reformation": {
+     "price/value": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "quality/durability": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "fit/sizing": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "style/trend": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "sustainability/ethics": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "shipping/returns": {
+      "base": 1,
+      "status": "base too small"
+     }
+    }
+   },
+   "appstore": {
+    "store_level_ratings_from_itunes_lookup": {
+     "Aritzia": {
+      "rating_count_us": 39526,
+      "avg_rating_us": 4.91188,
+      "rating_count_ca": 45954,
+      "avg_rating_ca": 4.82953
+     },
+     "Zara": {
+      "rating_count_us": 413358,
+      "avg_rating_us": 4.8227,
+      "rating_count_ca": 68116,
+      "avg_rating_ca": 4.76334
+     },
+     "H&M": {
+      "rating_count_us": 243350,
+      "avg_rating_us": 4.83844,
+      "rating_count_ca": 96794,
+      "avg_rating_ca": 4.81867
+     },
+     "Shein": {
+      "rating_count_us": 4046959,
+      "avg_rating_us": 4.73343,
+      "rating_count_ca": 392635,
+      "avg_rating_ca": 4.69607
+     },
+     "Uniqlo": {
+      "rating_count_us": 115718,
+      "avg_rating_us": 4.78488,
+      "rating_count_ca": 5108,
+      "avg_rating_ca": 4.78974
+     }
+    },
+    "store_level_note": "all-time store aggregates as of apps_lookup_utc; not the review sample",
+    "apps_lookup_utc": "2026-11-02T07:20:33+00:00",
+    "review_text_status": "UNAVAILABLE: customer-review RSS returned empty feeds for all apps/storefronts at collection time (retried over ~2 hours)",
+    "note": "app reviews judge the app/delivery as much as clothes; only the most recent reviews (RSS, max 10 pages x 50) are available; non-English text scores neutral",
+    "by_app_storefront": {}
+   },
+   "vader_validation": {
+    "n": 50,
+    "agreement": 0.64,
+    "agreement_ci95": [
+     0.501,
+     0.759
+    ],
+    "cohens_kappa": 0.449,
+    "confusion_human_rows_vader_cols": {
+     "pos": {
+      "pos": 14,
+      "neu": 1,
+      "neg": 1
+     },
+     "neu": {
+      "pos": 5,
+      "neu": 14,
+      "neg": 1
+     },
+     "neg": {
+      "pos": 5,
+      "neu": 5,
+      "neg": 4
+     }
+    },
+    "human_label_counts": {
+     "neu": 20,
+     "pos": 16,
+     "neg": 14
+    },
+    "labeller": "one human-equivalent labeller (the engineer agent), blind to VADER output; single rater, so no inter-rater reliability",
+    "caution": "n=50 gives a wide interval; sentence sentiment toward a brand is not the same as VADER's sentence polarity"
+   }
+  },
+  "segmentation": {
+   "question": "Are there groups of shoppers with different brand repertoires and concerns?",
+   "eligible_authors": 525,
+   "rule": "authors with >= 2 brand-mention sentences",
+   "vector_brands": [
+    "Aritzia",
+    "Zara",
+    "H&M",
+    "Shein",
+    "Uniqlo",
+    "Abercrombie",
+    "Old Navy",
+    "Everlane",
+    "Madewell",
+    "other"
+   ],
+   "silhouette_by_k": {
+    "2": 0.135,
+    "3": 0.166,
+    "4": 0.185,
+    "5": 0.189,
+    "6": 0.185
+   },
+   "k": 5,
+   "segments": [
+    {
+     "segment": 1,
+     "authors": 83,
+     "share_of_eligible": {
+      "k": 83,
+      "base": 525,
+      "pct": 15.8,
+      "ci95": [
+       12.9,
+       19.2
+      ]
+     },
+     "mention_sentences": 275,
+     "top_brands_share_of_mentions": {
+      "Zara": 64.7,
+      "Uniqlo": 13.1,
+      "H&M": 5.5,
+      "Shein": 3.6
+     },
+     "top_attributes_share_of_mentions": {
+      "price/value": 16.4,
+      "style/trend": 10.9,
+      "fit/sizing": 9.5
+     },
+     "sentiment": {
+      "base": 212,
+      "net_sentiment": 0.292,
+      "pos": {
+       "k": 99,
+       "base": 212,
+       "pct": 46.7,
+       "ci95": [
+        40.1,
+        53.4
+       ]
+      },
+      "neg": {
+       "k": 37,
+       "base": 212,
+       "pct": 17.5,
+       "ci95": [
+        12.9,
+        23.1
+       ]
+      },
+      "neu_pct": 35.8
+     },
+     "generation_known_n": 3,
+     "generation_mix": {
+      "Gen Z (14-29)": {
+       "k": 2,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "Millennial (30-45)": {
+       "k": 1,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "name": "Zara-led, fit/sizing-minded (rule: highest brand lift with >=10% share; highest attribute lift)"
+    },
+    {
+     "segment": 2,
+     "authors": 123,
+     "share_of_eligible": {
+      "k": 123,
+      "base": 525,
+      "pct": 23.4,
+      "ci95": [
+       20.0,
+       27.2
+      ]
+     },
+     "mention_sentences": 544,
+     "top_brands_share_of_mentions": {
+      "Aritzia": 27.9,
+      "Uniqlo": 9.7,
+      "Old Navy": 8.8,
+      "Zara": 8.3
+     },
+     "top_attributes_share_of_mentions": {
+      "price/value": 8.5,
+      "quality/durability": 7.2,
+      "style/trend": 6.6
+     },
+     "sentiment": {
+      "base": 299,
+      "net_sentiment": 0.428,
+      "pos": {
+       "k": 148,
+       "base": 299,
+       "pct": 49.5,
+       "ci95": [
+        43.9,
+        55.1
+       ]
+      },
+      "neg": {
+       "k": 20,
+       "base": 299,
+       "pct": 6.7,
+       "ci95": [
+        4.4,
+        10.1
+       ]
+      },
+      "neu_pct": 43.8
+     },
+     "generation_known_n": 4,
+     "generation_mix": {
+      "Millennial (30-45)": {
+       "k": 3,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      },
+      "Gen Z (14-29)": {
+       "k": 1,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "name": "Aritzia-led, shipping/returns-minded (rule: highest brand lift with >=10% share; highest attribute lift)"
+    },
+    {
+     "segment": 3,
+     "authors": 113,
+     "share_of_eligible": {
+      "k": 113,
+      "base": 525,
+      "pct": 21.5,
+      "ci95": [
+       18.2,
+       25.2
+      ]
+     },
+     "mention_sentences": 381,
+     "top_brands_share_of_mentions": {
+      "Shein": 56.7,
+      "Everlane": 11.3,
+      "Zara": 9.7,
+      "Temu": 6.3
+     },
+     "top_attributes_share_of_mentions": {
+      "price/value": 12.9,
+      "quality/durability": 10.5,
+      "style/trend": 8.7
+     },
+     "sentiment": {
+      "base": 239,
+      "net_sentiment": 0.197,
+      "pos": {
+       "k": 91,
+       "base": 239,
+       "pct": 38.1,
+       "ci95": [
+        32.2,
+        44.4
+       ]
+      },
+      "neg": {
+       "k": 44,
+       "base": 239,
+       "pct": 18.4,
+       "ci95": [
+        14.0,
+        23.8
+       ]
+      },
+      "neu_pct": 43.5
+     },
+     "generation_known_n": 4,
+     "generation_mix": {
+      "Millennial (30-45)": {
+       "k": 1,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      },
+      "Gen Z (14-29)": {
+       "k": 3,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "name": "Shein-led, sustainability/ethics-minded (rule: highest brand lift with >=10% share; highest attribute lift)"
+    },
+    {
+     "segment": 4,
+     "authors": 103,
+     "share_of_eligible": {
+      "k": 103,
+      "base": 525,
+      "pct": 19.6,
+      "ci95": [
+       16.4,
+       23.2
+      ]
+     },
+     "mention_sentences": 285,
+     "top_brands_share_of_mentions": {
+      "Uniqlo": 64.2,
+      "Everlane": 8.1,
+      "Old Navy": 6.0,
+      "Madewell": 4.2
+     },
+     "top_attributes_share_of_mentions": {
+      "style/trend": 13.3,
+      "quality/durability": 11.9,
+      "fit/sizing": 8.8
+     },
+     "sentiment": {
+      "base": 210,
+      "net_sentiment": 0.405,
+      "pos": {
+       "k": 111,
+       "base": 210,
+       "pct": 52.9,
+       "ci95": [
+        46.1,
+        59.5
+       ]
+      },
+      "neg": {
+       "k": 26,
+       "base": 210,
+       "pct": 12.4,
+       "ci95": [
+        8.6,
+        17.5
+       ]
+      },
+      "neu_pct": 34.8
+     },
+     "generation_known_n": 1,
+     "generation_mix": {
+      "Gen Z (14-29)": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "name": "Uniqlo-led, style/trend-minded (rule: highest brand lift with >=10% share; highest attribute lift)"
+    },
+    {
+     "segment": 5,
+     "authors": 103,
+     "share_of_eligible": {
+      "k": 103,
+      "base": 525,
+      "pct": 19.6,
+      "ci95": [
+       16.4,
+       23.2
+      ]
+     },
+     "mention_sentences": 366,
+     "top_brands_share_of_mentions": {
+      "H&M": 47.8,
+      "Uniqlo": 13.1,
+      "Zara": 12.6,
+      "Shein": 6.3
+     },
+     "top_attributes_share_of_mentions": {
+      "price/value": 11.7,
+      "quality/durability": 10.7,
+      "style/trend": 5.2
+     },
+     "sentiment": {
+      "base": 212,
+      "net_sentiment": 0.259,
+      "pos": {
+       "k": 87,
+       "base": 212,
+       "pct": 41.0,
+       "ci95": [
+        34.6,
+        47.8
+       ]
+      },
+      "neg": {
+       "k": 32,
+       "base": 212,
+       "pct": 15.1,
+       "ci95": [
+        10.9,
+        20.5
+       ]
+      },
+      "neu_pct": 43.9
+     },
+     "generation_known_n": 3,
+     "generation_mix": {
+      "Gen Z (14-29)": {
+       "k": 1,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "Millennial (30-45)": {
+       "k": 2,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "name": "H&M-led, quality/durability-minded (rule: highest brand lift with >=10% share; highest attribute lift)"
+    }
+   ],
+   "caveat": "silhouette is often low on sparse share vectors; segments describe talk patterns, not validated shopper types"
+  },
+  "trend": {
+   "question": "Does public search interest (Wikipedia pageviews) track social mention volume?",
+   "months": [
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+   ],
+   "caveat": "mention volume is bounded by collection caps per month/subreddit; use share-of-voice, not raw growth. Pageviews are English Wikipedia, all-access, user agent.",
+   "wikipedia_monthly_views": {
+    "Aritzia": {
+     "202511": 14923,
+     "202512": 14031,
+     "202601": 13800,
+     "202602": 8685,
+     "202603": 8470,
+     "202604": 7805,
+     "202605": 8339,
+     "202606": 7550,
+     "202607": 8351,
+     "202608": 8327,
+     "202609": 10442,
+     "202610": 9718
+    },
+    "Zara": {
+     "202511": 36627,
+     "202512": 34825,
+     "202601": 31206,
+     "202602": 30652,
+     "202603": 28242,
+     "202604": 26198,
+     "202605": 26279,
+     "202606": 22734,
+     "202607": 22646,
+     "202608": 23445,
+     "202609": 22678,
+     "202610": 21694
+    },
+    "H&M": {
+     "202511": 42854,
+     "202512": 39943,
+     "202601": 37435,
+     "202602": 32209,
+     "202603": 34047,
+     "202604": 33777,
+     "202605": 37630,
+     "202606": 33107,
+     "202607": 32995,
+     "202608": 29717,
+     "202609": 31447,
+     "202610": 30069
+    },
+    "Shein": {
+     "202511": 81343,
+     "202512": 42473,
+     "202601": 38915,
+     "202602": 38166,
+     "202603": 40804,
+     "202604": 41606,
+     "202605": 46605,
+     "202606": 34959,
+     "202607": 33641,
+     "202608": 33765,
+     "202609": 32525,
+     "202610": 26349
+    },
+    "Uniqlo": {
+     "202511": 34549,
+     "202512": 40044,
+     "202601": 36720,
+     "202602": 45769,
+     "202603": 46982,
+     "202604": 50715,
+     "202605": 46277,
+     "202606": 35801,
+     "202607": 32726,
+     "202608": 32147,
+     "202609": 29679,
+     "202610": 32775
+    },
+    "Temu": {
+     "202511": 79507,
+     "202512": 62595,
+     "202601": 66217,
+     "202602": 50843,
+     "202603": 50111,
+     "202604": 45263,
+     "202605": 44833,
+     "202606": 38770,
+     "202607": 35115,
+     "202608": 40875,
+     "202609": 38860,
+     "202610": 41879
+    },
+    "Forever 21": {
+     "202511": 12284,
+     "202512": 11324,
+     "202601": 21549,
+     "202602": 11518,
+     "202603": 10604,
+     "202604": 10642,
+     "202605": 10579,
+     "202606": 8565,
+     "202607": 8114,
+     "202608": 8637,
+     "202609": 8709,
+     "202610": 7463
+    },
+    "Lululemon": {
+     "202511": 3037,
+     "202512": 3346,
+     "202601": 2770,
+     "202602": 2178,
+     "202603": 1980,
+     "202604": 1896,
+     "202605": 2399,
+     "202606": 1921,
+     "202607": 3330,
+     "202608": 1749,
+     "202609": 4848,
+     "202610": 1922
+    },
+    "Old Navy": {
+     "202511": 10033,
+     "202512": 9182,
+     "202601": 7625,
+     "202602": 5889,
+     "202603": 7009,
+     "202604": 6909,
+     "202605": 8628,
+     "202606": 8077,
+     "202607": 8187,
+     "202608": 8681,
+     "202609": 7054,
+     "202610": 7909
+    },
+    "Gap": {
+     "202511": 20887,
+     "202512": 19043,
+     "202601": 18202,
+     "202602": 15130,
+     "202603": 16541,
+     "202604": 17306,
+     "202605": 27940,
+     "202606": 13779,
+     "202607": 14291,
+     "202608": 15909,
+     "202609": 14347,
+     "202610": 13355
+    },
+    "Brandy Melville": {
+     "202511": 16385,
+     "202512": 19208,
+     "202601": 18027,
+     "202602": 14303,
+     "202603": 17727,
+     "202604": 17581,
+     "202605": 14836,
+     "202606": 17435,
+     "202607": 20060,
+     "202608": 19587,
+     "202609": 15073,
+     "202610": 12835
+    }
+   },
+   "mention_items_by_month": {
+    "Aritzia": {
+     "2025-11": 22,
+     "2025-12": 28,
+     "2026-01": 30,
+     "2026-02": 13,
+     "2026-03": 33,
+     "2026-04": 35,
+     "2026-05": 31,
+     "2026-06": 18,
+     "2026-07": 13,
+     "2026-08": 23,
+     "2026-09": 6,
+     "2026-10": 8
+    },
+    "Zara": {
+     "2025-11": 36,
+     "2025-12": 21,
+     "2026-01": 22,
+     "2026-02": 34,
+     "2026-03": 36,
+     "2026-04": 53,
+     "2026-05": 35,
+     "2026-06": 91,
+     "2026-07": 25,
+     "2026-08": 11,
+     "2026-09": 20,
+     "2026-10": 19
+    },
+    "H&M": {
+     "2025-11": 28,
+     "2025-12": 33,
+     "2026-01": 36,
+     "2026-02": 30,
+     "2026-03": 29,
+     "2026-04": 37,
+     "2026-05": 36,
+     "2026-06": 19,
+     "2026-07": 15,
+     "2026-08": 21,
+     "2026-09": 10,
+     "2026-10": 18
+    },
+    "Shein": {
+     "2025-11": 28,
+     "2025-12": 15,
+     "2026-01": 20,
+     "2026-02": 31,
+     "2026-03": 35,
+     "2026-04": 47,
+     "2026-05": 60,
+     "2026-06": 55,
+     "2026-07": 11,
+     "2026-08": 6,
+     "2026-09": 13,
+     "2026-10": 61
+    },
+    "Uniqlo": {
+     "2025-11": 59,
+     "2025-12": 61,
+     "2026-01": 19,
+     "2026-02": 59,
+     "2026-03": 52,
+     "2026-04": 12,
+     "2026-05": 97,
+     "2026-06": 47,
+     "2026-07": 16,
+     "2026-08": 29,
+     "2026-09": 43,
+     "2026-10": 44
+    },
+    "Forever 21": {
+     "2025-11": 1,
+     "2025-12": 0,
+     "2026-01": 18,
+     "2026-02": 0,
+     "2026-03": 1,
+     "2026-04": 2,
+     "2026-05": 0,
+     "2026-06": 0,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "Garage": {
+     "2025-11": 0,
+     "2025-12": 0,
+     "2026-01": 0,
+     "2026-02": 0,
+     "2026-03": 1,
+     "2026-04": 0,
+     "2026-05": 0,
+     "2026-06": 0,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "Abercrombie": {
+     "2025-11": 2,
+     "2025-12": 2,
+     "2026-01": 4,
+     "2026-02": 3,
+     "2026-03": 8,
+     "2026-04": 13,
+     "2026-05": 8,
+     "2026-06": 10,
+     "2026-07": 5,
+     "2026-08": 7,
+     "2026-09": 6,
+     "2026-10": 6
+    },
+    "Lululemon": {
+     "2025-11": 13,
+     "2025-12": 5,
+     "2026-01": 2,
+     "2026-02": 1,
+     "2026-03": 2,
+     "2026-04": 0,
+     "2026-05": 3,
+     "2026-06": 6,
+     "2026-07": 1,
+     "2026-08": 2,
+     "2026-09": 0,
+     "2026-10": 7
+    },
+    "Old Navy": {
+     "2025-11": 8,
+     "2025-12": 9,
+     "2026-01": 2,
+     "2026-02": 8,
+     "2026-03": 11,
+     "2026-04": 4,
+     "2026-05": 15,
+     "2026-06": 17,
+     "2026-07": 1,
+     "2026-08": 4,
+     "2026-09": 3,
+     "2026-10": 7
+    },
+    "Gap": {
+     "2025-11": 2,
+     "2025-12": 4,
+     "2026-01": 0,
+     "2026-02": 2,
+     "2026-03": 2,
+     "2026-04": 2,
+     "2026-05": 6,
+     "2026-06": 8,
+     "2026-07": 1,
+     "2026-08": 2,
+     "2026-09": 1,
+     "2026-10": 3
+    },
+    "Mango": {
+     "2025-11": 1,
+     "2025-12": 0,
+     "2026-01": 1,
+     "2026-02": 1,
+     "2026-03": 0,
+     "2026-04": 1,
+     "2026-05": 0,
+     "2026-06": 2,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "Urban Outfitters": {
+     "2025-11": 1,
+     "2025-12": 0,
+     "2026-01": 0,
+     "2026-02": 0,
+     "2026-03": 2,
+     "2026-04": 2,
+     "2026-05": 1,
+     "2026-06": 2,
+     "2026-07": 0,
+     "2026-08": 1,
+     "2026-09": 1,
+     "2026-10": 3
+    },
+    "Brandy Melville": {
+     "2025-11": 0,
+     "2025-12": 0,
+     "2026-01": 0,
+     "2026-02": 0,
+     "2026-03": 2,
+     "2026-04": 0,
+     "2026-05": 0,
+     "2026-06": 0,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "Princess Polly": {
+     "2025-11": 0,
+     "2025-12": 0,
+     "2026-01": 0,
+     "2026-02": 0,
+     "2026-03": 2,
+     "2026-04": 1,
+     "2026-05": 0,
+     "2026-06": 0,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "Temu": {
+     "2025-11": 4,
+     "2025-12": 0,
+     "2026-01": 2,
+     "2026-02": 3,
+     "2026-03": 1,
+     "2026-04": 7,
+     "2026-05": 4,
+     "2026-06": 9,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 1,
+     "2026-10": 8
+    },
+    "Simons": {
+     "2025-11": 0,
+     "2025-12": 0,
+     "2026-01": 0,
+     "2026-02": 0,
+     "2026-03": 0,
+     "2026-04": 0,
+     "2026-05": 0,
+     "2026-06": 1,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 2
+    },
+    "Edikted": {
+     "2025-11": 0,
+     "2025-12": 0,
+     "2026-01": 1,
+     "2026-02": 0,
+     "2026-03": 0,
+     "2026-04": 0,
+     "2026-05": 0,
+     "2026-06": 0,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "Hollister": {
+     "2025-11": 2,
+     "2025-12": 0,
+     "2026-01": 3,
+     "2026-02": 0,
+     "2026-03": 1,
+     "2026-04": 0,
+     "2026-05": 3,
+     "2026-06": 1,
+     "2026-07": 1,
+     "2026-08": 0,
+     "2026-09": 0,
+     "2026-10": 0
+    },
+    "American Eagle": {
+     "2025-11": 1,
+     "2025-12": 1,
+     "2026-01": 1,
+     "2026-02": 0,
+     "2026-03": 0,
+     "2026-04": 2,
+     "2026-05": 3,
+     "2026-06": 9,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 1,
+     "2026-10": 1
+    },
+    "Free People": {
+     "2025-11": 0,
+     "2025-12": 0,
+     "2026-01": 0,
+     "2026-02": 1,
+     "2026-03": 2,
+     "2026-04": 2,
+     "2026-05": 4,
+     "2026-06": 5,
+     "2026-07": 0,
+     "2026-08": 2,
+     "2026-09": 0,
+     "2026-10": 12
+    },
+    "Everlane": {
+     "2025-11": 5,
+     "2025-12": 7,
+     "2026-01": 4,
+     "2026-02": 6,
+     "2026-03": 4,
+     "2026-04": 6,
+     "2026-05": 34,
+     "2026-06": 9,
+     "2026-07": 1,
+     "2026-08": 4,
+     "2026-09": 3,
+     "2026-10": 2
+    },
+    "COS": {
+     "2025-11": 1,
+     "2025-12": 9,
+     "2026-01": 1,
+     "2026-02": 2,
+     "2026-03": 2,
+     "2026-04": 3,
+     "2026-05": 4,
+     "2026-06": 1,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 1,
+     "2026-10": 1
+    },
+    "Madewell": {
+     "2025-11": 3,
+     "2025-12": 2,
+     "2026-01": 1,
+     "2026-02": 7,
+     "2026-03": 3,
+     "2026-04": 4,
+     "2026-05": 9,
+     "2026-06": 13,
+     "2026-07": 2,
+     "2026-08": 5,
+     "2026-09": 0,
+     "2026-10": 3
+    },
+    "Reformation": {
+     "2025-11": 3,
+     "2025-12": 2,
+     "2026-01": 1,
+     "2026-02": 0,
+     "2026-03": 0,
+     "2026-04": 5,
+     "2026-05": 2,
+     "2026-06": 4,
+     "2026-07": 0,
+     "2026-08": 0,
+     "2026-09": 1,
+     "2026-10": 0
+    }
+   },
+   "mention_share_of_voice_pct": {
+    "Aritzia": {
+     "2025-11": 10.0,
+     "2025-12": 14.1,
+     "2026-01": 17.9,
+     "2026-02": 6.5,
+     "2026-03": 14.4,
+     "2026-04": 14.7,
+     "2026-05": 8.7,
+     "2026-06": 5.5,
+     "2026-07": 14.1,
+     "2026-08": 19.7,
+     "2026-09": 5.5,
+     "2026-10": 3.9
+    },
+    "Zara": {
+     "2025-11": 16.4,
+     "2025-12": 10.6,
+     "2026-01": 13.1,
+     "2026-02": 16.9,
+     "2026-03": 15.7,
+     "2026-04": 22.3,
+     "2026-05": 9.9,
+     "2026-06": 27.8,
+     "2026-07": 27.2,
+     "2026-08": 9.4,
+     "2026-09": 18.2,
+     "2026-10": 9.3
+    },
+    "H&M": {
+     "2025-11": 12.7,
+     "2025-12": 16.6,
+     "2026-01": 21.4,
+     "2026-02": 14.9,
+     "2026-03": 12.7,
+     "2026-04": 15.5,
+     "2026-05": 10.1,
+     "2026-06": 5.8,
+     "2026-07": 16.3,
+     "2026-08": 17.9,
+     "2026-09": 9.1,
+     "2026-10": 8.8
+    },
+    "Shein": {
+     "2025-11": 12.7,
+     "2025-12": 7.5,
+     "2026-01": 11.9,
+     "2026-02": 15.4,
+     "2026-03": 15.3,
+     "2026-04": 19.7,
+     "2026-05": 16.9,
+     "2026-06": 16.8,
+     "2026-07": 12.0,
+     "2026-08": 5.1,
+     "2026-09": 11.8,
+     "2026-10": 29.8
+    },
+    "Uniqlo": {
+     "2025-11": 26.8,
+     "2025-12": 30.7,
+     "2026-01": 11.3,
+     "2026-02": 29.4,
+     "2026-03": 22.7,
+     "2026-04": 5.0,
+     "2026-05": 27.3,
+     "2026-06": 14.4,
+     "2026-07": 17.4,
+     "2026-08": 24.8,
+     "2026-09": 39.1,
+     "2026-10": 21.5
+    },
+    "Forever 21": {
+     "2025-11": 0.5,
+     "2025-12": 0.0,
+     "2026-01": 10.7,
+     "2026-02": 0.0,
+     "2026-03": 0.4,
+     "2026-04": 0.8,
+     "2026-05": 0.0,
+     "2026-06": 0.0,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "Garage": {
+     "2025-11": 0.0,
+     "2025-12": 0.0,
+     "2026-01": 0.0,
+     "2026-02": 0.0,
+     "2026-03": 0.4,
+     "2026-04": 0.0,
+     "2026-05": 0.0,
+     "2026-06": 0.0,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "Abercrombie": {
+     "2025-11": 0.9,
+     "2025-12": 1.0,
+     "2026-01": 2.4,
+     "2026-02": 1.5,
+     "2026-03": 3.5,
+     "2026-04": 5.5,
+     "2026-05": 2.3,
+     "2026-06": 3.1,
+     "2026-07": 5.4,
+     "2026-08": 6.0,
+     "2026-09": 5.5,
+     "2026-10": 2.9
+    },
+    "Lululemon": {
+     "2025-11": 5.9,
+     "2025-12": 2.5,
+     "2026-01": 1.2,
+     "2026-02": 0.5,
+     "2026-03": 0.9,
+     "2026-04": 0.0,
+     "2026-05": 0.8,
+     "2026-06": 1.8,
+     "2026-07": 1.1,
+     "2026-08": 1.7,
+     "2026-09": 0.0,
+     "2026-10": 3.4
+    },
+    "Old Navy": {
+     "2025-11": 3.6,
+     "2025-12": 4.5,
+     "2026-01": 1.2,
+     "2026-02": 4.0,
+     "2026-03": 4.8,
+     "2026-04": 1.7,
+     "2026-05": 4.2,
+     "2026-06": 5.2,
+     "2026-07": 1.1,
+     "2026-08": 3.4,
+     "2026-09": 2.7,
+     "2026-10": 3.4
+    },
+    "Gap": {
+     "2025-11": 0.9,
+     "2025-12": 2.0,
+     "2026-01": 0.0,
+     "2026-02": 1.0,
+     "2026-03": 0.9,
+     "2026-04": 0.8,
+     "2026-05": 1.7,
+     "2026-06": 2.4,
+     "2026-07": 1.1,
+     "2026-08": 1.7,
+     "2026-09": 0.9,
+     "2026-10": 1.5
+    },
+    "Mango": {
+     "2025-11": 0.5,
+     "2025-12": 0.0,
+     "2026-01": 0.6,
+     "2026-02": 0.5,
+     "2026-03": 0.0,
+     "2026-04": 0.4,
+     "2026-05": 0.0,
+     "2026-06": 0.6,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "Urban Outfitters": {
+     "2025-11": 0.5,
+     "2025-12": 0.0,
+     "2026-01": 0.0,
+     "2026-02": 0.0,
+     "2026-03": 0.9,
+     "2026-04": 0.8,
+     "2026-05": 0.3,
+     "2026-06": 0.6,
+     "2026-07": 0.0,
+     "2026-08": 0.9,
+     "2026-09": 0.9,
+     "2026-10": 1.5
+    },
+    "Brandy Melville": {
+     "2025-11": 0.0,
+     "2025-12": 0.0,
+     "2026-01": 0.0,
+     "2026-02": 0.0,
+     "2026-03": 0.9,
+     "2026-04": 0.0,
+     "2026-05": 0.0,
+     "2026-06": 0.0,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "Princess Polly": {
+     "2025-11": 0.0,
+     "2025-12": 0.0,
+     "2026-01": 0.0,
+     "2026-02": 0.0,
+     "2026-03": 0.9,
+     "2026-04": 0.4,
+     "2026-05": 0.0,
+     "2026-06": 0.0,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "Temu": {
+     "2025-11": 1.8,
+     "2025-12": 0.0,
+     "2026-01": 1.2,
+     "2026-02": 1.5,
+     "2026-03": 0.4,
+     "2026-04": 2.9,
+     "2026-05": 1.1,
+     "2026-06": 2.8,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.9,
+     "2026-10": 3.9
+    },
+    "Simons": {
+     "2025-11": 0.0,
+     "2025-12": 0.0,
+     "2026-01": 0.0,
+     "2026-02": 0.0,
+     "2026-03": 0.0,
+     "2026-04": 0.0,
+     "2026-05": 0.0,
+     "2026-06": 0.3,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 1.0
+    },
+    "Edikted": {
+     "2025-11": 0.0,
+     "2025-12": 0.0,
+     "2026-01": 0.6,
+     "2026-02": 0.0,
+     "2026-03": 0.0,
+     "2026-04": 0.0,
+     "2026-05": 0.0,
+     "2026-06": 0.0,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "Hollister": {
+     "2025-11": 0.9,
+     "2025-12": 0.0,
+     "2026-01": 1.8,
+     "2026-02": 0.0,
+     "2026-03": 0.4,
+     "2026-04": 0.0,
+     "2026-05": 0.8,
+     "2026-06": 0.3,
+     "2026-07": 1.1,
+     "2026-08": 0.0,
+     "2026-09": 0.0,
+     "2026-10": 0.0
+    },
+    "American Eagle": {
+     "2025-11": 0.5,
+     "2025-12": 0.5,
+     "2026-01": 0.6,
+     "2026-02": 0.0,
+     "2026-03": 0.0,
+     "2026-04": 0.8,
+     "2026-05": 0.8,
+     "2026-06": 2.8,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.9,
+     "2026-10": 0.5
+    },
+    "Free People": {
+     "2025-11": 0.0,
+     "2025-12": 0.0,
+     "2026-01": 0.0,
+     "2026-02": 0.5,
+     "2026-03": 0.9,
+     "2026-04": 0.8,
+     "2026-05": 1.1,
+     "2026-06": 1.5,
+     "2026-07": 0.0,
+     "2026-08": 1.7,
+     "2026-09": 0.0,
+     "2026-10": 5.9
+    },
+    "Everlane": {
+     "2025-11": 2.3,
+     "2025-12": 3.5,
+     "2026-01": 2.4,
+     "2026-02": 3.0,
+     "2026-03": 1.7,
+     "2026-04": 2.5,
+     "2026-05": 9.6,
+     "2026-06": 2.8,
+     "2026-07": 1.1,
+     "2026-08": 3.4,
+     "2026-09": 2.7,
+     "2026-10": 1.0
+    },
+    "COS": {
+     "2025-11": 0.5,
+     "2025-12": 4.5,
+     "2026-01": 0.6,
+     "2026-02": 1.0,
+     "2026-03": 0.9,
+     "2026-04": 1.3,
+     "2026-05": 1.1,
+     "2026-06": 0.3,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.9,
+     "2026-10": 0.5
+    },
+    "Madewell": {
+     "2025-11": 1.4,
+     "2025-12": 1.0,
+     "2026-01": 0.6,
+     "2026-02": 3.5,
+     "2026-03": 1.3,
+     "2026-04": 1.7,
+     "2026-05": 2.5,
+     "2026-06": 4.0,
+     "2026-07": 2.2,
+     "2026-08": 4.3,
+     "2026-09": 0.0,
+     "2026-10": 1.5
+    },
+    "Reformation": {
+     "2025-11": 1.4,
+     "2025-12": 1.0,
+     "2026-01": 0.6,
+     "2026-02": 0.0,
+     "2026-03": 0.0,
+     "2026-04": 2.1,
+     "2026-05": 0.6,
+     "2026-06": 1.2,
+     "2026-07": 0.0,
+     "2026-08": 0.0,
+     "2026-09": 0.9,
+     "2026-10": 0.0
+    }
+   },
+   "pearson_r_views_vs_mentions": {
+    "Aritzia": {
+     "r": 0.09,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Zara": {
+     "r": -0.11,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "H&M": {
+     "r": 0.57,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Shein": {
+     "r": -0.02,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Uniqlo": {
+     "r": 0.25,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Temu": {
+     "r": -0.13,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Forever 21": {
+     "r": 0.93,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Lululemon": {
+     "r": -0.08,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Old Navy": {
+     "r": 0.16,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Gap": {
+     "r": 0.25,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    },
+    "Brandy Melville": {
+     "r": 0.11,
+     "n_months": 12,
+     "note": "n=12, descriptive only"
+    }
+   }
+  }
+ },
+ "within_brand_context_brand_subreddits": {
+  "label": "WITHIN-BRAND CONTEXT ONLY: brand-subreddit sentences. Fan communities, not comparable across brands, never used to fill a general-sub cell.",
+  "subreddits_scanned": [
+   "Aritzia",
+   "shein",
+   "uniqlo",
+   "BrandyMelville",
+   "OldNavy",
+   "lululemon"
+  ],
+  "no_subreddit_with_data_found_for": [
+   "Zara",
+   "H&M"
+  ],
+  "by_brand": {
+   "Aritzia": {
+    "sentences": 693,
+    "sentiment": {
+     "base": 693,
+     "net_sentiment": 0.215,
+     "pos": {
+      "k": 270,
+      "base": 693,
+      "pct": 39.0,
+      "ci95": [
+       35.4,
+       42.6
+      ]
+     },
+     "neg": {
+      "k": 121,
+      "base": 693,
+      "pct": 17.5,
+      "ci95": [
+       14.8,
+       20.5
+      ]
+     },
+     "neu_pct": 43.6
+    },
+    "attribute_sentences": {
+     "price/value": 105,
+     "quality/durability": 52,
+     "fit/sizing": 68,
+     "style/trend": 28,
+     "sustainability/ethics": 11,
+     "shipping/returns": 48,
+     "customer service": 17,
+     "store experience": 45
+    }
+   },
+   "Zara": {
+    "sentences": 23,
+    "sentiment": {
+     "base": 23,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 6,
+     "quality/durability": 1,
+     "fit/sizing": 4,
+     "style/trend": 1,
+     "sustainability/ethics": 1,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 1
+    }
+   },
+   "H&M": {
+    "sentences": 17,
+    "sentiment": {
+     "base": 17,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 6,
+     "quality/durability": 6,
+     "fit/sizing": 1,
+     "style/trend": 2,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Shein": {
+    "sentences": 1729,
+    "sentiment": {
+     "base": 1729,
+     "net_sentiment": 0.32,
+     "pos": {
+      "k": 746,
+      "base": 1729,
+      "pct": 43.1,
+      "ci95": [
+       40.8,
+       45.5
+      ]
+     },
+     "neg": {
+      "k": 193,
+      "base": 1729,
+      "pct": 11.2,
+      "ci95": [
+       9.8,
+       12.7
+      ]
+     },
+     "neu_pct": 45.7
+    },
+    "attribute_sentences": {
+     "price/value": 412,
+     "quality/durability": 39,
+     "fit/sizing": 37,
+     "style/trend": 25,
+     "sustainability/ethics": 7,
+     "shipping/returns": 213,
+     "customer service": 20,
+     "store experience": 20
+    }
+   },
+   "Uniqlo": {
+    "sentences": 1538,
+    "sentiment": {
+     "base": 1538,
+     "net_sentiment": 0.226,
+     "pos": {
+      "k": 552,
+      "base": 1538,
+      "pct": 35.9,
+      "ci95": [
+       33.5,
+       38.3
+      ]
+     },
+     "neg": {
+      "k": 205,
+      "base": 1538,
+      "pct": 13.3,
+      "ci95": [
+       11.7,
+       15.1
+      ]
+     },
+     "neu_pct": 50.8
+    },
+    "attribute_sentences": {
+     "price/value": 107,
+     "quality/durability": 101,
+     "fit/sizing": 148,
+     "style/trend": 48,
+     "sustainability/ethics": 23,
+     "shipping/returns": 56,
+     "customer service": 19,
+     "store experience": 122
+    }
+   },
+   "Forever 21": {
+    "sentences": 4,
+    "sentiment": {
+     "base": 4,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 1,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 2
+    }
+   },
+   "Garage": {
+    "sentences": 3,
+    "sentiment": {
+     "base": 3,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 1,
+     "fit/sizing": 0,
+     "style/trend": 1,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Abercrombie": {
+    "sentences": 23,
+    "sentiment": {
+     "base": 23,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 1,
+     "quality/durability": 1,
+     "fit/sizing": 3,
+     "style/trend": 1,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Lululemon": {
+    "sentences": 457,
+    "sentiment": {
+     "base": 457,
+     "net_sentiment": 0.232,
+     "pos": {
+      "k": 178,
+      "base": 457,
+      "pct": 38.9,
+      "ci95": [
+       34.6,
+       43.5
+      ]
+     },
+     "neg": {
+      "k": 72,
+      "base": 457,
+      "pct": 15.8,
+      "ci95": [
+       12.7,
+       19.4
+      ]
+     },
+     "neu_pct": 45.3
+    },
+    "attribute_sentences": {
+     "price/value": 37,
+     "quality/durability": 28,
+     "fit/sizing": 38,
+     "style/trend": 12,
+     "sustainability/ethics": 2,
+     "shipping/returns": 28,
+     "customer service": 12,
+     "store experience": 33
+    }
+   },
+   "Old Navy": {
+    "sentences": 734,
+    "sentiment": {
+     "base": 734,
+     "net_sentiment": 0.183,
+     "pos": {
+      "k": 261,
+      "base": 734,
+      "pct": 35.6,
+      "ci95": [
+       32.2,
+       39.1
+      ]
+     },
+     "neg": {
+      "k": 127,
+      "base": 734,
+      "pct": 17.3,
+      "ci95": [
+       14.7,
+       20.2
+      ]
+     },
+     "neu_pct": 47.1
+    },
+    "attribute_sentences": {
+     "price/value": 69,
+     "quality/durability": 17,
+     "fit/sizing": 47,
+     "style/trend": 15,
+     "sustainability/ethics": 5,
+     "shipping/returns": 54,
+     "customer service": 16,
+     "store experience": 56
+    }
+   },
+   "Gap": {
+    "sentences": 20,
+    "sentiment": {
+     "base": 20,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 2,
+     "quality/durability": 0,
+     "fit/sizing": 1,
+     "style/trend": 1,
+     "sustainability/ethics": 0,
+     "shipping/returns": 5,
+     "customer service": 2,
+     "store experience": 7
+    }
+   },
+   "Urban Outfitters": {
+    "sentences": 1,
+    "sentiment": {
+     "base": 1,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Brandy Melville": {
+    "sentences": 297,
+    "sentiment": {
+     "base": 297,
+     "net_sentiment": 0.229,
+     "pos": {
+      "k": 97,
+      "base": 297,
+      "pct": 32.7,
+      "ci95": [
+       27.6,
+       38.2
+      ]
+     },
+     "neg": {
+      "k": 29,
+      "base": 297,
+      "pct": 9.8,
+      "ci95": [
+       6.9,
+       13.7
+      ]
+     },
+     "neu_pct": 57.6
+    },
+    "attribute_sentences": {
+     "price/value": 17,
+     "quality/durability": 6,
+     "fit/sizing": 23,
+     "style/trend": 15,
+     "sustainability/ethics": 3,
+     "shipping/returns": 4,
+     "customer service": 2,
+     "store experience": 29
+    }
+   },
+   "Temu": {
+    "sentences": 39,
+    "sentiment": {
+     "base": 39,
+     "net_sentiment": 0.308,
+     "pos": {
+      "k": 16,
+      "base": 39,
+      "pct": 41.0,
+      "ci95": [
+       27.1,
+       56.6
+      ]
+     },
+     "neg": {
+      "k": 4,
+      "base": 39,
+      "pct": 10.3,
+      "ci95": [
+       4.1,
+       23.6
+      ]
+     },
+     "neu_pct": 48.7
+    },
+    "attribute_sentences": {
+     "price/value": 7,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 1,
+     "sustainability/ethics": 0,
+     "shipping/returns": 1,
+     "customer service": 1,
+     "store experience": 0
+    }
+   },
+   "Simons": {
+    "sentences": 1,
+    "sentiment": {
+     "base": 1,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 1
+    }
+   },
+   "Edikted": {
+    "sentences": 1,
+    "sentiment": {
+     "base": 1,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Hollister": {
+    "sentences": 13,
+    "sentiment": {
+     "base": 13,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 2,
+     "fit/sizing": 1,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "American Eagle": {
+    "sentences": 3,
+    "sentiment": {
+     "base": 3,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 1,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Free People": {
+    "sentences": 2,
+    "sentiment": {
+     "base": 2,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Everlane": {
+    "sentences": 2,
+    "sentiment": {
+     "base": 2,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 1,
+     "fit/sizing": 1,
+     "style/trend": 1,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "COS": {
+    "sentences": 3,
+    "sentiment": {
+     "base": 3,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 1,
+     "fit/sizing": 0,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Madewell": {
+    "sentences": 2,
+    "sentiment": {
+     "base": 2,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 0,
+     "quality/durability": 0,
+     "fit/sizing": 0,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   },
+   "Reformation": {
+    "sentences": 3,
+    "sentiment": {
+     "base": 3,
+     "status": "base too small"
+    },
+    "attribute_sentences": {
+     "price/value": 1,
+     "quality/durability": 1,
+     "fit/sizing": 1,
+     "style/trend": 0,
+     "sustainability/ethics": 0,
+     "shipping/returns": 0,
+     "customer service": 0,
+     "store experience": 0
+    }
+   }
+  }
+ },
+ "supplementary": {
+  "note": "Supplementary analysis added after the audited report; every other top-level key is unchanged. Proxies from public social text, not survey measures.",
+  "supplementary_analysis_utc": "2026-11-02T18:58:10+00:00",
+  "comparison_basis": "general subreddits only",
+  "funnel": {
+   "label": "SOCIAL-LISTENING PROXY, not a survey funnel: stages come from phrases in public posts, and only authors who talked about the brand are in the base",
+   "base": "distinct authors mentioning the brand in general subreddits (= sample.authors_per_brand)",
+   "stages": {
+    "aware": "mentioned the brand",
+    "considering": "intent phrase in a sentence naming the brand, or any later stage",
+    "bought": "existing ownership/purchase phrase (or advocate)",
+    "advocate": "owner who also used a recommend/repeat phrase about the brand"
+   },
+   "intent_regex": "thinking (?:of|about) (?:buying|getting|ordering|trying)|should i (?:get|buy|order|try)|worth it|worth (?:the|buying)|\\bconsidering\\b|on my (?:wish ?list|list)|want to (?:buy|try|get)|planning (?:to|on) (?:buy|get|order)|debating (?:if|whether|getting|buying)",
+   "advocate_regex": "highly recommend|would recommend|buy(?:ing)? again|bought again|always buy|keep buying|repurchase|go-to|obsessed with my",
+   "ownership_regex": "\\b(?:i|we|i['’]ve|ive)\\b[^.!?]{0,40}\\b(?:bought|ordered|purchased|picked up|snagged|got|own|owned|returned)\\b|\\bmy\\b[^.!?]{0,40}\\bfrom\\b|\\bhaul\\b|\\b(?:ordered|bought|purchased|got)\\b[^.!?]{0,30}\\bfrom\\b",
+   "formulas": "share_of_aware = stage k / aware k; conversion = stage k / previous stage k; Wilson 95% CI; shown only when the base n >= 30; multi-brand sentences credit every brand named",
+   "by_brand": {
+    "Aritzia": {
+     "aware": {
+      "k": 209
+     },
+     "considering": {
+      "k": 26,
+      "share_of_aware": {
+       "k": 26,
+       "base": 209,
+       "pct": 12.4,
+       "ci95": [
+        8.6,
+        17.6
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 26,
+       "base": 209,
+       "pct": 12.4,
+       "ci95": [
+        8.6,
+        17.6
+       ]
+      }
+     },
+     "bought": {
+      "k": 25,
+      "share_of_aware": {
+       "k": 25,
+       "base": 209,
+       "pct": 12.0,
+       "ci95": [
+        8.2,
+        17.1
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 25,
+       "base": 26,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 209,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        1.8
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 25,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Zara": {
+     "aware": {
+      "k": 331
+     },
+     "considering": {
+      "k": 35,
+      "share_of_aware": {
+       "k": 35,
+       "base": 331,
+       "pct": 10.6,
+       "ci95": [
+        7.7,
+        14.4
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 35,
+       "base": 331,
+       "pct": 10.6,
+       "ci95": [
+        7.7,
+        14.4
+       ]
+      }
+     },
+     "bought": {
+      "k": 33,
+      "share_of_aware": {
+       "k": 33,
+       "base": 331,
+       "pct": 10.0,
+       "ci95": [
+        7.2,
+        13.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 33,
+       "base": 35,
+       "pct": 94.3,
+       "ci95": [
+        81.4,
+        98.4
+       ]
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 331,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        1.1
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 33,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        10.4
+       ]
+      }
+     }
+    },
+    "H&M": {
+     "aware": {
+      "k": 251
+     },
+     "considering": {
+      "k": 37,
+      "share_of_aware": {
+       "k": 37,
+       "base": 251,
+       "pct": 14.7,
+       "ci95": [
+        10.9,
+        19.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 37,
+       "base": 251,
+       "pct": 14.7,
+       "ci95": [
+        10.9,
+        19.7
+       ]
+      }
+     },
+     "bought": {
+      "k": 34,
+      "share_of_aware": {
+       "k": 34,
+       "base": 251,
+       "pct": 13.5,
+       "ci95": [
+        9.9,
+        18.3
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 34,
+       "base": 37,
+       "pct": 91.9,
+       "ci95": [
+        78.7,
+        97.2
+       ]
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 251,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        1.5
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 34,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        10.2
+       ]
+      }
+     }
+    },
+    "Shein": {
+     "aware": {
+      "k": 327
+     },
+     "considering": {
+      "k": 34,
+      "share_of_aware": {
+       "k": 34,
+       "base": 327,
+       "pct": 10.4,
+       "ci95": [
+        7.5,
+        14.2
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 34,
+       "base": 327,
+       "pct": 10.4,
+       "ci95": [
+        7.5,
+        14.2
+       ]
+      }
+     },
+     "bought": {
+      "k": 29,
+      "share_of_aware": {
+       "k": 29,
+       "base": 327,
+       "pct": 8.9,
+       "ci95": [
+        6.2,
+        12.4
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 29,
+       "base": 34,
+       "pct": 85.3,
+       "ci95": [
+        69.9,
+        93.6
+       ]
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 327,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        1.2
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 29,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Uniqlo": {
+     "aware": {
+      "k": 443
+     },
+     "considering": {
+      "k": 36,
+      "share_of_aware": {
+       "k": 36,
+       "base": 443,
+       "pct": 8.1,
+       "ci95": [
+        5.9,
+        11.0
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 36,
+       "base": 443,
+       "pct": 8.1,
+       "ci95": [
+        5.9,
+        11.0
+       ]
+      }
+     },
+     "bought": {
+      "k": 33,
+      "share_of_aware": {
+       "k": 33,
+       "base": 443,
+       "pct": 7.4,
+       "ci95": [
+        5.4,
+        10.3
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 33,
+       "base": 36,
+       "pct": 91.7,
+       "ci95": [
+        78.2,
+        97.1
+       ]
+      }
+     },
+     "advocate": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 443,
+       "pct": 0.2,
+       "ci95": [
+        0.0,
+        1.3
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 33,
+       "pct": 3.0,
+       "ci95": [
+        0.5,
+        15.3
+       ]
+      }
+     }
+    },
+    "Forever 21": {
+     "aware": {
+      "k": 22
+     },
+     "considering": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 22,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 22,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 22,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 22,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Garage": {
+     "aware": {
+      "k": 1
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Abercrombie": {
+     "aware": {
+      "k": 68
+     },
+     "considering": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 68,
+       "pct": 5.9,
+       "ci95": [
+        2.3,
+        14.2
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 68,
+       "pct": 5.9,
+       "ci95": [
+        2.3,
+        14.2
+       ]
+      }
+     },
+     "bought": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 68,
+       "pct": 5.9,
+       "ci95": [
+        2.3,
+        14.2
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 68,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        5.3
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Lululemon": {
+     "aware": {
+      "k": 40
+     },
+     "considering": {
+      "k": 5,
+      "share_of_aware": {
+       "k": 5,
+       "base": 40,
+       "pct": 12.5,
+       "ci95": [
+        5.5,
+        26.1
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 5,
+       "base": 40,
+       "pct": 12.5,
+       "ci95": [
+        5.5,
+        26.1
+       ]
+      }
+     },
+     "bought": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 40,
+       "pct": 10.0,
+       "ci95": [
+        4.0,
+        23.1
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 5,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 40,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        8.8
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Old Navy": {
+     "aware": {
+      "k": 82
+     },
+     "considering": {
+      "k": 6,
+      "share_of_aware": {
+       "k": 6,
+       "base": 82,
+       "pct": 7.3,
+       "ci95": [
+        3.4,
+        15.1
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 6,
+       "base": 82,
+       "pct": 7.3,
+       "ci95": [
+        3.4,
+        15.1
+       ]
+      }
+     },
+     "bought": {
+      "k": 6,
+      "share_of_aware": {
+       "k": 6,
+       "base": 82,
+       "pct": 7.3,
+       "ci95": [
+        3.4,
+        15.1
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 6,
+       "base": 6,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 2,
+      "share_of_aware": {
+       "k": 2,
+       "base": 82,
+       "pct": 2.4,
+       "ci95": [
+        0.7,
+        8.5
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 2,
+       "base": 6,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Gap": {
+     "aware": {
+      "k": 32
+     },
+     "considering": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 32,
+       "pct": 3.1,
+       "ci95": [
+        0.6,
+        15.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 32,
+       "pct": 3.1,
+       "ci95": [
+        0.6,
+        15.7
+       ]
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 32,
+       "pct": 3.1,
+       "ci95": [
+        0.6,
+        15.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 32,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        10.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Mango": {
+     "aware": {
+      "k": 6
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 6,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 6,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 6,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 6,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Urban Outfitters": {
+     "aware": {
+      "k": 12
+     },
+     "considering": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 12,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 12,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 12,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 12,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Brandy Melville": {
+     "aware": {
+      "k": 2
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 2,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 2,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 2,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 2,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Princess Polly": {
+     "aware": {
+      "k": 3
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Temu": {
+     "aware": {
+      "k": 38
+     },
+     "considering": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 38,
+       "pct": 2.6,
+       "ci95": [
+        0.5,
+        13.5
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 38,
+       "pct": 2.6,
+       "ci95": [
+        0.5,
+        13.5
+       ]
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 38,
+       "pct": 2.6,
+       "ci95": [
+        0.5,
+        13.5
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 38,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        9.2
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Simons": {
+     "aware": {
+      "k": 3
+     },
+     "considering": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Edikted": {
+     "aware": {
+      "k": 1
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Hollister": {
+     "aware": {
+      "k": 11
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 11,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 11,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 11,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 11,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "American Eagle": {
+     "aware": {
+      "k": 19
+     },
+     "considering": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 19,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 19,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 19,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 19,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Free People": {
+     "aware": {
+      "k": 27
+     },
+     "considering": {
+      "k": 2,
+      "share_of_aware": {
+       "k": 2,
+       "base": 27,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 2,
+       "base": 27,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 27,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 2,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 27,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Everlane": {
+     "aware": {
+      "k": 70
+     },
+     "considering": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 70,
+       "pct": 5.7,
+       "ci95": [
+        2.2,
+        13.8
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 70,
+       "pct": 5.7,
+       "ci95": [
+        2.2,
+        13.8
+       ]
+      }
+     },
+     "bought": {
+      "k": 4,
+      "share_of_aware": {
+       "k": 4,
+       "base": 70,
+       "pct": 5.7,
+       "ci95": [
+        2.2,
+        13.8
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 4,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 70,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        5.2
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 4,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "COS": {
+     "aware": {
+      "k": 24
+     },
+     "considering": {
+      "k": 3,
+      "share_of_aware": {
+       "k": 3,
+       "base": 24,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 3,
+       "base": 24,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 3,
+      "share_of_aware": {
+       "k": 3,
+       "base": 24,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 3,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 24,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 3,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Madewell": {
+     "aware": {
+      "k": 46
+     },
+     "considering": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 46,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        7.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 46,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        7.7
+       ]
+      }
+     },
+     "bought": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 46,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        7.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 46,
+       "pct": 0.0,
+       "ci95": [
+        0.0,
+        7.7
+       ]
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 0,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    },
+    "Reformation": {
+     "aware": {
+      "k": 14
+     },
+     "considering": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 14,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 14,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "bought": {
+      "k": 1,
+      "share_of_aware": {
+       "k": 1,
+       "base": 14,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 1,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     },
+     "advocate": {
+      "k": 0,
+      "share_of_aware": {
+       "k": 0,
+       "base": 14,
+       "pct": null,
+       "status": "base too small"
+      },
+      "conversion_from_previous_stage": {
+       "k": 0,
+       "base": 1,
+       "pct": null,
+       "status": "base too small"
+      }
+     }
+    }
+   }
+  },
+  "positioning_map": {
+   "rule": "brands with >= 30 attribute hits (same as the positioning matrix); x = price/value share of the brand's attribute hits, y = style/trend share, bubble = mention sentences, colour = net sentiment (VADER)",
+   "by_brand": {
+    "Aritzia": {
+     "attribute_hits": 101,
+     "x_price_value_share": {
+      "k": 28,
+      "base": 101,
+      "pct": 27.7,
+      "ci95": [
+       19.9,
+       37.1
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 21,
+      "base": 101,
+      "pct": 20.8,
+      "ci95": [
+       14.0,
+       29.7
+      ]
+     },
+     "bubble_mention_sentences": 284,
+     "colour_net_sentiment": 0.412,
+     "net_sentiment_block": {
+      "base": 221,
+      "net_sentiment": 0.412,
+      "pos": {
+       "k": 106,
+       "base": 221,
+       "pct": 48.0,
+       "ci95": [
+        41.5,
+        54.5
+       ]
+      },
+      "neg": {
+       "k": 15,
+       "base": 221,
+       "pct": 6.8,
+       "ci95": [
+        4.2,
+        10.9
+       ]
+      },
+      "neu_pct": 45.2
+     }
+    },
+    "Zara": {
+     "attribute_hits": 251,
+     "x_price_value_share": {
+      "k": 70,
+      "base": 251,
+      "pct": 27.9,
+      "ci95": [
+       22.7,
+       33.7
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 51,
+      "base": 251,
+      "pct": 20.3,
+      "ci95": [
+       15.8,
+       25.7
+      ]
+     },
+     "bubble_mention_sentences": 473,
+     "colour_net_sentiment": 0.265,
+     "net_sentiment_block": {
+      "base": 392,
+      "net_sentiment": 0.265,
+      "pos": {
+       "k": 176,
+       "base": 392,
+       "pct": 44.9,
+       "ci95": [
+        40.0,
+        49.8
+       ]
+      },
+      "neg": {
+       "k": 72,
+       "base": 392,
+       "pct": 18.4,
+       "ci95": [
+        14.8,
+        22.5
+       ]
+      },
+      "neu_pct": 36.7
+     }
+    },
+    "H&M": {
+     "attribute_hits": 143,
+     "x_price_value_share": {
+      "k": 38,
+      "base": 143,
+      "pct": 26.6,
+      "ci95": [
+       20.0,
+       34.4
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 31,
+      "base": 143,
+      "pct": 21.7,
+      "ci95": [
+       15.7,
+       29.1
+      ]
+     },
+     "bubble_mention_sentences": 339,
+     "colour_net_sentiment": 0.329,
+     "net_sentiment_block": {
+      "base": 252,
+      "net_sentiment": 0.329,
+      "pos": {
+       "k": 110,
+       "base": 252,
+       "pct": 43.7,
+       "ci95": [
+        37.7,
+        49.8
+       ]
+      },
+      "neg": {
+       "k": 27,
+       "base": 252,
+       "pct": 10.7,
+       "ci95": [
+        7.5,
+        15.1
+       ]
+      },
+      "neu_pct": 45.6
+     }
+    },
+    "Shein": {
+     "attribute_hits": 267,
+     "x_price_value_share": {
+      "k": 54,
+      "base": 267,
+      "pct": 20.2,
+      "ci95": [
+       15.8,
+       25.4
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 41,
+      "base": 267,
+      "pct": 15.4,
+      "ci95": [
+       11.5,
+       20.2
+      ]
+     },
+     "bubble_mention_sentences": 441,
+     "colour_net_sentiment": 0.202,
+     "net_sentiment_block": {
+      "base": 356,
+      "net_sentiment": 0.202,
+      "pos": {
+       "k": 156,
+       "base": 356,
+       "pct": 43.8,
+       "ci95": [
+        38.8,
+        49.0
+       ]
+      },
+      "neg": {
+       "k": 84,
+       "base": 356,
+       "pct": 23.6,
+       "ci95": [
+        19.5,
+        28.3
+       ]
+      },
+      "neu_pct": 32.6
+     }
+    },
+    "Uniqlo": {
+     "attribute_hits": 270,
+     "x_price_value_share": {
+      "k": 67,
+      "base": 270,
+      "pct": 24.8,
+      "ci95": [
+       20.0,
+       30.3
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 76,
+      "base": 270,
+      "pct": 28.1,
+      "ci95": [
+       23.1,
+       33.8
+      ]
+     },
+     "bubble_mention_sentences": 584,
+     "colour_net_sentiment": 0.435,
+     "net_sentiment_block": {
+      "base": 504,
+      "net_sentiment": 0.435,
+      "pos": {
+       "k": 257,
+       "base": 504,
+       "pct": 51.0,
+       "ci95": [
+        46.6,
+        55.3
+       ]
+      },
+      "neg": {
+       "k": 38,
+       "base": 504,
+       "pct": 7.5,
+       "ci95": [
+        5.5,
+        10.2
+       ]
+      },
+      "neu_pct": 41.5
+     }
+    },
+    "Old Navy": {
+     "attribute_hits": 30,
+     "x_price_value_share": {
+      "k": 8,
+      "base": 30,
+      "pct": 26.7,
+      "ci95": [
+       14.2,
+       44.4
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 6,
+      "base": 30,
+      "pct": 20.0,
+      "ci95": [
+       9.5,
+       37.3
+      ]
+     },
+     "bubble_mention_sentences": 113,
+     "colour_net_sentiment": 0.329,
+     "net_sentiment_block": {
+      "base": 76,
+      "net_sentiment": 0.329,
+      "pos": {
+       "k": 30,
+       "base": 76,
+       "pct": 39.5,
+       "ci95": [
+        29.2,
+        50.7
+       ]
+      },
+      "neg": {
+       "k": 5,
+       "base": 76,
+       "pct": 6.6,
+       "ci95": [
+        2.8,
+        14.5
+       ]
+      },
+      "neu_pct": 53.9
+     }
+    },
+    "Everlane": {
+     "attribute_hits": 38,
+     "x_price_value_share": {
+      "k": 19,
+      "base": 38,
+      "pct": 50.0,
+      "ci95": [
+       34.8,
+       65.2
+      ]
+     },
+     "y_style_trend_share": {
+      "k": 4,
+      "base": 38,
+      "pct": 10.5,
+      "ci95": [
+       4.2,
+       24.1
+      ]
+     },
+     "bubble_mention_sentences": 113,
+     "colour_net_sentiment": 0.134,
+     "net_sentiment_block": {
+      "base": 67,
+      "net_sentiment": 0.134,
+      "pos": {
+       "k": 14,
+       "base": 67,
+       "pct": 20.9,
+       "ci95": [
+        12.9,
+        32.1
+       ]
+      },
+      "neg": {
+       "k": 5,
+       "base": 67,
+       "pct": 7.5,
+       "ci95": [
+        3.2,
+        16.3
+       ]
+      },
+      "neu_pct": 71.6
+     }
+    }
+   }
+  },
+  "brand_image": {
+   "dictionary": {
+    "premium/aspirational": {
+     "regex": "luxur|premium|high[- ]end|aspirational|investment piece|upscale|designer|splurge|fancy|looks? expensive|quiet luxury|polished|sophisticated|elevated",
+     "valence": "+"
+    },
+    "basic/everyday": {
+     "regex": "\\bbasics?\\b|everyday|\\bstaples?\\b|workhorse|\\bplain\\b|\\bsimple\\b|neutrals?\\b|capsule|essentials?\\b",
+     "valence": "0"
+    },
+    "trendy/fashion-forward": {
+     "regex": "\\btrend(y|s|ing)\\b|fashion[- ]forward|on[- ]trend|runway|latest (styles?|looks?|drops?)|new (collection|drop)|\\bviral\\b|tiktok|\\bhype\\b|cutting[- ]edge",
+     "valence": "+"
+    },
+    "dated/frumpy": {
+     "regex": "\\bdated\\b|frumpy|\\bboring\\b|outdated|old[- ]fashioned|grandma|mumsy|stuffy|\\bdrab\\b|matronly|\\bbland\\b|old lady",
+     "valence": "-"
+    },
+    "cheap/disposable": {
+     "regex": "\\bcheap(ly)?\\b|cheaply made|disposable|throwaway|one[- ]wear|ultra[- ]fast fashion|falls? apart|fell apart|flimsy|\\bjunk\\b|\\btrash\\b|low quality|poorly made|landfill",
+     "valence": "-"
+    },
+    "comfortable": {
+     "regex": "\\bcomfortable|\\bcomfy\\b|\\bcozy\\b|\\bcosy\\b|\\bsoft(ness)?\\b|stretchy|breathable|\\bsnug\\b",
+     "valence": "+"
+    },
+    "uncomfortable": {
+     "regex": "uncomfortable|\\bitchy\\b|scratchy|\\bstiff\\b|restrictive|rough fabric|clammy|suffocat",
+     "valence": "-"
+    },
+    "ethical/responsible": {
+     "regex": "\\bethical(ly)?\\b|sustainab|responsible|fair[- ]trade|fair wages?|b[- ]corp|transparen|recycled|organic|eco[- ]friendly|traceab|living wage",
+     "valence": "+"
+    },
+    "unethical/exploitative": {
+     "regex": "unethical|exploit|sweatshop|child labou?r|forced labou?r|\\bslave|greenwash|union[- ]bust|steals? (designs?|from)|stole (designs?|from)|plagiar|rip[- ]?off|overproduc",
+     "valence": "-"
+    },
+    "reliable/consistent": {
+     "regex": "reliab|\\bconsistent(ly)?\\b|dependable|never (disappoints?|fails?|let me down)|trustworthy|holds? up|true to size|\\btts\\b|every time",
+     "valence": "+"
+    },
+    "inconsistent/hit-or-miss": {
+     "regex": "inconsistent|hit[- ]or[- ]miss|hit and miss|unreliable|quality (has )?(dropped|declined|gone down)|gone downhill|\\bvaries\\b|\\bvary\\b|lottery|gamble|not what it used to be",
+     "valence": "-"
+    },
+    "Canadian/local": {
+     "regex": "canad(a|ian)|made in canada|vancouver|toronto|montr[eé]al|homegrown|local(ly)? (brand|made|business)|small business",
+     "valence": "0"
+    },
+    "fun/young": {
+     "regex": "\\bfun\\b|playful|youthful|\\byoung\\b|\\bteen|gen ?z|college|quirky|bubbly|colou?rful|vibrant|girly|\\by2k\\b",
+     "valence": "+"
+    }
+   },
+   "pole_pairs": [
+    [
+     "premium/aspirational",
+     "cheap/disposable"
+    ],
+    [
+     "trendy/fashion-forward",
+     "dated/frumpy"
+    ],
+    [
+     "comfortable",
+     "uncomfortable"
+    ],
+    [
+     "ethical/responsible",
+     "unethical/exploitative"
+    ],
+    [
+     "reliable/consistent",
+     "inconsistent/hit-or-miss"
+    ]
+   ],
+   "unit": "single-brand sentences with at least one image keyword (a sentence can carry several images); multi-brand sentences excluded",
+   "coded_sentences_per_brand": {
+    "Aritzia": 27,
+    "Zara": 69,
+    "H&M": 45,
+    "Shein": 70,
+    "Uniqlo": 75,
+    "Forever 21": 1,
+    "Abercrombie": 6,
+    "Lululemon": 4,
+    "Old Navy": 6,
+    "Gap": 1,
+    "Urban Outfitters": 1,
+    "Simons": 1,
+    "American Eagle": 2,
+    "Free People": 1,
+    "Everlane": 3,
+    "COS": 4,
+    "Madewell": 2,
+    "Reformation": 3
+   },
+   "brands_in_grid": [
+    "Zara",
+    "H&M",
+    "Shein",
+    "Uniqlo"
+   ],
+   "brands_base_too_small": [
+    "Aritzia",
+    "Forever 21",
+    "Abercrombie",
+    "Lululemon",
+    "Old Navy",
+    "Gap",
+    "Urban Outfitters",
+    "Simons",
+    "American Eagle",
+    "Free People",
+    "Everlane",
+    "COS",
+    "Madewell",
+    "Reformation"
+   ],
+   "association_grid": {
+    "Zara": {
+     "premium/aspirational": {
+      "k": 18,
+      "base": 69,
+      "pct": 26.1,
+      "ci95": [
+       17.2,
+       37.5
+      ]
+     },
+     "basic/everyday": {
+      "k": 9,
+      "base": 69,
+      "pct": 13.0,
+      "ci95": [
+       7.0,
+       23.0
+      ]
+     },
+     "trendy/fashion-forward": {
+      "k": 16,
+      "base": 69,
+      "pct": 23.2,
+      "ci95": [
+       14.8,
+       34.4
+      ]
+     },
+     "dated/frumpy": {
+      "k": 3,
+      "base": 69,
+      "pct": 4.3,
+      "ci95": [
+       1.5,
+       12.0
+      ]
+     },
+     "cheap/disposable": {
+      "k": 10,
+      "base": 69,
+      "pct": 14.5,
+      "ci95": [
+       8.1,
+       24.7
+      ]
+     },
+     "comfortable": {
+      "k": 4,
+      "base": 69,
+      "pct": 5.8,
+      "ci95": [
+       2.3,
+       14.0
+      ]
+     },
+     "uncomfortable": {
+      "k": 2,
+      "base": 69,
+      "pct": 2.9,
+      "ci95": [
+       0.8,
+       10.0
+      ]
+     },
+     "ethical/responsible": {
+      "k": 2,
+      "base": 69,
+      "pct": 2.9,
+      "ci95": [
+       0.8,
+       10.0
+      ]
+     },
+     "unethical/exploitative": {
+      "k": 0,
+      "base": 69,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       5.3
+      ]
+     },
+     "reliable/consistent": {
+      "k": 3,
+      "base": 69,
+      "pct": 4.3,
+      "ci95": [
+       1.5,
+       12.0
+      ]
+     },
+     "inconsistent/hit-or-miss": {
+      "k": 5,
+      "base": 69,
+      "pct": 7.2,
+      "ci95": [
+       3.1,
+       15.9
+      ]
+     },
+     "Canadian/local": {
+      "k": 4,
+      "base": 69,
+      "pct": 5.8,
+      "ci95": [
+       2.3,
+       14.0
+      ]
+     },
+     "fun/young": {
+      "k": 4,
+      "base": 69,
+      "pct": 5.8,
+      "ci95": [
+       2.3,
+       14.0
+      ]
+     }
+    },
+    "H&M": {
+     "premium/aspirational": {
+      "k": 13,
+      "base": 45,
+      "pct": 28.9,
+      "ci95": [
+       17.7,
+       43.4
+      ]
+     },
+     "basic/everyday": {
+      "k": 6,
+      "base": 45,
+      "pct": 13.3,
+      "ci95": [
+       6.3,
+       26.2
+      ]
+     },
+     "trendy/fashion-forward": {
+      "k": 5,
+      "base": 45,
+      "pct": 11.1,
+      "ci95": [
+       4.8,
+       23.5
+      ]
+     },
+     "dated/frumpy": {
+      "k": 1,
+      "base": 45,
+      "pct": 2.2,
+      "ci95": [
+       0.4,
+       11.6
+      ]
+     },
+     "cheap/disposable": {
+      "k": 6,
+      "base": 45,
+      "pct": 13.3,
+      "ci95": [
+       6.3,
+       26.2
+      ]
+     },
+     "comfortable": {
+      "k": 5,
+      "base": 45,
+      "pct": 11.1,
+      "ci95": [
+       4.8,
+       23.5
+      ]
+     },
+     "uncomfortable": {
+      "k": 1,
+      "base": 45,
+      "pct": 2.2,
+      "ci95": [
+       0.4,
+       11.6
+      ]
+     },
+     "ethical/responsible": {
+      "k": 1,
+      "base": 45,
+      "pct": 2.2,
+      "ci95": [
+       0.4,
+       11.6
+      ]
+     },
+     "unethical/exploitative": {
+      "k": 1,
+      "base": 45,
+      "pct": 2.2,
+      "ci95": [
+       0.4,
+       11.6
+      ]
+     },
+     "reliable/consistent": {
+      "k": 3,
+      "base": 45,
+      "pct": 6.7,
+      "ci95": [
+       2.3,
+       17.9
+      ]
+     },
+     "inconsistent/hit-or-miss": {
+      "k": 2,
+      "base": 45,
+      "pct": 4.4,
+      "ci95": [
+       1.2,
+       14.8
+      ]
+     },
+     "Canadian/local": {
+      "k": 0,
+      "base": 45,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       7.9
+      ]
+     },
+     "fun/young": {
+      "k": 6,
+      "base": 45,
+      "pct": 13.3,
+      "ci95": [
+       6.3,
+       26.2
+      ]
+     }
+    },
+    "Shein": {
+     "premium/aspirational": {
+      "k": 8,
+      "base": 70,
+      "pct": 11.4,
+      "ci95": [
+       5.9,
+       21.0
+      ]
+     },
+     "basic/everyday": {
+      "k": 3,
+      "base": 70,
+      "pct": 4.3,
+      "ci95": [
+       1.5,
+       11.9
+      ]
+     },
+     "trendy/fashion-forward": {
+      "k": 10,
+      "base": 70,
+      "pct": 14.3,
+      "ci95": [
+       7.9,
+       24.3
+      ]
+     },
+     "dated/frumpy": {
+      "k": 3,
+      "base": 70,
+      "pct": 4.3,
+      "ci95": [
+       1.5,
+       11.9
+      ]
+     },
+     "cheap/disposable": {
+      "k": 22,
+      "base": 70,
+      "pct": 31.4,
+      "ci95": [
+       21.8,
+       43.0
+      ]
+     },
+     "comfortable": {
+      "k": 0,
+      "base": 70,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       5.2
+      ]
+     },
+     "uncomfortable": {
+      "k": 1,
+      "base": 70,
+      "pct": 1.4,
+      "ci95": [
+       0.3,
+       7.7
+      ]
+     },
+     "ethical/responsible": {
+      "k": 9,
+      "base": 70,
+      "pct": 12.9,
+      "ci95": [
+       6.9,
+       22.7
+      ]
+     },
+     "unethical/exploitative": {
+      "k": 6,
+      "base": 70,
+      "pct": 8.6,
+      "ci95": [
+       4.0,
+       17.5
+      ]
+     },
+     "reliable/consistent": {
+      "k": 2,
+      "base": 70,
+      "pct": 2.9,
+      "ci95": [
+       0.8,
+       9.8
+      ]
+     },
+     "inconsistent/hit-or-miss": {
+      "k": 2,
+      "base": 70,
+      "pct": 2.9,
+      "ci95": [
+       0.8,
+       9.8
+      ]
+     },
+     "Canadian/local": {
+      "k": 1,
+      "base": 70,
+      "pct": 1.4,
+      "ci95": [
+       0.3,
+       7.7
+      ]
+     },
+     "fun/young": {
+      "k": 7,
+      "base": 70,
+      "pct": 10.0,
+      "ci95": [
+       4.9,
+       19.2
+      ]
+     }
+    },
+    "Uniqlo": {
+     "premium/aspirational": {
+      "k": 5,
+      "base": 75,
+      "pct": 6.7,
+      "ci95": [
+       2.9,
+       14.7
+      ]
+     },
+     "basic/everyday": {
+      "k": 50,
+      "base": 75,
+      "pct": 66.7,
+      "ci95": [
+       55.4,
+       76.3
+      ]
+     },
+     "trendy/fashion-forward": {
+      "k": 0,
+      "base": 75,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       4.9
+      ]
+     },
+     "dated/frumpy": {
+      "k": 2,
+      "base": 75,
+      "pct": 2.7,
+      "ci95": [
+       0.7,
+       9.2
+      ]
+     },
+     "cheap/disposable": {
+      "k": 7,
+      "base": 75,
+      "pct": 9.3,
+      "ci95": [
+       4.6,
+       18.0
+      ]
+     },
+     "comfortable": {
+      "k": 10,
+      "base": 75,
+      "pct": 13.3,
+      "ci95": [
+       7.4,
+       22.8
+      ]
+     },
+     "uncomfortable": {
+      "k": 1,
+      "base": 75,
+      "pct": 1.3,
+      "ci95": [
+       0.2,
+       7.2
+      ]
+     },
+     "ethical/responsible": {
+      "k": 0,
+      "base": 75,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       4.9
+      ]
+     },
+     "unethical/exploitative": {
+      "k": 0,
+      "base": 75,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       4.9
+      ]
+     },
+     "reliable/consistent": {
+      "k": 10,
+      "base": 75,
+      "pct": 13.3,
+      "ci95": [
+       7.4,
+       22.8
+      ]
+     },
+     "inconsistent/hit-or-miss": {
+      "k": 0,
+      "base": 75,
+      "pct": 0.0,
+      "ci95": [
+       0.0,
+       4.9
+      ]
+     },
+     "Canadian/local": {
+      "k": 2,
+      "base": 75,
+      "pct": 2.7,
+      "ci95": [
+       0.7,
+       9.2
+      ]
+     },
+     "fun/young": {
+      "k": 1,
+      "base": 75,
+      "pct": 1.3,
+      "ci95": [
+       0.2,
+       7.2
+      ]
+     }
+    }
+   },
+   "set_average_share_pct": {
+    "premium/aspirational": 17.0,
+    "basic/everyday": 26.3,
+    "trendy/fashion-forward": 12.0,
+    "dated/frumpy": 3.5,
+    "cheap/disposable": 17.4,
+    "comfortable": 7.3,
+    "uncomfortable": 1.9,
+    "ethical/responsible": 4.6,
+    "unethical/exploitative": 2.7,
+    "reliable/consistent": 6.9,
+    "inconsistent/hit-or-miss": 3.5,
+    "Canadian/local": 2.7,
+    "fun/young": 6.9
+   },
+   "chi_square_independence": {
+    "chi2": 169.45,
+    "df": 36,
+    "p": 3.350642150574732e-19,
+    "n_image_hits": 292,
+    "cells": 52,
+    "cells_expected_lt_5": 32,
+    "note": "one author can contribute many sentences, so p is indicative"
+   },
+   "bonferroni_z": 3.3,
+   "adjusted_std_residuals": {
+    "Zara": {
+     "premium/aspirational": 2.18,
+     "basic/everyday": -2.99,
+     "trendy/fashion-forward": 3.2,
+     "dated/frumpy": 0.41,
+     "cheap/disposable": -0.85,
+     "comfortable": -0.64,
+     "uncomfortable": 0.64,
+     "ethical/responsible": -0.85,
+     "unethical/exploitative": -1.65,
+     "reliable/consistent": -1.05,
+     "inconsistent/hit-or-miss": 1.92,
+     "Canadian/local": 1.79,
+     "fun/young": -0.51
+    },
+    "H&M": {
+     "premium/aspirational": 2.37,
+     "basic/everyday": -2.07,
+     "trendy/fashion-forward": -0.16,
+     "dated/frumpy": -0.49,
+     "cheap/disposable": -0.73,
+     "comfortable": 1.1,
+     "uncomfortable": 0.17,
+     "ethical/responsible": -0.83,
+     "unethical/exploitative": -0.2,
+     "reliable/consistent": -0.05,
+     "inconsistent/hit-or-miss": 0.41,
+     "Canadian/local": -1.22,
+     "fun/young": 1.88
+    },
+    "Shein": {
+     "premium/aspirational": -1.18,
+     "basic/everyday": -4.53,
+     "trendy/fashion-forward": 0.94,
+     "dated/frumpy": 0.56,
+     "cheap/disposable": 3.95,
+     "comfortable": -2.63,
+     "uncomfortable": -0.28,
+     "ethical/responsible": 4.04,
+     "unethical/exploitative": 3.72,
+     "reliable/consistent": -1.43,
+     "inconsistent/hit-or-miss": -0.22,
+     "Canadian/local": -0.68,
+     "fun/young": 1.36
+    },
+    "Uniqlo": {
+     "premium/aspirational": -2.94,
+     "basic/everyday": 8.9,
+     "trendy/fashion-forward": -3.87,
+     "dated/frumpy": -0.53,
+     "cheap/disposable": -2.32,
+     "comfortable": 2.21,
+     "uncomfortable": -0.5,
+     "ethical/responsible": -2.32,
+     "unethical/exploitative": -1.76,
+     "reliable/consistent": 2.43,
+     "inconsistent/hit-or-miss": -2.0,
+     "Canadian/local": -0.09,
+     "fun/young": -2.35
+    }
+   },
+   "strengths_and_weaknesses_bonferroni": {
+    "rule": "|adjusted standardised residual| above the Bonferroni z over all cells; over-index on a favourable image or under-index on an unfavourable one = strength, the reverse = weakness; neutral images = distinctive",
+    "cells": [
+     {
+      "brand": "Shein",
+      "image": "basic/everyday",
+      "observed": 3,
+      "expected": 17.2,
+      "z": -4.53,
+      "direction": "under",
+      "cell_net_sentiment": "base too small",
+      "caution": "keyword association is not endorsement: people also discuss a brand's (un)ethical or cheap image critically; read with the cell sentiment",
+      "reading": "distinctive (neutral image)"
+     },
+     {
+      "brand": "Shein",
+      "image": "cheap/disposable",
+      "observed": 22,
+      "expected": 11.4,
+      "z": 3.95,
+      "direction": "over",
+      "cell_net_sentiment": "base too small",
+      "caution": "keyword association is not endorsement: people also discuss a brand's (un)ethical or cheap image critically; read with the cell sentiment",
+      "reading": "weakness"
+     },
+     {
+      "brand": "Shein",
+      "image": "ethical/responsible",
+      "observed": 9,
+      "expected": 3.0,
+      "z": 4.04,
+      "direction": "over",
+      "cell_net_sentiment": "base too small",
+      "caution": "keyword association is not endorsement: people also discuss a brand's (un)ethical or cheap image critically; read with the cell sentiment",
+      "reading": "strength"
+     },
+     {
+      "brand": "Shein",
+      "image": "unethical/exploitative",
+      "observed": 6,
+      "expected": 1.8,
+      "z": 3.72,
+      "direction": "over",
+      "cell_net_sentiment": "base too small",
+      "caution": "keyword association is not endorsement: people also discuss a brand's (un)ethical or cheap image critically; read with the cell sentiment",
+      "reading": "weakness"
+     },
+     {
+      "brand": "Uniqlo",
+      "image": "basic/everyday",
+      "observed": 50,
+      "expected": 20.5,
+      "z": 8.9,
+      "direction": "over",
+      "cell_net_sentiment": 0.62,
+      "caution": "keyword association is not endorsement: people also discuss a brand's (un)ethical or cheap image critically; read with the cell sentiment",
+      "reading": "distinctive (neutral image)"
+     },
+     {
+      "brand": "Uniqlo",
+      "image": "trendy/fashion-forward",
+      "observed": 0,
+      "expected": 9.3,
+      "z": -3.87,
+      "direction": "under",
+      "cell_net_sentiment": "base too small",
+      "caution": "keyword association is not endorsement: people also discuss a brand's (un)ethical or cheap image critically; read with the cell sentiment",
+      "reading": "weakness"
+     }
+    ]
+   },
+   "net_sentiment_by_cell": {
+    "Zara": {
+     "premium/aspirational": {
+      "base": 18,
+      "status": "base too small"
+     },
+     "basic/everyday": {
+      "base": 9,
+      "status": "base too small"
+     },
+     "trendy/fashion-forward": {
+      "base": 16,
+      "status": "base too small"
+     },
+     "dated/frumpy": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "cheap/disposable": {
+      "base": 10,
+      "status": "base too small"
+     },
+     "comfortable": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "uncomfortable": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "ethical/responsible": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "reliable/consistent": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "inconsistent/hit-or-miss": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "Canadian/local": {
+      "base": 4,
+      "status": "base too small"
+     },
+     "fun/young": {
+      "base": 4,
+      "status": "base too small"
+     }
+    },
+    "H&M": {
+     "premium/aspirational": {
+      "base": 13,
+      "status": "base too small"
+     },
+     "basic/everyday": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "trendy/fashion-forward": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "dated/frumpy": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "cheap/disposable": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "comfortable": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "uncomfortable": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "ethical/responsible": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "unethical/exploitative": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "reliable/consistent": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "inconsistent/hit-or-miss": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "fun/young": {
+      "base": 6,
+      "status": "base too small"
+     }
+    },
+    "Shein": {
+     "premium/aspirational": {
+      "base": 8,
+      "status": "base too small"
+     },
+     "basic/everyday": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "trendy/fashion-forward": {
+      "base": 10,
+      "status": "base too small"
+     },
+     "dated/frumpy": {
+      "base": 3,
+      "status": "base too small"
+     },
+     "cheap/disposable": {
+      "base": 22,
+      "status": "base too small"
+     },
+     "uncomfortable": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "ethical/responsible": {
+      "base": 9,
+      "status": "base too small"
+     },
+     "unethical/exploitative": {
+      "base": 6,
+      "status": "base too small"
+     },
+     "reliable/consistent": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "inconsistent/hit-or-miss": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "Canadian/local": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "fun/young": {
+      "base": 7,
+      "status": "base too small"
+     }
+    },
+    "Uniqlo": {
+     "premium/aspirational": {
+      "base": 5,
+      "status": "base too small"
+     },
+     "basic/everyday": {
+      "base": 50,
+      "net_sentiment": 0.62,
+      "pos": {
+       "k": 33,
+       "base": 50,
+       "pct": 66.0,
+       "ci95": [
+        52.2,
+        77.6
+       ]
+      },
+      "neg": {
+       "k": 2,
+       "base": 50,
+       "pct": 4.0,
+       "ci95": [
+        1.1,
+        13.5
+       ]
+      },
+      "neu_pct": 30.0
+     },
+     "dated/frumpy": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "cheap/disposable": {
+      "base": 7,
+      "status": "base too small"
+     },
+     "comfortable": {
+      "base": 10,
+      "status": "base too small"
+     },
+     "uncomfortable": {
+      "base": 1,
+      "status": "base too small"
+     },
+     "reliable/consistent": {
+      "base": 10,
+      "status": "base too small"
+     },
+     "Canadian/local": {
+      "base": 2,
+      "status": "base too small"
+     },
+     "fun/young": {
+      "base": 1,
+      "status": "base too small"
+     }
+    }
+   },
+   "priority_quadrant": {
+    "rule": "only brand x image cells with n >= 30; strong = brand's share of the image >= pooled set-average share (index >= 1.0), weak otherwise; positive = net sentiment within the cell > 0. strong+positive = defend, strong+negative = fix, weak+positive = hidden asset, weak+negative = low priority",
+    "by_brand": {
+     "Aritzia": {
+      "status": "base too small",
+      "coded_sentences": 27
+     },
+     "Zara": {
+      "coded_sentences": 69,
+      "cells_n_ge_30": [],
+      "cells_below_30_not_placed": 12
+     },
+     "H&M": {
+      "coded_sentences": 45,
+      "cells_n_ge_30": [],
+      "cells_below_30_not_placed": 12
+     },
+     "Shein": {
+      "coded_sentences": 70,
+      "cells_n_ge_30": [],
+      "cells_below_30_not_placed": 12
+     },
+     "Uniqlo": {
+      "coded_sentences": 75,
+      "cells_n_ge_30": [
+       {
+        "image": "basic/everyday",
+        "n": 50,
+        "share_pct": 66.7,
+        "index_vs_set_average": 2.54,
+        "net_sentiment": 0.62,
+        "quadrant": "defend"
+       }
+      ],
+      "cells_below_30_not_placed": 8
+     }
+    }
+   }
+  }
+ }
+}
