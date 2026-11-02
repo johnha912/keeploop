@@ -1,0 +1,19 @@
+name: marketing-research
+status: experimental
+profession: Marketing research (consumer insight reports from listening data)
+description: Pack for writing consumer insight reports that answer a stated business question from measured data (social listening, reviews, survey tables). Metric is a deterministic report-quality score with a hard traceability rule; taste comes from market-research reporting practice.
+metric: insight report quality score, 0 to 1 (weighted share of rule checks passed by report.md, printed by examples/marketing-research/evaluate.py; exit 2 when any number in the report is missing from data/metrics.json)
+metric_validation: not validated against client decisions. It measures rule compliance (objectives, evidence integrity, measure choice, flow, recommendations) and that every number traces to the analysis, not whether the insight is right. To validate it, have two senior researchers blind-rate several reports with different scores and check the rank correlation with the score. Until then the pack stays experimental.
+metric_examples: insight report quality score, share of numbers traceable to the analysis, senior-researcher blind rating
+taste_file: taste.md
+rubric_file: rubric.md
+scout_topics: social listening methodology, share of voice measurement, brand perceptual mapping correspondence analysis, sentiment analysis validation, consumer segmentation, insight report storytelling
+roles:
+  research-methodologist:
+    checklist: search terms are brand names, not loaded phrases; every brand is measured with the same sources, window and dictionaries; proxies are named as proxies; every share has its base and a 95% interval; no share on a base under 30; quotes are picked by a stated rule
+  insight-reader:
+    checklist: every module states the business question, the answer in one sentence, the so-what and a recommendation for the client; the report reads answer first; limits are stated after the findings, not hidden
+slop:
+  hype: (?i)\b(skyrocket\w*|explod\w*|game-?changer|revolutioni[sz]\w*)\b => hype word; state the measured change
+  certain: (?i)\b(clearly|obviously|undeniably|proves?)\b => overclaims what listening data can show
+  everyone: (?i)\b(everyone|all consumers|nobody|every gen z)\b => generalises beyond the sample
