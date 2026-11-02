@@ -19,6 +19,28 @@ still the demo, do not start the loop: ask the user, in plain words, what
 them to approve. Ask everything you need in one message; never make the
 user learn commands or flags.
 
+## Pointing keeploop at the user's own repo (first time)
+
+Out of the box the workspace is the demo `.keeploop/workspace`. To improve
+the user's own project, the human makes these changes before `kl begin`.
+You draft each one for them to approve and save, and give them any command
+ready to paste; you never write them yourself (see Hard rules):
+
+1. A separate git worktree of their project for the loop, so a reset never
+   touches their working copy: `git -C <their repo> worktree add <path> -b keeploop`.
+   It must be clean.
+2. In `team.yaml`: `workspace:` set to that path (relative to this folder,
+   or absolute), `protect:` for what no change may touch (for example
+   `tests`), and the `pack:` that fits.
+3. `evaluate.py` replaced: it gets the workspace path as its only argument
+   and prints one number, higher is better. Delete or replace the demo
+   `holdout.py` too: it scores the demo config and `kl begin` refuses
+   while it fails.
+4. The mission in `program.md`.
+
+Then run `python kl.py begin`. Every keep is a commit on the `keeploop`
+branch of that worktree; the human merges the ones they want.
+
 ## The company
 
 | Role | Job | May edit files? |
