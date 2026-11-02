@@ -133,7 +133,7 @@ Runs in seconds with no AI.
 </td>
 <td width="50%" valign="top">
 
-<a href="examples/marketing-research/"><img src="examples/marketing-research/report/charts/00-board.png" alt="Cover board of the marketing research example: a consumer insight summary for five fast-fashion brands" width="100%"></a>
+<a href="examples/marketing-research/"><img src="docs/assets/example-marketing-research.png" alt="Top of the marketing research example's cover board: the one-line answer and three headline numbers" width="100%"></a>
 
 **Consumer insight report (marketing research)**
 
