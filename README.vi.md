@@ -10,6 +10,8 @@
   </picture>
 </p>
 
+<h3 align="center">AI của bạn đề xuất thay đổi. Một con số quyết định nó có được giữ lại hay không.</h3>
+
 <p align="center">
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-0b0b0c?style=flat-square" alt="version 0.1.0"></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?style=flat-square" alt="Python 3.10+">
@@ -19,557 +21,262 @@
 </p>
 
 <p align="center">
-  <a href="#quickstart">Bắt đầu nhanh</a> ·
-  <a href="#use-it-with-a-chat-ai-no-install">AI chat</a> ·
-  <a href="#how-a-cycle-works">Cách hoạt động</a> ·
-  <a href="#where-the-rules-come-from">Đã qua thực tế</a> ·
-  <a href="#use-it-on-your-own-repo">Repo của bạn</a> ·
-  <a href="#safety">An toàn</a> ·
-  <a href="#faq-for-skeptics">FAQ</a> ·
-  <a href="#credits">Ghi công</a>
+  <a href="#giao-cho-ai-của-bạn">Giao cho AI của bạn</a> ·
+  <a href="#thử-offline">Thử offline</a> ·
+  <a href="#ví-dụ-thực-tế">Ví dụ</a> ·
+  <a href="#cách-hoạt-động">Cách hoạt động</a> ·
+  <a href="#faq">FAQ</a> ·
+  <a href="docs/GUIDE.md">Hướng dẫn đầy đủ (tiếng Anh)</a>
 </p>
-
-> **Ghi chú đồng bộ.** Bản này dịch từ [README.md](README.md), bản tiếng Anh
-> là bản gốc. Khi README.md đổi, sửa file này theo cùng lần commit: giữ nguyên
-> thứ tự các mục, khối code, tên file, lệnh và con số, chỉ dịch phần văn xuôi.
-> Nếu hai bản lệch nhau, bản tiếng Anh đúng.
-
----
 
 <p align="center"><img src="docs/demo.gif" alt="Bản ghi terminal chạy mock của keeploop: đo mức gốc, hai lần giữ, một lần bỏ, một lần crash thành bài học, rồi giữ lần cuối." width="853"></p>
 
-<p align="center"><sub>Ghi lại từ đầu ra thật của bản demo mock chạy offline (có thêm màu). Thích đọc chữ hơn? Bản ghi đầy đủ nằm ở mục <a href="#quickstart">Bắt đầu nhanh</a>, phần "Chạy qua đêm, không cần chat".</sub></p>
+<p align="center"><sub>Ghi lại từ đầu ra thật của bản demo mock chạy offline (có thêm màu). Bản ghi đầy đủ nằm ở <a href="docs/DEMO-OUTPUT.txt">docs/DEMO-OUTPUT.txt</a>.</sub></p>
 
-Dự án [autoresearch](https://github.com/karpathy/autoresearch) của Karpathy
-đã cho thấy một agent có thể cải thiện code qua đêm nếu bạn cho nó một chỉ
-số cố định, một quy tắc giữ/bỏ và git.
+AI agent rất giỏi nói như thể chắc chắn. keeploop bắt chúng phải chứng minh.
 
-**keeploop không phải một AI khác.** Clone nó, mở trong AI bạn đang dùng,
-và AI đó trở thành CEO của một công ty nhỏ gồm Analyst, Engineer, Auditor,
-Critic và Scout. keeploop trao cho nó sơ đồ tổ chức (`AGENTS.md`) và một
-bộ công cụ (`kl`) biết đo, chặn cổng, ghi lại và từ chối. AI của bạn lo
-phần suy nghĩ. Chỉ con số tốt hơn mới được commit.
+- **Bạn nói "tốt hơn" nghĩa là gì**: test chạy nhanh hơn, benchmark cao hơn,
+  báo cáo gọn hơn. Chỉ một con số.
+- **AI của bạn thử từng thay đổi một**, và một AI thứ hai, phiên mới, kiểm tra nó.
+- **Chỉ thay đổi nào vượt được con số mới được giữ lại.** Mọi thứ khác bị
+  hoàn tác, và lý do được ghi lại để không thử lại lần nữa.
 
-Chưa clone? Một AI chat không mở được link hay chạy lệnh vẫn dùng được:
-xem [Dùng với AI chat (không cần cài đặt)](#use-it-with-a-chat-ai-no-install).
+Dùng được với AI bạn đang dùng: Claude Code, Codex, Cursor, Copilot,
+Gemini CLI và nhiều công cụ khác. Bản thân keeploop không phải AI: nó là
+một công cụ Python nhỏ biết đo và biết từ chối. Nó không cần cài thêm gì,
+không gửi telemetry và không lưu API key.
 
-| Cách thông thường | Với keeploop |
-|---|---|
-| Chính model viết thay đổi cũng tự bảo là ổn | **Một vendor khác hoặc một phiên mới** kiểm toán diff thật; người làm không bao giờ tự kiểm tra việc của mình |
-| "Trông ổn đấy" | Chỉ `kl keep` mới commit, và nó tự chạy lại phần đánh giá: **chỉ số phải vượt mức tốt nhất hiện có quá nhiễu của chính phép đánh giá**, được xác nhận bằng lần chạy thứ hai khi phép đánh giá nhiễu hoặc thay đổi nặng, nếu không thì `git reset` |
-| Câu trả lời trôi chảy được coi là câu trả lời đúng | Mỗi thay đổi bắt đầu bằng một **giả thuyết đăng ký trước** với quy tắc loại bỏ đo được; thay đổi nặng phải qua **critic** trước; tiến độ được báo từ sổ cái, không bao giờ từ trí nhớ |
-| Tuần sau lại mắc đúng lỗi cũ | Mọi thất bại, lần bị từ chối hay lời phàn nàn (kể cả "chậm quá") đều thành một **bài học** kèm kiểm tra hồi quy chạy trước mỗi lần keep |
-| Agent lặng lẽ sửa test, làm lộ key, hoặc đụng vào config của bạn | **Cổng tất định** chặn lại: đường dẫn được bảo vệ, quét bí mật, mẫu rác (slop), cỡ diff, một hàng rào băm nội dung quanh dự án |
-| Điểm số cao nhưng không tổng quát hóa được | Một **holdout eval** tùy chọn mà agent không bao giờ thấy, kèm cảnh báo khi hai mức tăng lệch nhau |
-| Bạn tìm kỹ thuật mới bằng cách lướt web | Một **trend scout** xếp hạng repo GitHub mới, bài trên HN và bài báo arXiv theo độ liên quan, đà tăng và độ mới |
-| Bị khóa vào một vendor | `AGENTS.md` được Codex, Cursor, Copilot, Jules, Aider và nhiều công cụ khác đọc; Claude Code và Gemini CLI dùng file trỏ; mọi CLI khác cắm vào qua `team.yaml` |
+## Giao cho AI của bạn
 
-Khoảng 3,500 dòng Python thư viện chuẩn. Không phụ thuộc gói ngoài, không
-telemetry, không lưu API key.
+**Nếu AI của bạn chạy được lệnh** (Claude Code, Codex, Cursor, Copilot,
+Gemini CLI, Aider và các công cụ tương tự), hãy dán đoạn này vào nó và điền
+dòng cuối:
 
-<a id="quickstart"></a>
-## Bắt đầu nhanh
+```text
+Clone https://github.com/johnha912/keeploop next to my project (not inside it),
+run `python prepare.py` in the clone, then read its AGENTS.md and act as the CEO
+it describes. What I want better: <for example "make my test suite faster">
+```
 
-Cần Python 3.10+ và git.
+Dòng cuối bạn có thể viết bằng tiếng Việt.
+
+Vậy là xong. Bạn không bao giờ gõ `kl` và không có cờ nào phải học. Lần
+đầu, AI của bạn hỏi bằng lời thường "tốt hơn" nghĩa là gì và đo bằng cách
+nào, rồi đề xuất một `evaluate.py` (một script nhỏ in ra con số đó) để bạn
+duyệt trước khi có gì thay đổi. Trong Claude Code, `/keeploop 3` chạy trong bản clone sẽ chạy ba
+chu kỳ.
+
+**Nếu AI của bạn là một ứng dụng chat không mở được link hay chạy lệnh**
+(ứng dụng ChatGPT hoặc Gemini), hãy dán toàn bộ
+[`BOOTSTRAP.md`](BOOTSTRAP.md) vào một cuộc chat mới. Khi đó AI sẽ đưa bạn
+từng lệnh `python kl.py ...` để chạy trong một bản clone, và bạn dán đầu
+ra lại cho nó.
+
+<details>
+<summary><b>Nếu bạn là một AI agent đang đọc trang này</b></summary>
+
+1. Clone repo này vào một thư mục riêng, bên ngoài dự án của người dùng, và
+   chạy `python prepare.py` ở đó. Chạy mọi lệnh từ thư mục gốc của bản clone.
+2. Đọc [`AGENTS.md`](AGENTS.md). Đó là quy trình đầy đủ: các vai, các lệnh
+   `python kl.py` chính xác và các quy tắc cứng.
+3. Nếu `evaluate.py` vẫn là bản demo, đừng bắt đầu vòng lặp. Hỏi người
+   dùng, trong một tin nhắn, "tốt hơn" nghĩa là gì và đo bằng cách nào, rồi
+   đề xuất một `evaluate.py` (nó nhận đường dẫn workspace và in ra một con
+   số, càng cao càng tốt).
+4. Để làm việc trên repo của người dùng, nhờ họ tạo một git worktree cho
+   vòng lặp và đặt `workspace:` trong `team.yaml` trỏ tới đó; các bước nằm
+   trong [docs/GUIDE.md](docs/GUIDE.md#use-it-on-your-own-repo). Bạn có thể
+   soạn nháp `team.yaml`, `program.md` và `evaluate.py` cho người dùng,
+   nhưng chỉ người dùng được sửa chúng.
+5. Không bao giờ commit bằng tay: chỉ `python kl.py keep` mới commit. Với
+   mọi tuyên bố về tiến độ, hãy dán nguyên văn `python kl.py report`.
+
+</details>
+
+## Thử offline
+
+Muốn xem thử trước khi giao cho AI? Cần Python 3.10+ và git. Không cần AI,
+không cần API key; mất vài giây.
 
 ```bash
 git clone https://github.com/johnha912/keeploop.git && cd keeploop
 python prepare.py
-```
-
-Sau đó mở thư mục trong AI của bạn và **chỉ cần nói bạn muốn cải thiện điều gì**:
-"làm test chạy nhanh hơn", "nâng điểm benchmark". Bạn không bao giờ gõ `kl`
-và không có cờ nào phải học. AI của bạn đọc sơ đồ tổ chức, điều hành đội,
-và hỏi bạn bằng lời thường khi cần gì đó, chẳng hạn lần đầu là "tốt hơn"
-nghĩa là gì.
-
-| AI của bạn | Nó đọc gì | Lối tắt (tùy chọn) |
-|---|---|---|
-| Claude Code | `CLAUDE.md` → `AGENTS.md`, cùng các subagent trong `.claude/agents` | `/keeploop 3` |
-| Codex, Cursor, Copilot, Jules, Aider, Zed, Amp… | `AGENTS.md` | — |
-| Gemini CLI | `GEMINI.md` → `AGENTS.md` | — |
-| Công cụ khác | `AGENTS.md` (tự đủ) | các vai chạy như phiên mới nếu công cụ của bạn không có subagent |
-
-Trong Claude Code, `.claude/settings.json` cho phép sẵn các lệnh `kl` chỉ
-đọc và đo để bạn không bị hỏi cả chục lần mỗi chu kỳ (trend scout cũng nằm
-trong đó: nó chỉ đọc ba nguồn công khai cố định). Những lệnh chạy kiểm tra
-tùy ý, gọi vendor khác, tải link bạn đưa hoặc niêm phong lại hàng rào thì
-vẫn hỏi bạn trước.
-
-Phía sau, AI của bạn điều khiển `kl`, và `kl` quyết định. Trông như thế nào
-trên cấu hình demo đồ chơi:
-
-```text
-$ python kl.py begin
-kl: baseline metric = 0.828178  sigma = 0.000000 (3 runs)  holdout baseline recorded
-$ python kl.py recall "learning rate"
-nothing in memory matches; it is new
-$ python kl.py card card.txt
-card 1 registered
-                                   (the Engineer sets learning_rate to 0.03)
-$ python kl.py check
-PASS tier=light files=1 lines=2 diff=be28f0079be6
-$ python kl.py keep
-KEPT cycle 1: metric 0.942000 (bar 0.828178); best is now 0.942000
-                                   (next card: dropout 0.9)
-$ python kl.py keep
-kl: REFUSED: metric 0.558000 does not beat the keep bar 0.942000 (best 0.942000, sigma 0.000000)
-$ python kl.py discard --reason "dropout 0.9 lowered the metric"
-discarded cycle 2 (discard); workspace back at best 0.942000
-$ python kl.py report
-cycles: 2  keeps: 1  discards: 1  crashes: 0
-baseline: 0.828178  best: 0.942000
-hypotheses: rejected 1, supported 1
-```
-
-(Đầu ra đã được rút gọn còn những dòng quan trọng.)
-
-### Chạy qua đêm, không cần chat
-
-`run.py` chạy cùng vòng lặp đó ở chế độ headless, gọi các CLI vendor mà bạn
-liệt kê trong `team.yaml`. Bản demo dùng một **vendor giả theo kịch bản**
-đi qua một lần keep, một lần discard và một lần crash, để bạn thấy mọi
-nhánh ngoại tuyến trong vài giây. Nó cho thấy cơ chế, không phải kết quả
-một model thật đạt được.
-
-```bash
 python run.py --mock --iterations 5
 ```
 
 ```text
-run: baseline metric = 0.828178  sigma = 0.000000 (3 runs)  holdout baseline recorded
 cycle 1: keep  metric=0.942  best=0.942000  tokens=3501
 cycle 2: keep  metric=0.992  best=0.992000  tokens=3568
 cycle 3: discard  metric=0.942  best=0.992000  tokens=2820
 cycle 4: crash  metric=None  best=0.992000  tokens=3510  lesson=L-001
 cycle 5: keep  metric=1.0  best=1.000000  tokens=3860
-holdout: 0.818178 -> 0.998000 (+0.179822); evaluation: 0.828178 -> 1.000000 (+0.171822)
-
 run complete: 3 keeps, 1 discards, 1 crashes, 1 lessons, 17259 tokens. Best metric: 1.000000
 ```
 
-(Thời gian từng pha đã được rút gọn.)
+(Thời gian đã được rút gọn.) Bản mock là một AI giả viết theo kịch bản, để
+bạn xem một lần keep, một lần discard và một lần crash xảy ra thế nào. Nó
+cho thấy vòng lặp hoạt động ra sao, không cho thấy một model thật giỏi đến
+đâu. Mỗi lần keep là một commit thật:
+`git -C .keeploop/workspace log --oneline`.
 
-Mỗi lần keep là một commit bạn đọc được:
+## Ví dụ thực tế
 
-```bash
-git -C .keeploop/workspace log --oneline   # 3 keep commits on top of the initial one
-cat .keeploop/results.tsv                  # one row per cycle; kl only appends
-python kl.py recall "crash"                # L-001: what crashed, and the rule it left behind
-```
+<table>
+<tr>
+<td width="50%" valign="top">
 
-<a id="use-it-with-a-chat-ai-no-install"></a>
-## Dùng với AI chat (không cần cài đặt)
+**Demo offline (cấu hình đồ chơi)**
 
-Các ứng dụng chat dành cho người dùng phổ thông (ứng dụng Gemini, ChatGPT
-và tương tự) không mở được link GitHub, không đọc được file của bạn và
-không chạy được terminal. Dành cho chúng, keeploop có sẵn
-[`BOOTSTRAP.md`](BOOTSTRAP.md): một file tự đủ, nói keeploop làm gì, khi
-nào kích hoạt, chứa nguyên văn `AGENTS.md` và thêm các quy tắc cho chế độ
-chat.
+Chính là cái GIF ở trên. Một bản mock theo kịch bản chỉnh `config.json` của
+demo qua năm chu kỳ: ba lần keep, một lần discard và một lần crash thành
+bài học L-001. Chạy trong vài giây, không cần AI.
 
-1. Mở `BOOTSTRAP.md`, sao chép toàn bộ file và dán vào một cuộc chat mới.
-2. AI tóm tắt chu kỳ và các quy tắc cứng, rồi hỏi bạn muốn cải thiện điều gì.
-3. Bạn vẫn nằm trong vòng lặp: AI không chạy được gì, nên nó đưa bạn từng
-   lệnh `python kl.py ...` một. Bạn chạy lệnh trong một bản clone của repo
-   này rồi dán đầu ra lại. Nó không bao giờ bịa lệnh hay con số; điều gì
-   nó chưa biết sẽ nằm dưới `MISSING:` để bạn trả lời.
+[Bản ghi](docs/DEMO-OUTPUT.txt) · [Thử ngay](#thử-offline)
 
-Cách này cần Python 3.10+ và git trên máy bạn để chạy lệnh, nhưng không
-cần công cụ AI nào có quyền truy cập file. `BOOTSTRAP.md` được tạo lại mỗi
-khi `AGENTS.md` đổi (các bước nằm cuối file đó).
+</td>
+<td width="50%" valign="top">
 
-<a id="how-a-cycle-works"></a>
-## Một chu kỳ hoạt động thế nào
+<a href="examples/marketing-research/"><img src="docs/assets/example-marketing-research.png" alt="Phần đầu bảng bìa của ví dụ nghiên cứu marketing: câu trả lời một dòng và ba con số nổi bật" width="100%"></a>
 
-Cùng một chu kỳ chạy ở cả hai chế độ: trong AI của bạn, mỗi hộp bên dưới là
-một subagent hoặc một phiên mới và mỗi quyết định là một lệnh `kl`; trong
-`run.py`, vòng lặp tự gọi các CLI vendor.
+**Báo cáo insight người tiêu dùng (nghiên cứu marketing)**
+
+Một nghiên cứu lắng nghe mạng xã hội về năm thương hiệu thời trang nhanh,
+kèm một dashboard và một file PDF 30 trang. Một chu kỳ thật, chạy trong
+Claude Code, đã sửa hai tuyên bố thiếu căn cứ: điểm 0.970000 → 1.000000,
+kiểm toán APPROVED, được giữ lại. Trang đó cũng nói rõ điểm số không đo
+điều gì.
+
+[Đọc ví dụ](examples/marketing-research/)
+
+</td>
+</tr>
+</table>
+
+## Sao không để AI tự lặp?
+
+Vì một agent nói "xong rồi" không phải là một phép đo.
+
+| Cách thông thường | Với keeploop |
+|---|---|
+| Chính model viết thay đổi cũng tự bảo là ổn | **Một phiên mới hoặc một vendor khác** kiểm toán diff thật; người làm không bao giờ tự kiểm tra việc của mình |
+| "Trông ổn đấy" | Chỉ `kl keep` mới commit. Nó tự chạy lại phần đánh giá, và con số phải vượt mức tốt nhất quá nhiễu của chính phép đánh giá, nếu không thì thay đổi bị reset |
+| Câu trả lời trôi chảy được coi là câu trả lời đúng | Mỗi thay đổi bắt đầu bằng một **thẻ giả thuyết viết sẵn** với quy tắc đo được sẽ loại bỏ nó, chốt trước khi chạy phép đánh giá |
+| Tuần sau lại mắc đúng lỗi cũ | Mọi lần crash, bị từ chối hay bị phàn nàn đều thành một **bài học**, có thể kèm một kiểm tra chạy trước mỗi lần keep |
+| Agent lặng lẽ sửa test hoặc làm lộ key | **Cổng bằng code, không phải prompt**, chặn lại: đường dẫn được bảo vệ, quét bí mật, mẫu rác (slop) bị cấm, cỡ diff và một hàng rào băm nội dung |
+| Điểm số cao nhưng không tổng quát hóa được | Một điểm **holdout** tùy chọn mà agent không bao giờ thấy, kèm cảnh báo khi mức tăng của nó tụt lại sau điểm chính |
+| Bạn tìm kỹ thuật mới bằng cách lướt web | Một **trend scout** xếp hạng repo GitHub mới, bài trên Hacker News và bài báo arXiv; ý tưởng của nó vẫn phải đi qua một thẻ |
+| Bị khóa vào một vendor | `AGENTS.md` được Codex, Cursor, Copilot, Jules, Aider và nhiều công cụ khác đọc; Claude Code và Gemini CLI dùng file trỏ |
+
+## Cách hoạt động
+
+Dựa trên ý tưởng [autoresearch](https://github.com/karpathy/autoresearch)
+của Andrej Karpathy: một chỉ số cố định, một quy tắc giữ/bỏ, và git làm bộ
+nhớ về những gì hiệu quả.
 
 ```mermaid
 flowchart LR
-    A[Analyst<br/>reads the repo,<br/>writes one card] -. heavy card .-> X[Critic<br/>one round]
-    X -.-> E
-    A --> E[Engineer<br/>edits the workspace]
-    E --> G{QC gates<br/>fence · protected<br/>secrets · size}
-    G -- fail --> L[(lesson)]
-    G -- pass --> V[evaluate.py<br/>fixed metric]
-    V -- crash --> R[Engineer repair<br/>one try]
-    R --> G
-    V --> U[Auditor<br/>other vendor,<br/>real diff]
-    U --> C{beats best + noise,<br/>confirmed, approved,<br/>replay ok?}
+    A[Analyst<br/>writes one card] --> E[Engineer<br/>makes the change]
+    E --> G{Code gates<br/>fence · protected<br/>secrets · size}
+    G -- pass --> V[evaluate.py<br/>one number]
+    V --> U[Auditor<br/>fresh eyes,<br/>real diff]
+    U --> C{beats best<br/>+ noise?}
     C -- yes --> K[git commit]
     C -- no --> D[git reset]
-    D -. failed audit .-> L
-    L -. guardrails .-> A
+    G -- fail --> L[(lesson)]
+    D -. why .-> L
+    L -. read next time .-> A
 ```
 
-1. **Analyst** kiểm tra bộ nhớ của đội (`kl recall`) và chỉ mục code
-   (`kl map`), rồi viết một thẻ thí nghiệm: giả thuyết, thay đổi nhỏ nhất,
-   hiệu quả kỳ vọng và kết quả sẽ khiến nó bị loại.
-2. **Critic**, chỉ với thẻ nặng, phản biện thẻ một lần: những cách giải
-   thích bị bỏ sót, thẻ có thể thất bại ra sao, quy tắc loại bỏ có quá dễ
-   không. Analyst được sửa một lần. Thẻ nhẹ bỏ qua bước này.
-3. **Engineer** thực hiện đúng thẻ đó bằng cách sửa file. Nếu phép đánh
-   giá crash, nó được một lần sửa lại kèm thông báo lỗi.
-4. **Cổng QC** chạy bằng code, không bằng prompt: không gì ngoài workspace
-   được thay đổi, đường dẫn được bảo vệ không bị đụng tới, không thông tin
-   xác thực hay mẫu rác bị cấm nào được xuất hiện trong diff, và diff phải
-   đủ nhỏ để đọc. Các cổng cũng phân loại thay đổi là nhẹ hay nặng.
-5. **evaluate.py** in ra một con số. Vòng lặp không sửa được nó.
-6. **Auditor**, một vendor khác hoặc một phiên mới, kiểm tra phạm vi, việc
-   lách phép đánh giá, guardrail, bảo mật và tay nghề, cộng với checklist
-   chuyên gia của pack khi thay đổi nặng. Nó chỉ được gọi khi chỉ số đã
-   vượt ngưỡng.
-7. **Keep** cần chỉ số vượt mức tốt nhất quá nhiễu đã đo của phép đánh giá,
-   một lần chạy xác nhận (chỉ bỏ qua với thay đổi nhẹ khi phép đánh giá
-   không có nhiễu), một lần phê duyệt, không tụt rubric và mọi kiểm tra bài
-   học đều đạt. Bất cứ điều gì khác thì bị reset.
+1. **Analyst** viết một thẻ: giả thuyết, thay đổi nhỏ nhất, điều được kỳ
+   vọng sẽ xảy ra, và kết quả sẽ chứng minh nó sai.
+2. **Engineer** thực hiện đúng thay đổi đó, và là vai duy nhất được sửa
+   file.
+3. **Cổng bằng code** (`kl check`) từ chối thay đổi ngoài workspace, sửa
+   file được bảo vệ, thông tin xác thực và diff quá lớn.
+4. **evaluate.py** in ra một con số. Vòng lặp không sửa được nó.
+5. **Auditor**, trong một phiên mới hoặc từ vendor khác, kiểm tra diff so
+   với thẻ mà không thấy lời giải thích của Engineer.
+6. **`kl keep`** chỉ commit nếu mọi kiểm tra đều đạt và con số vượt ngưỡng;
+   nếu không thì **`kl discard`** reset và ghi lại lý do.
 
-Trước chu kỳ đầu tiên, vòng lặp chạy phép đánh giá ba lần để đo nhiễu (σ),
-và một lần keep phải vượt `2σ`. Nếu có `holdout.py`, nó được chấm một lần
-trước và một lần sau khi chạy; agent không bao giờ thấy nó, và nếu mức tăng
-trên holdout thấp hơn nhiều so với mức tăng của eval thì một cảnh báo được
-in ra rằng các lần keep có thể đang khớp với phép đánh giá thay vì với bài
-toán.
+Chu kỳ đầy đủ, vòng critic cho thay đổi nặng, bài học, trend scout và việc
+chỉnh tốc độ nằm trong [hướng dẫn](docs/GUIDE.md#how-a-cycle-works).
 
-<a id="hypotheses-not-prompts"></a>
-## Giả thuyết, không phải prompt
+## Dùng cho công việc của bạn
 
-Một prompt tốt hơn làm câu trả lời đọc hay hơn. Nó không đưa cho model dữ
-liệu mà nó chưa từng thấy. keeploop được xây để sự trôi chảy không thể giả
-làm bằng chứng:
-
-- **Thẻ đăng ký trước.** Analyst phải trả lời bằng các dòng có nhãn:
-  `HYPOTHESIS`, `ALTERNATIVES`, `CHANGE`, `EXPECT`, `REJECT IF`, `MISSING`.
-  Một thẻ viết văn xuôi tự do là một crash, không phải một chu kỳ. Tiêu chí
-  loại bỏ được chốt trước khi phép đánh giá chạy và phải đo được: "nếu nó
-  không tốt hơn" bị từ chối, "nếu metric < 0.85" được chấp nhận.
-- **Một critic trước khi làm.** Thẻ nặng phải qua một vòng phản biện trước
-  khi viết bất kỳ dòng code nào. Cuộc tranh luận được ghi lại; nó có thể
-  chặn một thẻ, không bao giờ giữ được một thẻ.
-- **Linh cảm của bạn đi trước.** Các gạch đầu dòng dưới `## Hypotheses to test`
-  trong `program.md` được thử, theo thứ tự, trước khi Analyst đề xuất ý
-  riêng.
-- **Chỗ trống giao cho bạn.** Bất cứ điều gì Analyst nói là `MISSING` sẽ
-  được đưa vào `.keeploop/questions.md` thay vì bị che đi.
-- **Đã bị loại thì vẫn bị loại.** Mỗi thẻ nhận một kết luận trong
-  `.keeploop/hypotheses.jsonl` (supported, rejected, inconclusive,
-  untested). Những thẻ rejected và inconclusive được cho Analyst xem, và nó
-  chỉ được đề xuất lại một thẻ bằng cách nói điều gì đã khác đi.
-- **Chỉ chỉ số mới quyết định.** Auditor thấy thẻ và diff, không bao giờ
-  thấy lời giải thích của Engineer, và một lần keep cần chỉ số đo được vượt
-  mức tốt nhất quá nhiễu của phép đánh giá.
-- **Con số đến từ file, không từ model.** AI của bạn được dặn dán `kl report`
-  cho mọi tuyên bố về tiến độ. `kl cite` (tùy chọn, dùng mạng) kiểm tra các
-  link được trích còn sống và đoạn trích dẫn có thật sự nằm trên trang.
-- **Slop là một cổng, không phải ghi chú phong cách.** Mỗi pack liệt kê các
-  mẫu bị cấm (`TODO` bỏ sót, "as an AI", lời quảng cáo sáo rỗng); một lần
-  trúng sẽ chặn thay đổi trước khi bất kỳ model nào xem xét.
-
-<a id="where-the-rules-come-from"></a>
-## Các quy tắc đến từ đâu
-
-Các quy tắc của keeploop không được vẽ ra trên bảng trắng. Chúng lấy cảm
-hứng từ những đội AI mà tác giả vận hành hằng ngày, mỗi đội có một chủ là
-con người và một AI đóng vai CEO. Các ví dụ dưới đây là cách những đội đó
-làm việc, không phải benchmark của repo này:
-
-- **Một cổng nghiên cứu cho môn học.** Các dự án được xếp hạng trên thang
-  100 điểm với các cổng cứng. Phiếu bầu của độc giả cộng thêm điểm nhưng
-  không cứu được dự án đã rớt một cổng.
-- **Một dự án ML bậc sau đại học.** Bảy vai, mỗi vai phụ trách một phần của
-  rubric chấm điểm. Analyst, rồi con người duyệt, rồi Engineer, rồi một
-  auditor từ vendor khác. Một con số chỉ vào báo cáo nếu phép đánh giá
-  chung tạo ra nó trên một tập test chưa bị đụng tới.
-- **Các cuộc thi Kaggle.** Cross-validation là sự thật, không phải bảng
-  xếp hạng công khai. Giả thuyết được khai báo trước khi chạm vào dữ liệu.
-  Mỗi lần nộp bài phải mua được thông tin mới.
-- **Một công ty sản xuất YouTube với 13 phòng ban.** Checklist bàn giao cố
-  định, file được kiểm bằng hash ở phía nhận, và đôi tai của chủ là cổng
-  cuối cùng.
-- **Hai đội nghiên cứu đối thủ trên các vendor khác nhau** (Muse Code và
-  Claude Code). Họ không được đọc công việc của nhau, và rubric được giữ
-  nguyên suốt cả mùa.
-- **Một nhật ký tập luyện sức mạnh.** Một bài tập thay thế được quy về một
-  thước đo chung để các buổi tập so sánh công bằng, và mỗi buổi lặp lại
-  được vẽ biểu đồ so với buổi trước.
-
-Sáu quy tắc đứng vững trong mọi đội đó:
-
-| Quy tắc | Học được ở | Trong keeploop |
-|---|---|---|
-| Một kênh duy nhất tới con người, không phải rải rác các quyết định nhỏ | cổng nghiên cứu, công ty sản xuất | AI của bạn là bên duy nhất nói chuyện với bạn; câu hỏi mở được gom vào `.keeploop/questions.md`, sự kiện đến từ `kl report` |
-| Người làm không bao giờ tự kiểm tra việc của mình | dự án ML, các đội đối thủ | Chỉ Engineer được sửa. Auditor và critic chỉ đọc: vendor khác nếu bạn đã thiết lập, nếu không thì một phiên mới |
-| Một chỉ số cố định là sự thật; ý kiến và demo không phải bằng chứng | Kaggle, cổng nghiên cứu | `evaluate.py` được bảo vệ và `kl keep` chạy lại nó. Kiểm toán, phản biện và cổng cứng có thể chặn một lần keep nhưng không bao giờ ép được một lần keep |
-| Nếu chỉ có trong chat thì nó không tồn tại | tất cả | Sổ cái, giả thuyết, bài học và các cuộc tranh luận là file mà lần chạy sau đọc; `kl` chỉ ghi nối thêm vào chúng |
-| Một sự cố chỉ đóng khi bản sửa được chứng minh là còn sống | Kaggle, công ty sản xuất | Nguyên nhân gốc trong bài học, một thay đổi với thứ lần chạy sau đọc, và một kiểm tra chạy lại trước mỗi lần keep |
-| Giả thuyết và ngưỡng đến trước dữ liệu | Kaggle, dự án ML | Một thẻ với REJECT IF đo được, do `kl card` kiểm; một ý tưởng bị loại chỉ quay lại với điều đã khác đi |
-
-Những thói quen nhỏ hơn cũng được đưa vào: các bài nộp gần trùng nhau
-thành kiểm tra thẻ trùng lặp, tập test chưa bị đụng tới thành holdout eval,
-"phản hồi là dữ liệu đầu vào, không phải mệnh lệnh" thành quy tắc cho đề
-xuất của scout, rubric mùa giải bị đóng băng thành bản hiến chương mà chỉ
-con người được sửa, và việc kiểm hash khi bàn giao thành hàng rào.
-
-<a id="use-it-on-your-own-repo"></a>
-## Dùng trên repo của bạn
-
-1. Cho vòng lặp một worktree riêng, để nó không bao giờ reset công việc bạn
-   quan tâm:
-   ```bash
-   git worktree add ../myrepo-keeploop -b keeploop
-   ```
-2. Viết `evaluate.py`. Nó nhận đường dẫn workspace và in ra một con số,
-   càng cao càng tốt: tỷ lệ test đạt, điểm benchmark, kích thước bundle
-   đảo dấu, tỷ lệ sạch lỗi lint.
-3. Sửa `team.yaml`:
-   ```yaml
-   workspace: ../myrepo-keeploop
-   protect: tests, evaluate.py
-   pack: software
-   roles:
-     analyst:
-       vendor: claude-cli, gemini-cli   # ordered fallback
-     engineer:
-       vendor: claude-cli
-     auditor:
-       vendor: codex-cli                # a different vendor audits
-   ```
-4. Viết sứ mệnh của bạn trong `program.md`. Scout cũng đọc nó.
-5. Tùy chọn: viết `holdout.py` (cùng hợp đồng với `evaluate.py`, chấm trên
-   dữ liệu mà phép đánh giá không dùng).
-6. Mở thư mục trong AI của bạn và chạy `/keeploop 3` (hoặc "follow AGENTS.md
-   and run 3 cycles"), hoặc chạy headless bằng `python run.py --iterations 3`.
-   Sau đó đọc `python kl.py report`, `.keeploop/questions.md` và git log.
-
-Bất kỳ CLI nào đọc prompt từ stdin đều có thể làm vendor cho chế độ headless
-hoặc cho `kl audit`, cấu hình trong `team.yaml` mà không cần đổi code:
-
-```yaml
-vendors:
-  myvendor:
-    cmd: mycli --print          # check your CLI's docs for the real flags
-    edit_args: --allow-edits    # added for the engineer only
-    model_flag: --model
-    env_keep: MYVENDOR_         # prefixes this CLI may see
-    env_allow: MYVENDOR_API_KEY # secret-looking names pass only if listed exactly
-```
-
-Các CLI vendor phải được cài và đăng nhập sẵn. Các cờ không tương tác của
-chúng thay đổi giữa các bản phát hành; hãy đối chiếu với phiên bản bạn có
-trước một lần chạy dài. Một chu kỳ headless thực hiện từ hai đến sáu lần
-gọi vendor (nhiều hơn chỉ với thẻ nặng và khi crash); `max_run_tokens`
-(ước tính) dừng một lần chạy trở nên tốn kém.
-
-<a id="speed"></a>
-## Tốc độ
-
-Phần lớn các chu kỳ là nhỏ, nên keeploop dồn công sức vào nơi có rủi ro:
-
-- **Nhẹ hay nặng.** Một thay đổi là nặng khi nó đụng tới đường dẫn nằm dưới
-  `heavy:` trong `team.yaml` hoặc vượt `heavy_diff_lines`. Thay đổi nhẹ bỏ
-  qua critic, bỏ qua Auditor khi chỉ số đã rõ ràng, và bỏ qua lần chạy xác
-  nhận khi phép đánh giá không có nhiễu. Một vai có thể có `model:` rẻ hơn
-  và `heavy_model:` mạnh hơn.
-- **Không kiểm toán kẻ thua.** Auditor chỉ được gọi khi chỉ số đã vượt
-  ngưỡng, và rubric được chấm trong cùng lần gọi đó.
-- **Đọc ít hơn.** Chỉ những bài học liên quan nhất tới thẻ hiện tại mới
-  vào prompt; `kl map` giữ một chỉ mục code được cache, chỉ phân tích lại
-  các file đã đổi.
-- **"Chậm quá" là một bug.** `kl slow` nêu tên pha chậm nhất và các đòn bẩy
-  có thể cắt giảm nó, kèm rủi ro. `kl staff --goal speed` đề xuất model
-  nhanh hơn cho từng vai dựa trên sổ cái, và `--apply` chỉ đổi những gì
-  danh sách cho phép `staffing:` của bạn trong `team.yaml` cho phép. Danh
-  sách đó phải có trước `kl begin`, để AI của bạn không tự cấp quyền cho
-  mình. Lời phàn nàn trở thành một bài học mà phần kiểm tra
-  (`kl report --assert-cycle-under N`) sẽ fail nếu chu kỳ chậm lại lần nữa.
-
-<a id="never-repeat-lessons"></a>
-## Bài học không lặp lại
-
-Một crash, một lần kiểm toán thất bại, một lần `kl` từ chối hoặc một lời
-phàn nàn của bạn tạo ra một bài học kèm guardrail, và các guardrail liên
-quan nhất được đưa vào các prompt sau. Cùng một thất bại lặp lại thì mở
-rộng bài học cũ thay vì thêm một bản sao. Để bài học có hiệu lực thực thi,
-gắn thêm một kiểm tra:
-
-```bash
-python kl.py lesson check L-002 -- python -m pytest tests/test_parser.py
-```
-
-Từ đó, kiểm tra chạy trong workspace trước mỗi lần keep, và một lần fail sẽ
-chặn lần keep. Một bài học có kiểm tra còn đạt được báo cáo là đã được thực
-thi và rời khỏi prompt; bài học cứ kích hoạt lại thì bị đánh dấu là không
-hiệu quả (`kl lesson review`). Ở chế độ headless, các lệnh kiểm tra chỉ
-đến từ bạn tại dòng lệnh. Trong AI của bạn, hãy xem lại lệnh kiểm tra trước
-khi cho nó thêm vào, vì nó chạy ở mỗi lần keep.
-
-`kl recall "<idea>"` tìm trong bài học, giả thuyết đã có, các cuộc tranh
-luận và câu hỏi mở, để đội hỏi "ta đã thử cái này chưa?" trước khi tốn một
-chu kỳ cho nó.
-
-<a id="trend-scout"></a>
-## Trend scout
-
-```bash
-python scout.py --dry-run
-```
-
-```text
-- h9-tec/ai-roadmap-2026 (GitHub) score 0.325 = relevance 1.00 x momentum 0.59 x recency 0.55
-- matched: agent, evaluation, eval, llm; stars/day=21.1
-```
-
-Nó đọc các repository GitHub mới, Hacker News và arXiv, chấm mỗi mục theo
-độ liên quan (sứ mệnh trong `program.md` của bạn và `scout_topics` của
-pack) × đà tăng (số sao mỗi ngày, điểm và bình luận) × độ mới, rồi nối mục
-tốt nhất vào `.keeploop/proposals.md`. Bản thân scout không thay đổi gì.
-Các đề xuất là văn bản không đáng tin: AI của bạn có thể biến một đề xuất
-thành thẻ, và thẻ đó đi qua cùng hợp đồng như mọi ý tưởng khác. Đặt
-`GITHUB_TOKEN` để có giới hạn tốc độ cao hơn; nó chỉ được gửi tới
-`api.github.com`.
-
-<a id="profession-packs"></a>
-## Pack nghề nghiệp
-
-Vòng lặp không biết lĩnh vực nào; một pack biến nó thành công ty cho một
-ngành. Pack đưa cho Analyst và Engineer một `taste.md` gồm các nguyên tắc
-tay nghề, cho Auditor một `rubric.md` có trọng số với các cổng cứng, và
-khai báo các reviewer chuyên gia (kiểm tra ở thay đổi nặng), chủ đề cho
-scout và các mẫu slop. Một lần keep cần chỉ số tăng và rubric không tụt.
-
-Ngành mới? `python kl.py pack new NAME` dựng khung một pack, và AI của bạn
-điền vào bằng cách phỏng vấn bạn. Câu hỏi đầu tiên nó phải trả lời là câu
-khó: chỉ số tự động nào, và nó đã được kiểm với kết quả thật ra sao? Không
-có điều đó, vòng lặp không có gì để học.
+keeploop chạy được trên mọi thư mục nằm trong git và có điểm số tự động.
+Một **pack** đưa cho đội các quy tắc tay nghề và checklist rà soát cho một
+lĩnh vực:
 
 | Pack | Dành cho | Trạng thái |
 |---|---|---|
-| `software` | kỹ thuật phần mềm | Sẵn sàng: test và benchmark là các chỉ số trung thực |
-| `ui-design` | UI/UX | Thử nghiệm: điểm Lighthouse hay axe đo mức sàn, không đo gu thẩm mỹ. Có sẵn kho style, palette và font với tìm kiếm BM25: `python packs/ui-design/search.py "dark dashboard fintech"` |
-| `marketing-content` | nội dung marketing | Thử nghiệm: kết quả thật (CTR, chuyển đổi) đến muộn và nhiễu; một proxy ngoại tuyến phải được kiểm chứng với kết quả quá khứ trước |
+| `software` | code | Sẵn sàng: test và benchmark là các chỉ số trung thực |
+| `ui-design` | UI/UX | Thử nghiệm: điểm Lighthouse hay axe đo mức sàn, không đo gu thẩm mỹ |
+| `marketing-content` | nội dung marketing | Thử nghiệm: kết quả thật đến muộn và nhiễu |
+| `marketing-research` | báo cáo insight người tiêu dùng | Thử nghiệm: kiểm tra quy tắc và khả năng truy vết, không kiểm tra insight có đúng không |
 
-<a id="safety"></a>
-## An toàn
+Lĩnh vực mới? `python kl.py pack new NAME` dựng khung một pack. Cách thiết
+lập cho repo của bạn, `team.yaml`, vendor và chế độ headless chạy qua đêm
+(`python run.py`) nằm trong [docs/GUIDE.md](docs/GUIDE.md#use-it-on-your-own-repo).
 
-keeploop là một bản triển khai tham chiếu bạn chạy trên máy của mình, tự
-chịu rủi ro (MIT, không bảo hành). Những gì nó làm để bảo vệ bạn:
+## An toàn, nói gọn
 
-- **keeploop không bao giờ thực thi văn bản từ model hay trang web.** CLI
-  vendor nhận prompt qua stdin và chỉ Engineer có quyền sửa. Điều một CLI
-  làm trong chế độ quyền của chính nó là do CLI đó và thiết lập của bạn
-  quyết định.
-- **Hai chế độ, hai mức tin cậy.** Trong `run.py` vòng lặp nắm mọi bước.
-  Trong AI của bạn, `kl` kiểm tra lại mọi thứ trước khi commit, nhưng AI
-  của bạn có cùng quyền file với `kl`: hàng rào ở đó chỉ phát hiện được
-  việc can thiệp, không ngăn được. Các hộp thoại xin quyền của chính công
-  cụ AI là bức tường ngoài.
-- **Hàng rào (fence).** Trong mọi pha chạy code bạn không viết (gọi vendor,
-  phép đánh giá, holdout, kiểm tra bài học), mọi file trong thư mục dự án
-  nằm ngoài workspace đều được băm nội dung, cùng với git config, hook và
-  cờ index của workspace. Bất kỳ thay đổi nào cũng dừng lần chạy, và vòng
-  lặp không chạy thêm lệnh git nào ở đó. Hàng rào chỉ bao phủ thư mục dự
-  án; nó không phải sandbox.
-- **Cổng bí mật.** Toàn bộ nội dung của mọi file đã đổi, kể cả file nhị
-  phân, được quét tìm các định dạng thông tin xác thực phổ biến và tên file
-  khóa. Một lần trúng sẽ không bao giờ được đánh giá hay gửi cho vendor
-  khác, và sổ cái ghi loại khóa, không bao giờ ghi giá trị. Bí mật bị mã
-  hóa hoặc tách nhỏ thì không phát hiện được.
-- **Môi trường được làm sạch.** Các biến trông giống token hay khóa bị gỡ
-  trước khi một CLI vendor, phép đánh giá hay một kiểm tra khởi động; mỗi
-  CLI chỉ giữ các biến của vendor riêng nó.
-- **Gia cố git.** Hook và fsmonitor bị tắt cho mọi lệnh git mà vòng lặp
-  thực hiện; external diff driver và textconv bị tắt với các diff nó đọc.
-- **Khởi đầu sạch, reset an toàn.** Workspace bẩn bị từ chối; các file bị
-  bỏ qua như `.env` không bao giờ bị xóa.
+- keeploop không bao giờ thực thi văn bản từ model hay trang web. CLI vendor
+  nhận prompt qua stdin, và chỉ Engineer có quyền sửa.
+- Trong lúc code bạn không viết đang chạy, mọi file trong thư mục dự án
+  nằm ngoài workspace đều được băm nội dung. Bất kỳ thay đổi nào cũng dừng
+  lần chạy.
+- Các file đã đổi được quét tìm thông tin xác thực, và các biến môi trường
+  trông giống token bị gỡ trước khi bất kỳ CLI vendor hay phép đánh giá nào
+  khởi động.
+- Hàng rào phát hiện thay đổi; **nó không phải sandbox**. Nếu điều đó quan
+  trọng với bạn, hãy chạy vendor thật trong container hoặc VM.
 
-Hãy đọc [SECURITY.md](SECURITY.md) trước khi kết nối một vendor thật. Báo
-cáo lỗ hổng riêng tư qua tab Security của GitHub.
+Chi tiết: [docs/GUIDE.md](docs/GUIDE.md#safety) và [SECURITY.md](SECURITY.md).
 
-<a id="faq-for-skeptics"></a>
-## FAQ cho người hoài nghi
+## FAQ
 
-**Giữ lại cái tốt nhất trong nhiều lần thử có làm overfit phép đánh giá không?**
+**Giữ lại cái tốt nhất trong nhiều lần thử có làm overfit điểm số không?**
 Có, đó là rủi ro chính của mọi vòng lặp keep/discard. keeploop đo nhiễu của
-phép đánh giá và đòi mức tăng trên `2σ`, chạy lại phép đánh giá trước mỗi
-lần keep, và hỗ trợ một holdout eval mà agent không bao giờ thấy, kèm cảnh
-báo khi mức tăng của nó tụt lại sau mức tăng của eval. Hãy dùng holdout cho
-mọi thứ quan trọng.
+điểm số, đòi mức tăng vượt qua nó, chạy lại phép đánh giá trước mỗi lần
+keep, và hỗ trợ một điểm holdout mà agent không bao giờ thấy.
 
 **Bản demo có chứng minh các agent giỏi không?**
-Không. Bản mock được viết kịch bản để đi qua mọi nhánh. Chất lượng của một
-lần chạy thật là chất lượng của các vendor và `evaluate.py` của bạn.
-
-**Sao không để CLI agent của tôi tự lặp?**
-Một agent nói rằng nó đã xong không phải là một chỉ số. keeploop thêm một
-phép đánh giá cố định mà nó không sửa được, một auditor không phải tác giả,
-một lần reset sau mỗi thất bại, và một bộ nhớ về những gì đã thử.
+Không. Bản mock được viết theo kịch bản. Một lần chạy thật chỉ tốt bằng AI
+của bạn và `evaluate.py` của bạn.
 
 **Đây có phải chỉ là một framework multi-agent nữa không?**
 Không có model nào chạy bên trong keeploop. Nó là một sơ đồ tổ chức mà AI
-của bạn đọc và một bộ công cụ từ chối commit những gì chưa được đo. Đổi AI
-mà công ty vẫn còn.
-
-**Hàng rào có phải sandbox không?**
-Không. Nó phát hiện thay đổi trong thư mục dự án; nó không ngăn được một CLI
-có quyền rộng đọc hay gửi file của bạn. Hãy chạy vendor thật trong container
-hoặc VM nếu điều đó quan trọng với bạn.
+của bạn đọc, cộng với các công cụ từ chối commit những gì chưa được đo. Đổi
+AI mà quy trình vẫn còn.
 
 **Khi nào tôi không nên dùng keeploop?**
-Khi không có chỉ số tự động, khi chỉ số mất hàng giờ hay hàng ngày mới có,
-khi thay đổi không nằm trong git, hoặc khi mỗi thay đổi cần chuyên gia ký
-duyệt (y khoa, luật, giao dịch).
+Khi không có điểm số tự động, khi điểm số mất hàng ngày mới có, khi công
+việc không nằm trong git, hoặc khi mỗi thay đổi cần chuyên gia ký duyệt
+(y khoa, luật, giao dịch).
 
-<a id="repository-layout"></a>
-## Cấu trúc repo
+Thêm câu hỏi: [docs/GUIDE.md](docs/GUIDE.md#faq-for-skeptics).
 
-```
-AGENTS.md     the org chart your AI reads: roles, the cycle, hard rules
-CLAUDE.md     pointers to AGENTS.md for tools with their own file name
-GEMINI.md
-.github/copilot-instructions.md
-.claude/      optional Claude Code subagents and the /keeploop skill
-kl.py         the toolbox: begin, card, debate, check, eval, keep, discard,
-              report, slow, recall, map, staff, pack, cite, lesson, scout
-run.py        the headless loop and its QC gates
-prepare.py    setup, every global constant, the version
-program.md    the charter every agent reads (you edit it)
-team.yaml     workspace, protected paths, roles → vendors, budgets, staffing
-vendors.py    mock, claude/codex/gemini presets, any CLI from team.yaml
-lessons.py    lessons, guardrails, replay checks, recall
-codemap.py    cached code index for kl map
-bm25.py       the one ranker behind recall and the ui-design search
-ledger.py     append-only results.tsv
-scout.py      trend scout → proposals.md
-rubric.py     weighted rubric with hard gates
-packs/        taste, rubric, specialists, scout topics, slop per field
-evaluate.py   YOUR fixed metric (ships with the demo)
-holdout.py    optional metric the agents never see (ships with the demo)
-docs/SPEC.md  parameters, formats, invariants
-```
+## Tài liệu
 
-<a id="roadmap"></a>
-## Lộ trình
+| | |
+|---|---|
+| [docs/GUIDE.md](docs/GUIDE.md) | Cuốn hướng dẫn đầy đủ: từng bước, bài học, scout, tốc độ, pack, an toàn, cấu trúc |
+| [AGENTS.md](AGENTS.md) | Sơ đồ tổ chức và các lệnh chính xác mà AI của bạn làm theo |
+| [BOOTSTRAP.md](BOOTSTRAP.md) | Một file để dán vào ứng dụng chat |
+| [docs/SPEC.md](docs/SPEC.md) | Tham số, định dạng file, các bất biến |
+| [SECURITY.md](SECURITY.md) | Mô hình mối đe dọa và cách báo lỗ hổng |
+| [CHANGELOG.md](CHANGELOG.md) | Các phiên bản ([SemVer](https://semver.org)) |
 
-- Vendor qua API (Anthropic, OpenAI, Google) sau cùng một giao diện
-- Một GitHub Action chạy theo lịch, chạy vòng lặp và mở một PR cho mỗi lần chạy
-- Chế độ đua: hai vendor giải cùng một thẻ trong môi trường cô lập
-
-Các phiên bản theo [SemVer](https://semver.org); xem [CHANGELOG.md](CHANGELOG.md).
-
-<a id="credits"></a>
 ## Ghi công
 
 keeploop đứng trên vai [**autoresearch**](https://github.com/karpathy/autoresearch)
-của Andrej Karpathy. Cốt lõi của repo này là ý tưởng của ông: một phép
-đánh giá cố định mà agent không đụng tới được, một `results.tsv` chỉ ghi
-nối thêm, một quy tắc keep/discard, git làm bộ nhớ về những gì hiệu quả, và
-một repo phẳng nơi con người viết chỉ dẫn còn agent sửa code. keeploop biến
-nó thành một sơ đồ tổ chức mà AI nào cũng chạy được, và thêm các vai trò,
-kiểm toán chéo vendor, cổng QC, một động cơ bài học và một trend scout lên
-trên. Không có code nào của autoresearch được sao chép. Nếu bạn thích repo
-này, hãy star repo của ông trước.
+của Andrej Karpathy: một phép đánh giá cố định mà agent không đụng tới
+được, một `results.tsv` chỉ ghi nối thêm, một quy tắc keep/discard và git
+làm bộ nhớ. keeploop biến nó thành một sơ đồ tổ chức mà AI nào cũng chạy
+được, và thêm các vai trò, kiểm toán chéo vendor, cổng bằng code, bài học
+và một trend scout. Không có code nào của autoresearch được sao chép. Nếu
+bạn thích repo này, hãy star repo của ông trước.
 
 Một số ý tưởng cũng được mượn (viết lại, không sao chép code) từ các công
 cụ chúng tôi dùng hằng ngày:
@@ -584,7 +291,14 @@ cụ chúng tôi dùng hằng ngày:
 
 Banner được dàn chữ bằng [Google Sans Flex](https://fonts.google.com/specimen/Google+Sans+Flex).
 
-<a id="license"></a>
+Nếu keeploop đã chặn được một thay đổi xấu, một ⭐ sẽ giúp người khác tìm
+thấy nó. Lỗi và ý tưởng: [mở một issue](https://github.com/johnha912/keeploop/issues).
+
 ## Giấy phép
 
 [MIT](LICENSE).
+
+> **Ghi chú đồng bộ.** Bản này dịch từ [README.md](README.md), bản tiếng Anh
+> là bản gốc. Khi README.md đổi, sửa file này theo cùng lần commit: giữ nguyên
+> thứ tự các mục, khối code, tên file, lệnh và con số, chỉ dịch phần văn xuôi.
+> Nếu hai bản lệch nhau, bản tiếng Anh đúng.
