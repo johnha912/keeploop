@@ -58,8 +58,8 @@ user learn commands or flags.
 
 Out of the box the workspace is the demo `.keeploop/workspace`. To improve
 the user's own project, the human makes these changes before `kl begin`.
-You draft each one for them to approve and save; you never write them
-yourself (see Hard rules):
+You draft each one for them to approve and save, and give them any command
+ready to paste; you never write them yourself (see Hard rules):
 
 1. A separate git worktree of their project for the loop, so a reset never
    touches their working copy: `git -C <their repo> worktree add <path> -b keeploop`.
