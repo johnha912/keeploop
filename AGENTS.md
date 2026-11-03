@@ -41,6 +41,9 @@ ready to paste; you never write them yourself (see Hard rules):
 Then run `python kl.py begin`. Every keep is a commit on the `keeploop`
 branch of that worktree; the human merges the ones they want.
 
+To run a worked example instead: `python tools/make_sandbox.py examples/<name> <new short folder>`
+builds its sandbox in seconds and prints the next command (docs/GUIDE.md).
+
 ## The company
 
 | Role | Job | May edit files? |
