@@ -333,7 +333,20 @@ paths relative to the example folder:
 Root files are the fixed scorers and config the agents never edit; holdout
 data goes there too, never in the workspace (the script refuses any
 `holdout*` file for the workspace). A new example needs only these two
-lines.
+lines. Two optional extras:
+
+```yaml
+# sandbox requires: claude (the scorer calls Claude CLI; install it and log in first)
+loop:
+  metric_max: 1.0
+```
+
+The first makes `make_sandbox.py` print a warning before the `next:` line
+when that command is not on PATH (the prompt-optimization scorer calls the
+`claude` CLI itself, so without it `kl begin` stops at the baseline). The
+second is the top of the metric's scale: when the keep bar is at or above it (a
+baseline already at the maximum), `kl begin`, `kl status` and `run.py`
+warn that every cycle will be discarded until the score has headroom.
 
 Any CLI that reads a prompt on stdin can be a vendor for the headless mode
 or for `kl audit`, configured in `team.yaml` without code changes:

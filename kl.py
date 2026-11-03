@@ -276,6 +276,8 @@ def status_text(c) -> str:
            f"{_bar(c, best):.6f}  | cycles {len(cyc)} (keep {count('keep')}, discard "
            f"{count('discard')}, crash {count('crash')})",
            f"workspace: {c.workspace}"]
+    if warn := R.ceiling_warning(best["metric"], _bar(c, best), c.loop_cfg["metric_max"]):
+        out.append(warn)
     cy = _cycle(c)
     out.append(f"pending card: {cy['n']}  {cy['parsed']['hypothesis'][:80]}" if "card" in cy
                else "pending card: none")
