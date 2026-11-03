@@ -1,11 +1,10 @@
 # team.yaml - marketing research example (consumer insight report).
-# Set up: copy this folder's evaluate.py to the keeploop root as evaluate.py
-# (it replaces the demo), delete the demo holdout.py (it imports the demo
-# scorer; lesson L-001, see run/LOG.md and run/cycle-1/transcript.txt), make a
-# fresh git repo for the workspace holding brief.md, report.md and a data/
-# folder (copy data/metrics.json and data/quotes.json from this folder), and
-# point `workspace:` at it (relative to the keeploop folder, or absolute).
-# Then: python kl.py begin
+# Set up (seconds): python tools/make_sandbox.py examples/marketing-research DEST
+# It copies keeploop to DEST/kl with these files on top, removes the demo
+# holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
+# makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
+# sandbox root: evaluate.py, team.yaml
+# sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
 

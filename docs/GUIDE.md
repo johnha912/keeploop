@@ -305,6 +305,36 @@ hash check on delivery became the fence.
    Then read `python kl.py report`, `.keeploop/questions.md` and the git
    log.
 
+### Run a worked example
+
+One command, about a second, from the repo root:
+
+```bash
+python tools/make_sandbox.py examples/prompt-optimization ../klpo
+```
+
+It copies keeploop's code, packs, docs and `.claude` to `../klpo/kl`,
+removes the demo `holdout.py` (it scores the demo config; lesson L-001),
+puts the example's root files on top, and makes the workspace its
+`team.yaml` names (here `../klpo/ws`) a fresh git repo with one commit.
+Then it prints the next command: `cd ../klpo/kl && python kl.py begin`.
+`DEST` must be new or empty and outside the repo, so no sandbox or
+`.keeploop/` state ever lands in it. On Windows keep `DEST` short
+(MAX_PATH).
+
+An example says what goes where in two lines of its `team.yaml` header,
+paths relative to the example folder:
+
+```yaml
+# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, data/holdout.jsonl
+# sandbox workspace: prompt.md, data/dev.jsonl
+```
+
+Root files are the fixed scorers and config the agents never edit; holdout
+data goes there too, never in the workspace (the script refuses any
+`holdout*` file for the workspace). A new example needs only these two
+lines.
+
 Any CLI that reads a prompt on stdin can be a vendor for the headless mode
 or for `kl audit`, configured in `team.yaml` without code changes:
 

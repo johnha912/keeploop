@@ -170,13 +170,12 @@ In short: one card, one edit of two lines, score 0.970000 to 1.000000, audit APP
 
 ```yaml
 # team.yaml - marketing research example (consumer insight report).
-# Set up: copy this folder's evaluate.py to the keeploop root as evaluate.py
-# (it replaces the demo), delete the demo holdout.py (it imports the demo
-# scorer; lesson L-001, see run/LOG.md and run/cycle-1/transcript.txt), make a
-# fresh git repo for the workspace holding brief.md, report.md and a data/
-# folder (copy data/metrics.json and data/quotes.json from this folder), and
-# point `workspace:` at it (relative to the keeploop folder, or absolute).
-# Then: python kl.py begin
+# Set up (seconds): python tools/make_sandbox.py examples/marketing-research DEST
+# It copies keeploop to DEST/kl with these files on top, removes the demo
+# holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
+# makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
+# sandbox root: evaluate.py, team.yaml
+# sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
 
@@ -434,16 +433,16 @@ The transcript includes one operator mistake: the `kl recall` query was first ty
 
 ## How to reproduce
 
-Run everything from the keeploop repo root. These are the steps from the `team.yaml` header and the transcript.
+These are the steps from the `team.yaml` header and the transcript.
 
-1. Set up the workspace (see the `team.yaml` header above): copy this folder's `evaluate.py` to the repo root as `evaluate.py`, delete the demo `holdout.py`, make a fresh git repo holding `brief.md`, `report.md` and a `data/` folder (copy `data/metrics.json` and `data/quotes.json`), and point `workspace:` in `team.yaml` at it.
+1. Build the sandbox from the keeploop repo root (about a second; use a short `DEST` on Windows): `python tools/make_sandbox.py examples/marketing-research DEST`. It puts this folder's `evaluate.py` and `team.yaml` in a keeploop copy at `DEST/kl`, removes the demo `holdout.py`, and makes `DEST/mr-workspace` a fresh git repo holding `brief.md`, `report.md`, `data/metrics.json` and `data/quotes.json`. Run the rest from `DEST/kl`.
 2. Start from the draft. The `report.md` in this folder is the kept version. To get the draft that scored 0.970000, apply the cycle's edit in reverse inside the workspace: `git apply -R run/cycle-2/cycle.diff` (run it where the diff's `report.md` path resolves). We checked this: the reversed report scores 0.970000 and the kept one scores 1.000000.
 3. Run the cycle:
 
 ```text
 python kl.py begin
 python kl.py status
-python evaluate.py ../workspace
+python evaluate.py ../mr-workspace
 python kl.py recall "unsupported claims about who posts on Reddit"
 python kl.py card ../card2.md
 python kl.py check
