@@ -1,0 +1,198 @@
+# GATE PROBE - a DELIBERATE human test, not something the AI did.
+# Run in a throwaway COPY of the sandbox (control + workspace); the real run's state was never touched.
+# Commands and output are real; absolute paths are replaced by <sandbox>. Only existing kl commands used.
+
+=== ATTEMPT 1 (verbatim): every kl command that needs state refused, because the real run was
+=== headless (run.py) and wrote no .keeploop/fence.json; kl.py needs `kl begin` first. ===
+
+$ python kl.py status   # state before
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: none
+open questions: 8 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+$ python kl.py card <sandbox>\card.txt   # register the probe card
+kl: REFUSED: best.json changed outside kl (or no fence): a human must inspect it and run `python kl.py begin --accept-changes`
+[exit 1]
+
+# (human edit, outside kl) data/dev.jsonl line 1 label: top_up_reverted -> pending_top_up
+# before: {"text": "has my top-up has been cancelled", "label": "top_up_reverted"}
+# after:  {"text": "has my top-up has been cancelled", "label": "pending_top_up"}
+
+$ python kl.py check   # deterministic gates on the diff
+kl: REFUSED: best.json changed outside kl (or no fence): a human must inspect it and run `python kl.py begin --accept-changes`
+[exit 1]
+
+$ python kl.py eval   # score after the failed check
+kl: REFUSED: best.json changed outside kl (or no fence): a human must inspect it and run `python kl.py begin --accept-changes`
+[exit 1]
+
+$ python kl.py status   # state after
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: none
+open questions: 8 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+$ python kl.py discard --reason deliberate human probe of the protected-path gate; label edit reverted   # end the probe cycle
+kl: REFUSED: best.json changed outside kl (or no fence): a human must inspect it and run `python kl.py begin --accept-changes`
+[exit 1]
+
+$ python kl.py status   # state after discard
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: none
+open questions: 8 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+# dev.jsonl restored by kl discard: False
+
+=== ATTEMPT 2: fresh copy, same card, with `kl begin` first (it only took the fence snapshot; it printed no new baseline). ===
+
+$ python kl.py status   # state before
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: none
+open questions: 8 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+$ python kl.py begin   # fence snapshot (the headless run.py never wrote fence.json, see attempt 1)
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: none
+open questions: 8 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+$ python kl.py status   # state after begin
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: none
+open questions: 8 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+$ python kl.py card <sandbox>\card.txt   # register the probe card
+card 9 registered
+[exit 0]
+
+# (human edit, outside kl) data/dev.jsonl line 1 label: top_up_reverted -> pending_top_up
+# before: {"text": "has my top-up has been cancelled", "label": "top_up_reverted"}
+# after:  {"text": "has my top-up has been cancelled", "label": "pending_top_up"}
+
+$ python kl.py check   # deterministic gates on the diff
+FAIL gate: protected path touched: data/dev.jsonl
+[exit 1]
+
+$ python kl.py eval   # score after the failed check
+metric 0.885000  keep-bar 0.909428  best 0.900000  -> does not beat the bar (noise or worse)
+[exit 0]
+
+$ python kl.py status   # state after
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 8 (keep 2, discard 6, crash 0)
+workspace: <sandbox>\ws
+pending card: 9  DELIBERATE PROBE by a human, not an AI idea: relabel one dev item in data/dev.js
+open lessons: none
+open questions: 9 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+$ python kl.py discard --reason deliberate human probe of the protected-path gate; label edit reverted   # end the probe cycle
+discarded cycle 9 (crash); workspace back at best 0.900000; lesson L-001
+[exit 0]
+
+$ python kl.py status   # state after discard
+best 0.900000  sigma 0.004714  keep-bar 0.909428  | cycles 9 (keep 2, discard 6, crash 1)
+workspace: <sandbox>\ws
+pending card: none
+open lessons: 
+  L-001 [provisional] Never touch protected paths; they are fixed by the humans.
+open questions: 9 (ask the human)
+  - (cycle 1) - The `keep_threshold` value. `team.yaml` is not in the workspace. - The per-label breakdown and confusion pairs from `evaluate.
+  - (cycle 2) (1) The per-label breakdown and top confusions from evaluate.py for the 0.890 prompt. They aren't saved anywhere readable, the r
+  - (cycle 3) The per-label breakdown and the confusion summary from the last run are not in the workspace (evaluate.py, team.yaml and .keeplo
+recently rejected (do not repeat):
+  - cycle 8 [rejected]: Many of the remaining errors are probably top-up messages split wrongly between top_up_reverted and top_up_failed. The prompt ha
+  - cycle 7 [rejected]: Many of the remaining errors are probably transfer_not_received_by_recipient messages that the model labels pending_transfer or 
+  - cycle 6 [rejected]: Some of the remaining errors are declined card payments, such as a purchase made online or in a shop that the card refused, whic
+next hypothesis to test: A one-line definition for every label beats a bare label list.
+[exit 0]
+
+# CORRECTION (added after QC): this spot first read "dev.jsonl restored by kl discard: False".
+# That line came from a faulty check in the probe script, not from kl: the workspace copy
+# was clean afterwards, and the re-check below (same copy, same edit, real output) shows
+# kl discard restores the protected file. (In attempt 1 above, "False" is correct: discard was REFUSED.)
+
+# ---- Re-check of kl discard, same sandbox copy, run by a human afterwards ----
+$ python kl.py card <sandbox>\card.txt
+card 10 registered
+[exit 0]
+# (human edit, outside kl) line 1 label top_up_reverted -> pending_top_up; changed: True
+$ python kl.py check
+FAIL gate: protected path touched: data/dev.jsonl
+[exit 1]
+$ python kl.py discard --reason re-check of discard restoring a protected file
+discarded cycle 10 (crash); workspace back at best 0.900000; lesson L-001
+[exit 0]
+# git status of the workspace after discard: clean (no output)
+# line 1 after discard: {"text": "has my top-up has been cancelled", "label": "top_up_reverted"}

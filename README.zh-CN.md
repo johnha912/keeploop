@@ -142,6 +142,23 @@ Claude Code 里跑的一个真实周期，修正了两处缺乏依据的说法�
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top">
+
+<a href="examples/prompt-optimization/"><img src="examples/prompt-optimization/run/score-by-cycle.png" alt="各周期的开发集准确率：保留两次提示词修改，丢弃六次，其中一次 0.915 在重跑时未被确认" width="100%"></a>
+
+**提示词优化（无人值守，8 个周期）**
+
+一个 AI 团队改进银行工单分类器的系统提示词（Claude Haiku，Banking77
+数据）。保留两次修改，丢弃六次，其中包括一次 Auditor 已批准、但重跑未能
+确认的 0.915。开发集准确率 0.873333 → 0.900000；隐藏的保留集从
+0.835 升到 0.855。该页面还展示了一次有意的作弊测试，以及它在 keeploop
+中发现的四个缺口。
+
+[阅读示例](examples/prompt-optimization/)
+
+</td>
+</tr>
 </table>
 
 ## 为什么不直接让 AI 自己循环？

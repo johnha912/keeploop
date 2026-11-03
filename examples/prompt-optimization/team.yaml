@@ -1,0 +1,48 @@
+# team.yaml - prompt optimization example (banking support-ticket classifier).
+# Set up: copy this folder's evaluate.py, holdout.py, holdout.jsonl (from data/),
+# team.yaml and program.md to the keeploop root (evaluate.py and holdout.py
+# REPLACE the demo ones: the demo holdout.py scores the demo config and `kl begin`
+# refuses while it fails; lesson L-001). Make a fresh git repo for the workspace
+# holding prompt.md and data/dev.jsonl (copy both from this folder), with one
+# commit, and point `workspace:` at it (relative to the keeploop folder, or absolute).
+# Keep the keeploop folder and the workspace on SHORT paths (Windows MAX_PATH).
+# Then: python run.py   (headless) or python kl.py begin (interactive).
+# The Engineer sees only FORMAT.md, never evaluate.py or holdout.py.
+# Format of prompt.md: examples/prompt-optimization/FORMAT.md
+
+pack: prompt-engineering
+
+# CHANGE ME: your own folder, a clean git repo with prompt.md and data/dev.jsonl.
+workspace: ../ws
+
+# The dev set is visible by design but nobody may edit it to win the score.
+protect: data
+
+# `claude -p --safe-mode`: without --safe-mode the user's own CLAUDE.md, hooks and
+# plugins leak into every role call. It keeps the OAuth login (--bare does not).
+vendors:
+  claude-safe:
+    cmd: claude -p --safe-mode
+    edit_args: --permission-mode acceptEdits
+    model_flag: --model
+    env_keep: ANTHROPIC_, CLAUDE_
+
+roles:
+  analyst:
+    vendor: claude-safe
+    token_budget: 30000
+  engineer:
+    vendor: claude-safe
+    token_budget: 50000
+  auditor:
+    vendor: claude-safe     # same CLI is allowed only as a fresh context (AGENTS.md)
+    token_budget: 30000
+
+# The score is the accuracy of a model call, so it is noisy: the baseline is
+# measured noise_runs times and a keep must beat 2 sigma (and 1%) above best.
+# One dev item is 0.005. Measured: one evaluation (8 parallel calls) takes about 12-14 s;
+# 300 s leaves room for a slow API.
+loop:
+  max_iterations: 8
+  keep_threshold: 0.01
+  eval_timeout_s: 300

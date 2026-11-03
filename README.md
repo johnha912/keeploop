@@ -146,6 +146,23 @@ page also says what the score does not measure.
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top">
+
+<a href="examples/prompt-optimization/"><img src="examples/prompt-optimization/run/score-by-cycle.png" alt="Dev accuracy by cycle: two prompt edits kept, six discarded, and a 0.915 that did not confirm on re-run" width="100%"></a>
+
+**Prompt optimization (headless, 8 cycles)**
+
+An AI team improves the system prompt of a banking-ticket classifier
+(Claude Haiku, Banking77 data). Two edits kept, six refused, including a
+0.915 that the Auditor approved but a re-run did not confirm. Dev accuracy
+0.873333 → 0.900000; a hidden holdout rose 0.835 → 0.855. The page also
+shows a deliberate cheating probe and four gaps it found in keeploop.
+
+[Read the example](examples/prompt-optimization/)
+
+</td>
+</tr>
 </table>
 
 ## Why not just let the AI loop on its own?

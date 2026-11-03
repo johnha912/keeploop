@@ -1,0 +1,19 @@
+name: prompt-engineering
+status: experimental
+profession: Prompt engineering (system prompts for LLM classifiers)
+description: Pack for improving a system prompt that an LLM uses to classify short texts into a fixed label set. Metric is accuracy on a fixed visible dev set, checked against a hidden holdout; taste comes from evaluation practice (no leakage, rules that generalize, concise definitions).
+metric: classification accuracy on the visible dev set, 0 to 1 (printed by examples/prompt-optimization/evaluate.py; exit 2 on an invalid prompt.md)
+metric_validation: validated only by a hidden holdout of the same size and label set, scored on the baseline and the final HEAD by holdout.py. Dev and holdout are small (200 items each), so one item is 0.005; treat gains of a few items as noise unless the holdout agrees.
+metric_examples: accuracy on a labelled dev set, macro F1, holdout accuracy
+taste_file: taste.md
+rubric_file: rubric.md
+scout_topics: prompt engineering for text classification, few-shot versus rule-based prompts, label definition design, prompt overfitting and leakage, LLM evaluation noise, banking intent detection
+roles:
+  leakage-checker:
+    checklist: no dev ticket appears in the prompt verbatim or near-verbatim; no example is a dev ticket with a few words changed; label hints describe the intent, not specific dev wording
+  prompt-reader:
+    checklist: every label has a one-line definition; confusable pairs have a tie-breaker; no padding, no repeated rules; the prompt does not tell the model how to format the answer (the harness does)
+slop:
+  hype: (?i)\b(you are the world'?s best|expert|genius|flawless)\b => persona padding; define the task instead
+  threat: (?i)\b(i will tip|you will be (fired|penali[sz]ed)|lives depend)\b => manipulation, not instruction
+  format: (?i)\b(json (array|object)|output only|return only)\b => the harness owns the output format
