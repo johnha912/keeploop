@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,8 @@ name = "keeploop"
 dynamic = ["version"]
 description = "An autoresearch-style keep/discard loop for any git repo, with cross-vendor audit, deterministic QC gates, a never-repeat lesson engine and a trend scout."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = []
 
@@ -18,8 +19,11 @@ dev = ["pytest>=8"]
 kl = "kl:main"
 
 [tool.setuptools]
+# The engine only. evaluate.py and holdout.py are project files, not modules: the
+# demo evaluate.py ships as an asset that `kl init` copies (setup.py packs the
+# assets into keeploop_assets/; scaffold.py lists them).
 py-modules = ["prepare", "run", "kl", "vendors", "ledger", "lessons", "scout",
-              "packs", "rubric", "evaluate", "bm25", "codemap", "holdout"]
+              "packs", "rubric", "bm25", "codemap", "scaffold"]
 
 [tool.setuptools.dynamic]
 version = { attr = "prepare.__version__" }

@@ -21,6 +21,9 @@ every command except `kl audit --vendor` runs with no AI CLI installed.
     python kl.py cite FILE              opt-in network: dead links, missing quotes
     python kl.py staff [--apply]        staffing proposal from the ledger
     python kl.py pack new NAME          scaffold a profession pack
+    python kl.py init [DIR]             write keeploop's editable files into DIR (pip: kl init)
+    python kl.py init --example NAME DEST   build a worked example's sandbox
+    python kl.py run [--mock] [...]     the headless loop (same as python run.py)
 
 HONEST LIMIT: in interactive mode the user's AI has the same file rights as kl.
 The fence snapshot and the best.json seal in .keeploop/ are TAMPER-EVIDENT (a
@@ -54,6 +57,7 @@ import lessons
 import packs
 import rubric as rubric_mod
 import run as R
+import scaffold
 import scout
 import vendors
 from prepare import ROOT, load_team, setup
@@ -964,6 +968,8 @@ def parser() -> argparse.ArgumentParser:
     sub.add_parser("cite", help="opt-in, network: dead links and quotes missing from pages").add_argument("file")
     sub.add_parser("lesson", help="add | check | review | list (see lessons.py)")
     sub.add_parser("scout", help="trend scout (see scout.py)")
+    sub.add_parser("init", help="write keeploop's files into a folder, or --example NAME DEST")
+    sub.add_parser("run", help="the headless loop (run.py): --mock, --iterations N")
     s = sub.add_parser("staff", help="staffing proposal")
     s.add_argument("--apply", action="store_true")
     s.add_argument("--goal", choices=["balanced", "speed", "quality", "cost"], default="balanced")
@@ -979,6 +985,47 @@ def parser() -> argparse.ArgumentParser:
     return p
 
 
+def cmd_init(argv: list[str]) -> int:
+    """`kl init`: no project is loaded (load() would create .keeploop/ in the cwd)."""
+    src = scaffold.source()
+    names = scaffold.example_names(src)
+    p = argparse.ArgumentParser(prog=f"{kl()} init", description=(
+        "Write keeploop's editable files (AGENTS.md, program.md, team.yaml, a demo "
+        "evaluate.py, packs/, .claude/) into DIR. Existing files are never overwritten."))
+    p.add_argument("dir", nargs="?", type=Path, help="default: the current folder; "
+                   "with --example: the new sandbox folder (required)")
+    p.add_argument("--example", choices=names or None, metavar="NAME",
+                   help="build a worked example's sandbox in DIR: " + (", ".join(names) or "none"))
+    a = p.parse_args(argv)
+    cli = kl() == "kl"  # a pip-installed kl: the copies say `kl ...`, no code is copied
+    try:
+        if a.example:
+            if a.dir is None:
+                raise Refuse(f"--example needs a new folder: `{kl()} init --example {a.example} DEST`")
+            example = src / "examples" / a.example
+            root, ws = scaffold.make_sandbox(example, a.dir, with_code=not cli, src=src)
+            print(f"sandbox ready: workspace {ws}")
+            for line in scaffold.missing_requirements(example):
+                print(line)
+            print(f"next: cd {root} && {kl()} begin   (headless: "
+                  f"{'kl run' if cli else 'python run.py'})")
+            return 0
+        dest = (a.dir or Path.cwd()).resolve()
+        written, kept = scaffold.init(dest, rewrite=cli, src=src)
+    except SystemExit as exc:  # scaffold refuses with SystemExit (shared with make_sandbox.py)
+        raise Refuse(str(exc).removeprefix("refused: "))
+    print(f"kl init: wrote {len(written)} files in {dest}" + (
+        f"; kept {len(kept)} that were already there: " + ", ".join(kept[:8])
+        + (" ..." if len(kept) > 8 else "") if kept else ""))
+    for rel in ("AGENTS.md", "team.yaml", "evaluate.py"):
+        if rel in kept:
+            print(f"warning: your {rel} was kept, so keeploop's was not written. Run "
+                  f"`{kl()} init` in a new, empty folder unless this one is already keeploop's.")
+    print(f"next: cd {dest} && {kl()} begin   (the demo; then follow AGENTS.md, "
+          f"'Pointing keeploop at the user's own repo')")
+    return 0
+
+
 COMMANDS = {"begin": cmd_begin, "status": cmd_status, "card": cmd_card, "check": cmd_check,
             "eval": cmd_eval, "audit": cmd_audit, "keep": cmd_keep, "discard": cmd_discard,
             "staff": cmd_staff, "pack": cmd_pack, "report": cmd_report, "slow": cmd_slow, "debate": cmd_debate, "cite": cmd_cite,
@@ -990,6 +1037,14 @@ def main(argv: list[str] | None = None) -> int:
     root = ROOT if (ROOT / "team.yaml").exists() else Path.cwd()  # pip-installed: the project is cwd
     if argv[:1] == ["--root"] and len(argv) > 1:
         root, argv = Path(argv[1]), argv[2:]
+    if argv[:1] == ["init"]:
+        try:
+            return cmd_init(argv[1:])
+        except Refuse as exc:
+            print(f"kl: REFUSED: {exc}")
+            return 1
+    if argv[:1] == ["run"]:  # passthrough: run.py's own parser, the project kl resolved
+        return R.main(argv[1:], root=root)
     try:
         if argv[:1] in (["lesson"], ["scout"]):  # passthrough: their own parsers, '--' intact
             c = load(root)

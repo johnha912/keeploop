@@ -9,7 +9,7 @@ Improve `prompt.md`, the system prompt of a banking support-ticket classifier, m
 ONLY by the accuracy `evaluate.py` prints on the visible dev set. A hidden holdout of
 the same labels is scored only on the baseline and the final result; no role ever sees
 it. A gain that does not carry to the holdout is overfitting, and it will be reported.
-The format of `prompt.md` is in `examples/prompt-optimization/FORMAT.md`.
+The format of `prompt.md` is in `FORMAT.md` next to this file.
 
 ## Hypotheses to test
 
