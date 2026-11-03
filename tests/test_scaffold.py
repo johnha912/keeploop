@@ -105,5 +105,39 @@ class TestScaffold(unittest.TestCase):
         self.assertTrue((ws / "report.md").is_file() and (ws / ".git").is_dir())
 
 
+class TestRelease(unittest.TestCase):
+    def test_pypi_readme_pins_relative_links_to_the_tag(self):
+        text = ('<img src="docs/demo.gif"> [guide](docs/GUIDE.md#faq) [ext](https://x.test/a) '
+                '[top](#quick-start) <a href="CHANGELOG.md">c</a> <source srcset="docs/a.png">')
+        out = scaffold.pypi_readme(text, "v9.9.9")
+        raw = "https://raw.githubusercontent.com/johnha912/keeploop/v9.9.9/"
+        blob = "https://github.com/johnha912/keeploop/blob/v9.9.9/"
+        self.assertIn(f'src="{raw}docs/demo.gif"', out)
+        self.assertIn(f"]({blob}docs/GUIDE.md#faq)", out)
+        self.assertIn(f'href="{blob}CHANGELOG.md"', out)
+        self.assertIn(f'srcset="{raw}docs/a.png"', out)
+        self.assertIn("](https://x.test/a)", out)
+        self.assertIn("](#quick-start)", out)
+
+    def test_release_notes_are_the_changelog_section(self):
+        sys.path.insert(0, str(ROOT / "tools"))
+        import release_notes
+        from prepare import __version__
+        text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        notes = release_notes.section(text, __version__)
+        self.assertTrue(notes.startswith("### "))
+        self.assertNotIn(f"## [{__version__}]", notes)
+        self.assertNotIn("## [0.1.0]", notes)  # stops at the next section
+        self.assertEqual(release_notes.section(text, "9.9.9"), "")
+
+    def test_publish_workflow_gates_the_upload(self):
+        wf = (ROOT / ".github" / "workflows" / "publish.yml").read_text(encoding="utf-8")
+        build = wf.index("tools/check_dist.py --dist dist")
+        self.assertLess(build, wf.index("pypa/gh-action-pypi-publish"))  # gate before upload
+        self.assertIn("id-token: write", wf)  # Trusted Publishing, no token in the repo
+        self.assertNotIn("password:", wf)
+        self.assertIn('"$GITHUB_REF_NAME" != "v$V"', wf)  # tag must equal the version
+
+
 if __name__ == "__main__":
     unittest.main()

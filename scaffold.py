@@ -15,9 +15,9 @@ team.yaml header:
     # sandbox requires: claude (why; optional, warns when not on PATH)
 
 Source of the files: a clone reads them from the repo; a pip install reads the
-copy setup.py packed into `keeploop_assets/` next to the modules. A pip-installed
-`kl` has no kl.py to run, so its copies say `kl ...` instead of `python kl.py ...`.
-Stdlib only.
+copy setup.py packed into `_assets/` next to the modules (all inside the wheel's
+`keeploop/` folder). A pip-installed `kl` has no kl.py to run, so its copies say
+`kl ...` instead of `python kl.py ...`. Stdlib only.
 """
 
 import re
@@ -27,7 +27,13 @@ from pathlib import Path
 from prepare import GIT_AUTHOR, git
 
 HERE = Path(__file__).resolve().parent
-BUNDLE = HERE / "keeploop_assets"  # present only in a pip install (setup.py)
+BUNDLE = HERE / "_assets"  # present only in a pip install (setup.py)
+
+# The engine: the modules the wheel installs, inside its `keeploop/` folder (never
+# top-level, where names like `run` or `prepare` would clash with other packages).
+ENGINE = ["bm25", "codemap", "kl", "ledger", "lessons", "packs", "prepare", "rubric",
+          "run", "scaffold", "scout", "vendors"]
+REPO_URL = "https://github.com/johnha912/keeploop"
 
 # What `kl init` writes, relative to the source; globs allowed.
 FRAMEWORK = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "BOOTSTRAP.md", "program.md",
@@ -179,3 +185,17 @@ def make_sandbox(example: Path, dest: Path, *, with_code: bool,
     git(ws, "add", "-A")
     git(ws, *GIT_AUTHOR, "commit", "-qm", "keeploop: initial workspace")
     return root, ws
+
+
+def pypi_readme(text: str, ref: str) -> str:
+    """README.md for the PyPI page: relative links and images become absolute URLs
+    pinned to `ref` (the release tag), since PyPI cannot resolve repo paths."""
+    def absolute(path: str) -> str:
+        if re.match(r"[a-z][a-z0-9+.-]*:|#|/", path, re.I):
+            return path  # already absolute, an anchor, or site-relative
+        kind = "raw" if re.search(r"\.(png|gif|jpe?g|svg|webp)(#|$)", path, re.I) else "blob"
+        if kind == "raw":
+            return f"{REPO_URL.replace('github.com', 'raw.githubusercontent.com')}/{ref}/{path}"
+        return f"{REPO_URL}/blob/{ref}/{path}"
+    text = re.sub(r"(\]\()([^)\s]+)", lambda m: m.group(1) + absolute(m.group(2)), text)
+    return re.sub(r'((?:src|href|srcset)=")([^"]+)"', lambda m: m.group(1) + absolute(m.group(2)) + '"', text)

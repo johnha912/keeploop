@@ -1,10 +1,13 @@
-"""Packs keeploop's project files into the wheel and the sdist.
+"""Builds keeploop's wheel and sdist. pyproject.toml holds the static metadata;
+this file adds what has to be computed:
 
-pyproject.toml holds the metadata; this file only adds the assets that `kl init`
-copies into a project (AGENTS.md, program.md, team.yaml, the demo evaluate.py,
-packs/, .claude/, and each worked example's sandbox files). scaffold.py is the
-single list of them. In the wheel they land in keeploop_assets/ next to the
-modules; in the sdist at their repo paths, so a wheel built from it finds them.
+- the engine modules go into the wheel's `keeploop/` folder, not top-level, so
+  names like `run` or `prepare` never clash with other installed packages; the
+  `kl` command is `keeploop:main`, which puts that folder on sys.path and runs kl;
+- the project files `kl init` copies (scaffold.bundle_files) go into
+  `keeploop/_assets/`, and into the sdist at their repo paths;
+- the version comes from prepare.__version__ (the single source);
+- the PyPI page gets README.md with every relative link pinned to the release tag.
 
     python -m build                  sdist + wheel in dist/
     python tools/check_dist.py       build, list, install in a clean venv, smoke test
@@ -17,11 +20,30 @@ from pathlib import Path
 from setuptools import setup
 from setuptools.command.build_py import build_py
 from setuptools.command.sdist import sdist
+from setuptools.dist import Distribution
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import scaffold  # noqa: E402
+from prepare import __version__  # noqa: E402
+
+INIT = '''"""keeploop: the `kl` engine. Its modules live in this folder and import each
+other by plain name, so the folder goes on sys.path only while kl runs."""
+
+import sys
+from pathlib import Path
+
+__version__ = "{version}"
+_HERE = str(Path(__file__).resolve().parent)
+
+
+def main() -> int:
+    if _HERE not in sys.path:
+        sys.path.insert(0, _HERE)
+    import kl
+    return kl.main()
+'''
 
 
 def _copy(files: list[str], dest: Path) -> None:
@@ -33,15 +55,33 @@ def _copy(files: list[str], dest: Path) -> None:
 class BuildPy(build_py):
     def run(self):
         super().run()
-        if not self.dry_run:
-            _copy(scaffold.bundle_files(HERE), Path(self.build_lib) / "keeploop_assets")
+        if self.dry_run:
+            return
+        pkg = Path(self.build_lib) / "keeploop"
+        _copy([f"{m}.py" for m in scaffold.ENGINE], pkg)
+        (pkg / "__init__.py").write_text(INIT.format(version=__version__), encoding="utf-8")
+        _copy(scaffold.bundle_files(HERE), pkg / "_assets")
 
 
 class Sdist(sdist):
     def make_release_tree(self, base_dir, files):
         super().make_release_tree(base_dir, files)
-        _copy([f for f in scaffold.bundle_files(HERE) if not (Path(base_dir) / f).exists()],
-              Path(base_dir))
+        need = ["README.md"] + [f"{m}.py" for m in scaffold.ENGINE] + scaffold.bundle_files(HERE)
+        _copy([f for f in need if not (Path(base_dir) / f).exists()], Path(base_dir))
 
 
-setup(cmdclass={"build_py": BuildPy, "sdist": Sdist})
+class Dist(Distribution):
+    """No module is declared (they go in keeploop/ by hand), so setuptools would skip
+    build_py altogether; this keeps it running."""
+    def has_pure_modules(self):
+        return True
+
+
+setup(
+    distclass=Dist,
+    version=__version__,
+    long_description=scaffold.pypi_readme((HERE / "README.md").read_text(encoding="utf-8"),
+                                          f"v{__version__}"),
+    long_description_content_type="text/markdown",
+    cmdclass={"build_py": BuildPy, "sdist": Sdist},
+)

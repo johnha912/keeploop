@@ -151,19 +151,22 @@ class TestS3Packaging(unittest.TestCase):
             import tomllib
         except ImportError:
             self.skipTest("tomllib needs Python 3.11+")
+        import scaffold
         cfg = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-        mods = set(cfg["tool"]["setuptools"]["py-modules"])
-        self.assertEqual(cfg["project"]["scripts"]["kl"], "kl:main")
+        # nothing top-level: setup.py puts scaffold.ENGINE in the wheel's keeploop/ folder
+        self.assertEqual(cfg["tool"]["setuptools"]["py-modules"], [])
+        self.assertEqual(cfg["project"]["scripts"]["kl"], "keeploop:main")
+        mods = set(scaffold.ENGINE)
         local = {p.stem for p in ROOT.glob("*.py")}
         need = set()
-        for name in sorted(mods) + ["kl", "run"]:
+        for name in sorted(mods):
             for node in ast.walk(ast.parse((ROOT / f"{name}.py").read_text(encoding="utf-8"))):
                 if isinstance(node, ast.Import):
                     need |= {a.name.split(".")[0] for a in node.names}
                 elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
                     need.add(node.module.split(".")[0])
         self.assertEqual(sorted((need & local) - mods), [])
-        self.assertTrue({"kl", "bm25", "codemap", "scaffold"} <= mods)
+        self.assertTrue({"kl", "run", "bm25", "codemap", "scaffold"} <= mods)
         # project files, not modules: `evaluate` clashed with a PyPI package; kl init copies them
         self.assertFalse({"evaluate", "holdout", "setup"} & mods)
         self.assertTrue(callable(kl.main))
