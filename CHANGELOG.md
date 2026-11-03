@@ -28,6 +28,15 @@ the entry says so under **Changed** with the migration step.
 
 ## [0.2.0] - 2026-11-03
 
+### Changed
+
+- The wheel no longer installs `evaluate.py` and `holdout.py` as top-level
+  modules (`evaluate` clashed with an unrelated PyPI package); the demo
+  `evaluate.py` ships as a file `kl init` copies. The engine modules are
+  still top-level (`kl`, `run`, `prepare`, ...): install with pipx, or in a
+  venv of its own.
+- `project.license` is an SPDX string; building needs setuptools 77 or newer.
+
 ### Fixed
 
 First-run gaps found by building the worked examples' sandboxes from a fresh clone:
@@ -70,6 +79,23 @@ Four gaps found by the prompt-optimization worked example:
 
 ### Added
 
+- `kl init [DIR]`: a pip/pipx install is the engine only; `kl init` copies
+  the files a project edits (AGENTS.md, CLAUDE.md, GEMINI.md, BOOTSTRAP.md,
+  program.md, team.yaml, the demo evaluate.py, packs/, .claude/ agents,
+  skill and settings, a .gitignore) into the folder. It never overwrites a
+  file, and warns when the folder has its own AGENTS.md, team.yaml or
+  evaluate.py. In the copies, `python kl.py` reads `kl`, `python run.py`
+  reads `kl run`.
+- `kl init --example NAME DEST`: the worked example's sandbox for a pip
+  install (no code copy; `tools/make_sandbox.py` stays for a clone, and
+  both use the new `scaffold.py`).
+- `kl run [--mock] [--iterations N]`: the headless loop from a pip install
+  (same as `python run.py`).
+- Packaging: `setup.py` packs every file `scaffold.py` lists into the wheel
+  (`keeploop_assets/`) and the sdist; `tools/check_dist.py` builds both,
+  checks their contents, installs the wheel in a clean venv and runs
+  `kl init` -> `kl begin` -> `kl status` -> `kl run --mock`, plus the
+  marketing-research sandbox. CI runs it on Linux and Windows.
 - The headless Analyst sees `evaluate.py`'s stderr for the current best
   (per-label breakdowns and the like), with control characters stripped and
   secrets redacted. Never `holdout.py`'s. Capped by the new loop key

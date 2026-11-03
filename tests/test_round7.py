@@ -163,7 +163,9 @@ class TestS3Packaging(unittest.TestCase):
                 elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
                     need.add(node.module.split(".")[0])
         self.assertEqual(sorted((need & local) - mods), [])
-        self.assertTrue({"kl", "bm25", "codemap", "holdout"} <= mods)
+        self.assertTrue({"kl", "bm25", "codemap", "scaffold"} <= mods)
+        # project files, not modules: `evaluate` clashed with a PyPI package; kl init copies them
+        self.assertFalse({"evaluate", "holdout", "setup"} & mods)
         self.assertTrue(callable(kl.main))
 
 

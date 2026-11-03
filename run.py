@@ -1107,15 +1107,16 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
     return 0
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="keeploop loop")
+def main(argv: list[str] | None = None, root: Path | None = None) -> int:
+    """`python run.py`, or `kl run` (root = the project kl resolved)."""
+    parser = argparse.ArgumentParser(prog="kl run" if root else None, description="keeploop loop")
     parser.add_argument("--version", action="version", version=f"keeploop {__version__}")
     parser.add_argument("--mock", action="store_true",
                         help="route every role to the mock vendor (offline demo)")
     parser.add_argument("--iterations", type=int, default=None,
                         help="default: loop.max_iterations from team.yaml")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent)
-    args = parser.parse_args()
+    parser.add_argument("--root", type=Path, default=root or Path(__file__).resolve().parent)
+    args = parser.parse_args(argv)
     return run(args.root, mock=args.mock, iterations=args.iterations)
 
 

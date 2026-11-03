@@ -20,77 +20,22 @@ command is printed with a warning when it is missing:
 Paths are relative to the example folder and keep their relative path in the
 destination. A file named holdout* is refused for the workspace. DEST must be
 new (or empty) and outside the keeploop repo; keep it short on Windows.
+
+The same sandbox, without the code copy, is `kl init --example NAME DEST` for
+a pip-installed kl (scaffold.py holds the logic for both).
 """
 
-import re
-import shutil
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
-from prepare import GIT_AUTHOR, git  # noqa: E402
-from run import project_config  # noqa: E402
-
-SKIP = {".git", ".keeploop", "__pycache__", ".venv", "venv", "dist",
-        ".playwright-mcp", "examples", "tests", "tools"}
-
-
-def manifest(example: Path) -> dict[str, list[str]]:
-    text = (example / "team.yaml").read_text(encoding="utf-8")
-    found = {k: [p.strip() for p in v.split(",") if p.strip()]
-             for k, v in re.findall(r"^# sandbox (root|workspace):(.*)$", text, re.M)}
-    if set(found) != {"root", "workspace"}:
-        raise SystemExit(f"{example / 'team.yaml'}: needs '# sandbox root:' and "
-                         f"'# sandbox workspace:' lines in its header")
-    if bad := [p for p in found["workspace"] if Path(p).name.lower().startswith("holdout")]:
-        raise SystemExit(f"refused: holdout files must never go in the workspace: {bad}")
-    if missing := [p for p in found["root"] + found["workspace"] if not (example / p).is_file()]:
-        raise SystemExit(f"missing in {example}: {missing}")
-    return found
-
-
-def requirements(example: Path) -> list[tuple[str, str]]:
-    """'# sandbox requires: cmd (why)' lines -> [(cmd, why)]."""
-    text = (example / "team.yaml").read_text(encoding="utf-8")
-    return [(cmd, why.strip()) for cmd, why in
-            re.findall(r"^# sandbox requires:\s*(\S+)\s*(?:\((.*)\))?\s*$", text, re.M)]
-
-
-def missing_requirements(example: Path, which=shutil.which) -> list[str]:
-    """One warning line per required command that is not on PATH."""
-    return [f"warning: this example needs `{cmd}` on PATH and it was not found"
-            + (f": {why}" if why else "") + f". `kl begin` will fail until `{cmd}` works."
-            for cmd, why in requirements(example) if not which(cmd)]
-
-
-def copy(example: Path, rel: str, dest: Path) -> None:
-    (dest / rel).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(example / rel, dest / rel)
+import scaffold  # noqa: E402
+from scaffold import manifest, missing_requirements, requirements  # noqa: E402,F401
 
 
 def make(example: Path, dest: Path) -> tuple[Path, Path]:
-    example, dest = example.resolve(), dest.resolve()
-    files = manifest(example)
-    if dest == REPO or REPO in dest.parents:
-        raise SystemExit(f"refused: {dest} is inside the keeploop repo")
-    if dest.exists() and any(dest.iterdir()):
-        raise SystemExit(f"refused: {dest} is not empty")
-    root = dest / "kl"
-    shutil.copytree(REPO, root, ignore=lambda d, names: set(names) & (
-        SKIP if Path(d) == REPO else {"__pycache__"}))
-    (root / "holdout.py").unlink(missing_ok=True)  # demo holdout scores the demo config
-    for rel in files["root"]:
-        copy(example, rel, root)
-    ws = project_config(root)["workspace"]
-    if dest not in ws.parents:
-        raise SystemExit(f"refused: team.yaml workspace {ws} is outside {dest}")
-    for rel in files["workspace"]:
-        copy(example, rel, ws)
-    git(ws, "init", "-q")
-    git(ws, "add", "-A")
-    git(ws, *GIT_AUTHOR, "commit", "-qm", "keeploop: initial workspace")
-    return root, ws
+    return scaffold.make_sandbox(example, dest, with_code=True, src=REPO)
 
 
 def main(argv: list[str]) -> int:

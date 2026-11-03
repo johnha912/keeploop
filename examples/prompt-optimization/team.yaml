@@ -4,7 +4,7 @@
 # the demo evaluate.py and holdout.py; lesson L-001) and makes the workspace a
 # fresh git repo; the holdout set stays out of it. Use a SHORT DEST on Windows.
 # Then: cd DEST/kl && python run.py (headless) or python kl.py begin (interactive).
-# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, data/holdout.jsonl
+# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, FORMAT.md, data/holdout.jsonl
 # sandbox workspace: prompt.md, data/dev.jsonl
 # sandbox requires: claude (the scorer calls Claude CLI; install it and log in first)
 # The Engineer sees only FORMAT.md, never evaluate.py or holdout.py.
