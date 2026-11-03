@@ -28,6 +28,11 @@ the entry says so under **Changed** with the migration step.
 
 ### Added
 
+- `tools/make_sandbox.py examples/<name> DEST`: builds a worked example's
+  sandbox (control copy of keeploop plus a fresh git workspace) in about a
+  second, from two `# sandbox root:` / `# sandbox workspace:` lines in the
+  example's `team.yaml`. It always removes the demo `holdout.py` (L-001) and
+  refuses holdout files in the workspace and a DEST inside the repo.
 - README demo GIF of the offline mock run (baseline, keeps, a discard, a
   crash that becomes a lesson), re-recorded with `python docs/record_demo.py`.
 
