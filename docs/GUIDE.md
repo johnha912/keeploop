@@ -83,6 +83,12 @@ run complete: 3 keeps, 1 discards, 1 crashes, 1 lessons, 17259 tokens. Best metr
 
 (Per-phase timings trimmed.)
 
+A finished run leaves the fence snapshot `kl` expects, so you or your AI
+can carry on with `kl card`, `kl check` and the rest. If something outside
+the workspace changed before or during the run, or an earlier run stopped
+on a broken fence, no new snapshot is written and `kl` keeps refusing
+until you inspect the change and run `kl begin --accept-changes`.
+
 Every keep is a commit you can read:
 
 ```bash
@@ -195,6 +201,35 @@ evidence:
 - **Slop is a gate, not a style note.** Each pack lists banned patterns
   (leftover `TODO`s, "as an AI", stock marketing filler); a hit stops the
   change before any model reviews it.
+
+### What the Analyst sees from the scorer
+
+If `evaluate.py` prints diagnostics on stderr (a per-label breakdown, the
+top confusions, failing test names), the headless Analyst gets the stderr
+of the run that scored the current best. Without it, the Analyst can only
+guess where the errors are: in the prompt-optimization example it asked
+for the per-label breakdown under `MISSING` in all 8 cycles, and 6 of the
+8 cards were discarded.
+
+- **Small.** Capped at `loop.eval_stderr_max_chars` (1500 characters, about
+  400 tokens) in `team.yaml`; `0` turns it off. The example's breakdown is
+  about 750 characters.
+- **Cleaned.** Control characters are stripped (newlines and tabs stay)
+  and anything the secret gate recognizes is replaced by
+  `[<kind> redacted]`. It is still text from your scorer: print nothing
+  there you would not paste into a prompt.
+- **Never the holdout.** Only `evaluate.py`'s stderr is kept; `holdout.py`
+  output never reaches any prompt.
+
+**The trade-off (Goodhart).** The more the Analyst knows about how it is
+scored, the easier it is to fit the score instead of the task: a
+per-label breakdown invites edits aimed at the few dev items that fail.
+keeploop accepts that risk because the other checks still stand: the
+Auditor flags changes that game the evaluation, the keep bar ignores
+gains inside the noise, and the hidden holdout warns when evaluation gains
+do not carry over. If your holdout gain falls behind your evaluation gain,
+set the cap to `0` first. Print aggregates, never the expected outputs
+themselves.
 
 ## Where the rules come from
 

@@ -31,6 +31,7 @@ CONFIG = {
     "confirm_keep": True,           # re-run the evaluation once before a keep
     "engineer_repairs": 1,          # extra engineer calls for a repairable failure
     "repo_map_max_chars": 3000,     # size of the Analyst's repo map
+    "eval_stderr_max_chars": 1500,  # evaluate.py's stderr for the best, shown to the Analyst; 0 = off
     "max_diff_lines": 400,          # added+removed lines per diff (one idea)
     "max_consecutive_crashes": 3,
     "eval_timeout_s": 120,

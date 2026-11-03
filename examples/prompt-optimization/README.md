@@ -56,7 +56,7 @@ Both kept edits only add lines to the one-line baseline prompt. This is the full
 
 Cycle 4 scored **0.915**, above the bar of 0.909428, and the Auditor replied APPROVED. The cycle was still discarded.
 
-What the files show: `run/results.tsv` has cycle 4 as `discard`, verdict `inconclusive`, audit APPROVED. In [`run.py`](../../run.py) (`needs_confirm`, and the decide step after the audit), a score that clears the bar is re-run once because sigma is above 0, and the change is kept only if the lower of the two scores still beats the bar; otherwise the note is "unconfirmed: noisy metric". The re-run did happen: `run/timing.jsonl` records 13.51 s of `confirm` time for cycle 4. In that code the confirm runs only after the audit and rubric checks have passed, so a refused confirm is what discarded it. The ledger cuts each description at 240 characters, so the note and the re-run score were **not recorded**, and this README does not state one.
+What the files show: `run/results.tsv` has cycle 4 as `discard`, verdict `inconclusive`, audit APPROVED. In [`run.py`](../../run.py) (`needs_confirm`, and the decide step after the audit), a score that clears the bar is re-run once because sigma is above 0, and the change is kept only if the lower of the two scores still beats the bar; otherwise the note was "unconfirmed: noisy metric" in the version this run used. The re-run did happen: `run/timing.jsonl` records 13.51 s of `confirm` time for cycle 4. In that code the confirm runs only after the audit and rubric checks have passed, so a refused confirm is what discarded it. The ledger cuts each description at 240 characters, so the note and the re-run score were **not recorded**, and this README does not state one. (Fixed since this run: the ledger now puts `unconfirmed: re-run <score> below the bar` before the cut, and `hypotheses.jsonl` keeps `confirm_metric`.)
 
 The change itself was a trim: delete the clause ", including money arriving from another country," from the second tie-breaker (card 4's test of "a shorter prompt is not worse"). The discarded prompt was never committed, so [`run/prompts/prompt-cycle4-candidate.md`](run/prompts/prompt-cycle4-candidate.md) is **reconstructed** from the card's CHANGE text ([`NOTE.md`](run/prompts/NOTE.md)).
 
@@ -118,6 +118,8 @@ A change is kept only if its score beats `best + max(best * 0.01, 2 * sigma)`, t
 With this run's numbers, at the end: best 0.9, so 0.9 x 0.01 = 0.009; 2 x 0.004714 = 0.009428; the larger is 0.009428; the bar is **0.909428**. Cycle 7 (0.905) is below it, cycle 4 (0.915) above it. At the start, the bar was 0.873333 + 0.009428 = 0.882761 (our arithmetic); cycle 1 (0.890) and cycle 2 (0.900 against 0.899428) cleared theirs.
 
 ## Known issues this example found in keeploop
+
+All four are fixed since this run (see the Unreleased section of [CHANGELOG.md](../../CHANGELOG.md)); the files in `run/` are left as the run wrote them.
 
 1. **No fence after a headless run.** After `python run.py` there is no `.keeploop/fence.json`, so `kl card`, `kl check`, `kl eval` and `kl discard` printed `REFUSED` until `kl begin` was run (`kl status` still worked; gate-probe attempt 1).
 2. **`kl eval` ran after a failed `kl check`.** It printed `metric 0.885000 keep-bar 0.909428 best 0.900000 -> does not beat the bar (noise or worse)` and exit 0 even though the protected-path gate had failed. This cannot keep a bad change: `kl keep` re-runs the same gates and stops on a failure (`cmd_keep` in `kl.py`). It is an inconsistency between commands, not a way around the gate.
