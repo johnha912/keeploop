@@ -393,6 +393,23 @@ def keep_bar(best: float, keep_threshold: float, noise_z: float, sigma: float) -
     return best + max(abs(best) * keep_threshold, noise_z * sigma)
 
 
+def ceiling_warning(best: float, bar: float, metric_max) -> str | None:
+    """A warning when no score can beat the keep bar (a keep needs metric > bar): the
+    bar is at or above the top of the metric's scale (loop.metric_max). Without
+    metric_max, a best of exactly 1.0 gets a hint, since 0..1 is the commonest scale."""
+    if metric_max is not None:
+        if bar >= float(metric_max):
+            return (f"warning: baseline at ceiling: keep-bar {bar:.6f} is not below the metric's "
+                    f"maximum {float(metric_max):.6f}, so every cycle will be discarded. A human "
+                    f"must give the score headroom (a stricter evaluate.py) and take a new baseline")
+        return None
+    if best == 1.0:
+        return (f"note: best is 1.000000 and keep-bar {bar:.6f}; if 1.0 is the top of your "
+                f"metric, nothing can be kept. Set `metric_max: 1.0` under `loop:` in "
+                f"team.yaml to check this")
+    return None
+
+
 LAST_STDERR = [""]  # evaluate.py's stderr from its last run in this process; never holdout.py's
 
 
@@ -799,6 +816,9 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
     def bar(b):
         return keep_bar(b, loop_cfg["keep_threshold"], loop_cfg["noise_z"], sigma)
 
+    if warn := ceiling_warning(best["metric"], bar(best["metric"]), loop_cfg["metric_max"]):
+        print(f"run: {warn}")
+
     def cycle(n: int, base: str) -> tuple[str, float | None, str]:
         def learn(what, cause, rule):
             return lessons.record(state, what=what, root_cause=cause,
@@ -1087,15 +1107,16 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
     return 0
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="keeploop loop")
+def main(argv: list[str] | None = None, root: Path | None = None) -> int:
+    """`python run.py`, or `kl run` (root = the project kl resolved)."""
+    parser = argparse.ArgumentParser(prog="kl run" if root else None, description="keeploop loop")
     parser.add_argument("--version", action="version", version=f"keeploop {__version__}")
     parser.add_argument("--mock", action="store_true",
                         help="route every role to the mock vendor (offline demo)")
     parser.add_argument("--iterations", type=int, default=None,
                         help="default: loop.max_iterations from team.yaml")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent)
-    args = parser.parse_args()
+    parser.add_argument("--root", type=Path, default=root or Path(__file__).resolve().parent)
+    args = parser.parse_args(argv)
     return run(args.root, mock=args.mock, iterations=args.iterations)
 
 

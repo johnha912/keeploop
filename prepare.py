@@ -19,7 +19,7 @@ import json
 import subprocess
 from pathlib import Path
 
-__version__ = "0.1.0"  # the single source; pyproject reads it, see CHANGELOG.md
+__version__ = "0.2.0"  # the single source; pyproject reads it, see CHANGELOG.md
 
 ROOT = Path(__file__).resolve().parent
 STATE_DIR = ROOT / ".keeploop"
@@ -37,6 +37,7 @@ CONFIG = {
     "eval_timeout_s": 120,
     "noise_runs": 3,                # baseline evaluations; their pstdev is sigma
     "noise_z": 2.0,                 # a keep must beat best by noise_z * sigma
+    "metric_max": None,             # top of evaluate.py's scale, if it has one (warns at the ceiling)
     "max_run_tokens": 2_000_000,    # estimated tokens per run; reached = stop
     "duplicate_jaccard": 0.8,       # card vs a rejected one: skip the Engineer
     "heavy_diff_lines": 100,        # a bigger diff is heavy: forced confirm, heavy_model

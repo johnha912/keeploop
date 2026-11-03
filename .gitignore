@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 dist/
+build/
 *.egg-info/
 .DS_Store
 .playwright-mcp/
