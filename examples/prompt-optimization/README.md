@@ -133,12 +133,11 @@ Limits of the example itself:
 
 ## Reproduce
 
-Setup follows the header of [`team.yaml`](team.yaml); use short folder paths on Windows.
+What goes where is declared in the header of [`team.yaml`](team.yaml); use a short `DEST` on Windows.
 
 1. `python -X utf8 evaluate.py --self-check` (offline check of the scorer).
-2. Copy `evaluate.py`, `holdout.py`, `team.yaml`, `program.md` and `data/holdout.jsonl` to the root of a keeploop copy. They replace the demo `evaluate.py` and `holdout.py`.
-3. Create a fresh git repo for the workspace (`../ws`) holding `prompt.md` and `data/dev.jsonl`, with one commit.
-4. `python run.py --iterations 8` for the headless run, or `python kl.py begin` and then drive it from your AI.
+2. From the keeploop repo root (about a second): `python tools/make_sandbox.py examples/prompt-optimization DEST`. It puts `evaluate.py`, `holdout.py`, `team.yaml`, `program.md` and `data/holdout.jsonl` in a keeploop copy at `DEST/kl` (replacing the demo scorers) and makes `DEST/ws` a fresh git repo holding only `prompt.md` and `data/dev.jsonl`.
+3. `cd DEST/kl`, then `python run.py --iterations 8` for the headless run, or `python kl.py begin` and then drive it from your AI.
 
 Why `--safe-mode`: without it your own CLAUDE.md, hooks and plugins leak into every role call. It keeps the OAuth login (`--bare` does not). Expect about 15 minutes and about 40k tokens (this run's log); the model is not deterministic, so your numbers will differ by a few points. Needs the `claude` CLI logged in.
 

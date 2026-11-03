@@ -6,6 +6,7 @@ description: Run N keeploop cycles as the CEO: analyst card, engineer edit, dete
 
 You are the CEO. Read AGENTS.md first; it is the full procedure. Run N cycles (default 3).
 
+0. Worked example? `python tools/make_sandbox.py examples/<name> <new short folder>`, then work from the folder it prints.
 1. `python kl.py begin` once if `kl status` says "not started". Optionally `python kl.py scout` once per session.
 2. For each cycle:
    - `python kl.py status`
