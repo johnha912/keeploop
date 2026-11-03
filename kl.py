@@ -95,12 +95,7 @@ def _json(p: Path, default):
 
 
 def _snap(c) -> dict:
-    """R.fingerprint minus what kl itself writes (.keeploop/), bytecode, and the
-    root .git churn that `git status` causes (config/hooks/info stay covered)."""
-    keep_git = (".git/config", ".git/hooks/", ".git/info/")
-    return {k: v for k, v in R.fingerprint(c.root, c.workspace).items()
-            if not k.startswith(".keeploop/") and "__pycache__/" not in k
-            and (not k.startswith(".git/") or k.startswith(keep_git))}
+    return R.fence_files(c.root, c.workspace)
 
 
 def _write_fence(c) -> None:
@@ -246,6 +241,10 @@ def _stop_on_fail(c, fail) -> None:
 def cmd_begin(c, a) -> int:
     if problem := R.workspace_error(c.root, c.workspace):
         raise Refuse(problem)
+    mark = c.state / "tampered.txt"  # left by a run.py that stopped on a broken fence
+    if mark.exists() and not a.accept_changes:
+        raise Refuse(f"the last run.py stopped on a broken fence ({mark}): a human must "
+                     f"inspect it, then run `{kl()} begin --accept-changes`")
     fence = _json(c.state / "fence.json", None)
     if fence and not a.accept_changes:
         _fence_check(c)  # a resumed session must not launder an earlier change
@@ -260,6 +259,7 @@ def cmd_begin(c, a) -> int:
             raise Refuse(error)
         print("kl: " + summary)
     _write_fence(c)
+    mark.unlink(missing_ok=True)
     print(status_text(c))
     return 0
 
@@ -406,6 +406,11 @@ def cmd_check(c, a) -> int:
 def cmd_eval(c, a) -> int:
     best = _best(c)
     _fence_check(c)
+    cy = _cycle(c)
+    if "card" in cy and (fail := _gates(c, best, cy["parsed"])[3]):  # the gates `kl keep` runs
+        _put(c, fail=list(fail))
+        print(f"FAIL {fail[1]} (no evaluation run): fix it and `{kl()} check` again, or `{kl()} discard`")
+        return 1
     metric, error = _timed(c, "eval_s", lambda: _evaluate(c))
     if metric is None:
         _put(c, fail=["crash", f"evaluation crashed: {error}", list(R.eval_crash_lesson(error))])
@@ -468,6 +473,7 @@ def cmd_keep(c, a) -> int:
     n, parsed = cy["n"], cy["parsed"]
     if R.is_measurement(parsed):
         raise Refuse("measurement card: nothing to keep; `kl discard` it (verdict refuted)")
+    _put(c, unconfirmed=None, confirm_metric=None)  # an earlier attempt's re-run is not this one's
     _fence_check(c)
     changed, diff, heavy, fail = _gates(c, best)
     if fail:
@@ -499,9 +505,11 @@ def cmd_keep(c, a) -> int:
             raise Refuse(f"rubric regressed from {best['rubric']:.0f} to {rscore:.0f}")
     elif heavy:
         raise Refuse("heavy change: needs --audit-verdict FILE (an APPROVED audit of this diff)")
+    metric2 = None
     if R.needs_confirm(heavy, c.loop_cfg, best.get("sigma") or 0.0):
         metric2, error = _timed(c, "confirm_s", lambda: _evaluate(c))
         if metric2 is None or not metric2 > bar:
+            _put(c, unconfirmed=R.unconfirmed_note(metric2, error), confirm_metric=metric2)
             raise Refuse("unconfirmed: the re-run " + (f"failed: {error}" if metric2 is None
                                                        else f"gave {metric2:.6f}, below the bar"))
         metric = min(metric, metric2)
@@ -516,7 +524,7 @@ def cmd_keep(c, a) -> int:
     before = best["metric"]  # commit_keep updates `best` in place
     R.commit_keep(c.workspace, c.state, best, n, card1, metric, rscore)
     _reseal(c)
-    R.record_hypothesis(c.state, n, parsed, "supported", metric, before)
+    R.record_hypothesis(c.state, n, parsed, "supported", metric, before, confirm_metric=metric2)
     _log_time(c, n)
     _row(c, n, "keep", metric, "", f"card: {card1[:90]} | verdict: supported | tier: "
          f"{'heavy' if heavy else 'light'}", a.tokens, best)
@@ -544,12 +552,14 @@ def cmd_discard(c, a) -> int:
     lid = _learn(c, tuple(fail[2]), n) if fail else ""
     metric = cy.get("metric")
     notes = [f"card: {cy['parsed']['hypothesis'][:90]}"] if "card" in cy else []
-    notes += ([fail[1]] if fail else []) + ([f"discard: {a.reason}"] if a.reason else [])
+    notes += ([cy["unconfirmed"]] if cy.get("unconfirmed") else []) + ([fail[1]] if fail else []) \
+        + ([f"discard: {a.reason}"] if a.reason else [])
     if "card" in cy:
         verdict = R.verdict_of(status, metric, _bar(c, best),
                                a.refuted or R.is_measurement(cy["parsed"]))
         notes.insert(1, f"verdict: {verdict}")
-        R.record_hypothesis(c.state, n, cy["parsed"], verdict, metric, best["metric"])
+        R.record_hypothesis(c.state, n, cy["parsed"], verdict, metric, best["metric"],
+                            confirm_metric=cy.get("confirm_metric"))
     _log_time(c, n)
     _row(c, n, status, metric, lid, " | ".join(notes), a.tokens, best)
     _clear(c)
