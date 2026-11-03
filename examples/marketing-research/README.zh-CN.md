@@ -174,13 +174,12 @@ keeploop 像一家小公司一样运作。**Analyst（分析师）**在一张书
 
 ```yaml
 # team.yaml - marketing research example (consumer insight report).
-# Set up: copy this folder's evaluate.py to the keeploop root as evaluate.py
-# (it replaces the demo), delete the demo holdout.py (it imports the demo
-# scorer; lesson L-001, see run/LOG.md and run/cycle-1/transcript.txt), make a
-# fresh git repo for the workspace holding brief.md, report.md and a data/
-# folder (copy data/metrics.json and data/quotes.json from this folder), and
-# point `workspace:` at it (relative to the keeploop folder, or absolute).
-# Then: python kl.py begin
+# Set up (seconds): python tools/make_sandbox.py examples/marketing-research DEST
+# It copies keeploop to DEST/kl with these files on top, removes the demo
+# holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
+# makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
+# sandbox root: evaluate.py, team.yaml
+# sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
 
@@ -438,16 +437,16 @@ next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
 
 ## 如何复现
 
-请在 keeploop 仓库根目录下运行所有命令。以下步骤取自 `team.yaml` 的头部注释和转录。
+以下步骤取自 `team.yaml` 的头部注释和转录。
 
-1. 搭建工作区（见上文 `team.yaml` 头部注释）：把本文件夹中的 `evaluate.py` 复制到仓库根目录作为 `evaluate.py`，删除演示用的 `holdout.py`，新建一个 git 仓库，存放 `brief.md`、`report.md` 和一个 `data/` 文件夹（复制 `data/metrics.json` 和 `data/quotes.json`），并把 `team.yaml` 中的 `workspace:` 指向它。
+1. 在 keeploop 仓库根目录下搭建沙盒（约一秒；Windows 上请使用较短的 `DEST`）：`python tools/make_sandbox.py examples/marketing-research DEST`。它把本文件夹中的 `evaluate.py` 和 `team.yaml` 放入位于 `DEST/kl` 的 keeploop 副本，删除演示用的 `holdout.py`，并把 `DEST/mr-workspace` 建成一个新的 git 仓库，存放 `brief.md`、`report.md`、`data/metrics.json` 和 `data/quotes.json`。其余步骤在 `DEST/kl` 中运行。
 2. 从初稿开始。本文件夹中的 `report.md` 是保留后的版本。要得到得分 0.970000 的初稿，请在工作区内反向应用该周期的编辑：`git apply -R run/cycle-2/cycle.diff`（在 diff 中的 `report.md` 路径能够解析的位置运行）。我们核实过：反向还原后的报告得分为 0.970000，保留后的报告得分为 1.000000。
 3. 运行该周期：
 
 ```text
 python kl.py begin
 python kl.py status
-python evaluate.py ../workspace
+python evaluate.py ../mr-workspace
 python kl.py recall "unsupported claims about who posts on Reddit"
 python kl.py card ../card2.md
 python kl.py check
