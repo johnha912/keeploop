@@ -288,6 +288,16 @@ def fingerprint(root: Path, workspace: Path) -> dict:
     return out
 
 
+def fence_files(root: Path, workspace: Path) -> dict:
+    """What kl's fence.json seals: fingerprint() minus what the loop itself writes
+    (.keeploop/), bytecode, and the root .git churn that `git status` causes
+    (config/hooks/info stay covered)."""
+    keep_git = (".git/config", ".git/hooks/", ".git/info/")
+    return {k: v for k, v in fingerprint(root, workspace).items()
+            if not k.startswith(".keeploop/") and "__pycache__/" not in k
+            and (not k.startswith(".git/") or k.startswith(keep_git))}
+
+
 def index_flags(workspace: Path) -> list[str]:
     """Paths the index hides from `git status`: skip-worktree (S) or
     assume-unchanged (lowercase tag)."""
@@ -383,6 +393,27 @@ def keep_bar(best: float, keep_threshold: float, noise_z: float, sigma: float) -
     return best + max(abs(best) * keep_threshold, noise_z * sigma)
 
 
+LAST_STDERR = [""]  # evaluate.py's stderr from its last run in this process; never holdout.py's
+
+
+def save_scorer_notes(state: Path, commit: str) -> None:
+    """Pin the last evaluate.py stderr to the best commit (after a baseline or a keep):
+    control characters stripped (newlines and tabs kept), secrets redacted, then cut."""
+    text = re.sub(r"(?![\n\t])" + CONTROL_RX, "", LAST_STDERR[0])
+    for kind, rx in SECRET_PATTERNS.items():
+        text = rx.sub(f"[{kind} redacted]", text)
+    _write_json(state / "scorer_notes.json", {"commit": commit, "stderr": text.strip()[:65536]})
+
+
+def scorer_notes(state: Path, best: dict, cap: int) -> str:
+    """The saved scorer stderr for the current best, capped; "" when off or stale."""
+    path = state / "scorer_notes.json"
+    if cap <= 0 or not path.exists():
+        return ""
+    saved = _read_json(path)
+    return str(saved.get("stderr", ""))[:cap] if saved.get("commit") == best.get("commit") else ""
+
+
 def evaluate_workspace(root: Path, workspace: Path, script: str = "evaluate.py",
                        timeout: int | None = None,
                        eval_cmd: str | None = None) -> tuple[float | None, str]:
@@ -410,6 +441,8 @@ def evaluate_workspace(root: Path, workspace: Path, script: str = "evaluate.py",
         return None, f"evaluation timed out after {timeout}s"
     except OSError as exc:  # eval_cmd names a program that cannot start
         return None, re.sub(CONTROL_RX, " ", f"eval_cmd could not start: {exc}")
+    if script == "evaluate.py":
+        LAST_STDERR[0] = proc.stderr
     if proc.returncode != 0:
         err = (proc.stderr.strip().splitlines() or ["evaluation crashed"])[-1]
         return None, re.sub(CONTROL_RX, " ", err)
@@ -575,6 +608,7 @@ def take_baseline(state: Path, loop_cfg: dict, evaluate, has_holdout: bool,
     best.update(metric=metric, sigma=sigma,
                 commit=git(workspace, "rev-parse", "HEAD").strip())
     _write_json(state / "best.json", best)
+    save_scorer_notes(state, best["commit"])
     ledger.append_row(state, {
         "cycle": 0, "ts": _now(), "role_vendors": role_vendors,
         "metric": f"{metric:.6f}", "best_metric": f"{metric:.6f}",
@@ -590,6 +624,7 @@ def commit_keep(workspace: Path, state: Path, best: dict, n: int, card1: str,
     best.update(metric=metric, commit=git(workspace, "rev-parse", "HEAD").strip(),
                 rubric=rubric_score if rubric_score is not None else best.get("rubric"))
     _write_json(state / "best.json", best)
+    save_scorer_notes(state, best["commit"])
 
 
 def rubric_regressed(score: float | None, best: dict) -> bool:
@@ -598,14 +633,22 @@ def rubric_regressed(score: float | None, best: dict) -> bool:
 
 
 def record_hypothesis(state: Path, n: int, parsed: dict, verdict: str,
-                      metric: float | None, best_before: float) -> None:
+                      metric: float | None, best_before: float,
+                      confirm_metric: float | None = None) -> None:
+    """The confirm re-run's score, when there is one, is kept here, untruncated."""
+    confirm = {"confirm_metric": confirm_metric} if confirm_metric is not None else {}
     with (state / "hypotheses.jsonl").open("a", encoding="utf-8") as f:
         f.write(json.dumps({
             "cycle": n, "ts": _now(), "hypothesis": parsed["hypothesis"][:300],
             "change": parsed.get("change", "")[:300],
             "alternatives": parsed.get("alternatives", "")[:300],
             "reject_if": parsed["reject_if"][:200], "verdict": verdict,
-            "metric": metric, "best_before": best_before}) + "\n")
+            "metric": metric, "best_before": best_before, **confirm}) + "\n")
+
+
+def unconfirmed_note(metric2: float | None, error: str = "") -> str:
+    return ("unconfirmed: re-run " + (f"{metric2:.6f} below the bar" if metric2 is not None
+                                      else f"failed: {error[:80]}"))
 
 
 def verdict_of(status: str, metric: float | None, bar_before: float,
@@ -694,6 +737,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         return guarded(root, workspace, role, fn)
 
     def halt(exc: Tampered) -> int:
+        # blocks any later re-seal of fence.json until a human runs `kl begin --accept-changes`
+        (state / "tampered.txt").write_text("\n".join(exc.files) + "\n", encoding="utf-8")
         print("run: STOPPED, the fence was broken:\n  " + "\n  ".join(exc.files[:20])
               + "\nThe workspace is left as is: inspect its .git/config and index "
                 "before running git there.")
@@ -726,6 +771,15 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         tokens[0] += res.tokens
         return res
 
+    # kl's fence.json: refreshed at the end only if it held at the start (no fence is not
+    # clean after a halt: tampered.txt) and nothing outside the workspace changed since,
+    # so a headless run never launders a tamper
+    fence_path = state / "fence.json"
+    sealed = _read_json(fence_path) if fence_path.exists() else None
+    start_files = fence_files(root, workspace)
+    fence_ok = not (state / "tampered.txt").exists() and not index_flags(workspace) and (
+        sealed is None or (sealed.get("files") == start_files
+                           and sealed.get("best_sha") == _sha(state / "best.json")))
     best = _read_json(state / "best.json")
     hold_path = state / "holdout.json"  # never read into a prompt or the ledger
     has_holdout = (root / "holdout.py").exists()
@@ -760,10 +814,13 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         rows = read_hypotheses(state)
         tested = already_tested(rows)
         human = human_hypotheses(root / "program.md", rows)
+        diag = scorer_notes(state, best, loop_cfg["eval_stderr_max_chars"])
         card = call("analyst", (
             f"{charter}\n\n{standards}\n\nRepo map:\n"
             f"{repo_map(workspace, loop_cfg['repo_map_max_chars'], state / 'map.json')}\n\nRecent ledger:\n"
             f"{ledger.tail_text(state, loop_cfg['ledger_tail_for_prompt'])}\n\n"
+            + (f"Scorer diagnostics for the current best (evaluate.py stderr, capped):\n{diag}\n\n"
+               if diag else "")
             + (f"Already tested (do not re-propose without saying what is "
                f"different):\n{tested}\n\n" if tested else "")
             + ("Human hypotheses (test the first one not yet in the registry "
@@ -893,9 +950,9 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             return "discard", metric, lesson_id
         if needs_confirm(heavy, loop_cfg, sigma):
             metric2, error = evaluate(part="u")
+            forced["confirm_metric"] = metric2
             if metric2 is None or not beats(min(metric, metric2)):
-                notes.append("unconfirmed: noisy metric" if metric2 is not None
-                             else f"unconfirmed: re-run failed: {error}")
+                notes.insert(1, unconfirmed_note(metric2, error))  # early: the ledger cuts at 240
                 return "discard", metric, lesson_id
             metric = min(metric, metric2)
         failures = (guard("replay", lambda: lessons.replay(state, workspace, loop_cfg))
@@ -946,7 +1003,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             verdict = forced.get("verdict") or verdict_of(
                 status, metric, bar(best_before))
             notes.insert(min(1, len(notes)), f"verdict: {verdict}")
-            record_hypothesis(state, n, parsed, verdict, metric, best_before)
+            record_hypothesis(state, n, parsed, verdict, metric, best_before,
+                              confirm_metric=forced.get("confirm_metric"))
         consecutive_crashes = consecutive_crashes + 1 if status == "crash" else 0
         totals[status] += 1
         totals["tokens"] += tokens[0]
@@ -1021,6 +1079,11 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
     qs = state / "questions.md"
     if qs.exists() and (open_q := len(qs.read_text(encoding="utf-8").splitlines())):
         print(f"{open_q} open questions in {qs}")
+    if fence_ok and fence_files(root, workspace) == start_files and not index_flags(workspace):
+        _write_json(fence_path, {"files": start_files, "best_sha": _sha(state / "best.json")})
+    else:
+        print(f"run: {fence_path} left as it was: something outside the workspace changed "
+              "outside kl; a human must inspect it, then run `kl begin --accept-changes`")
     return 0
 
 
