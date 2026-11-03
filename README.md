@@ -21,9 +21,8 @@
 </p>
 
 <p align="center">
-  <a href="#hand-it-to-your-ai">Hand it to your AI</a> ·
-  <a href="#try-it-offline">Try it offline</a> ·
-  <a href="#worked-examples">Examples</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#examples">Examples</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#faq">FAQ</a> ·
   <a href="docs/GUIDE.md">Full guide</a>
@@ -41,16 +40,14 @@ AI agents are good at sounding sure. keeploop makes them prove it.
 - **Only a change that beats the number is kept.** Everything else is
   undone, and the reason is written down so it is not tried again.
 
-Works with the AI you already use: Claude Code, Codex, Cursor, Copilot,
-Gemini CLI and others. keeploop itself is not an AI: it is a small Python
-tool that measures and refuses. It needs nothing else installed, sends no
-telemetry and stores no API keys.
+Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI and other AIs
+you already use. keeploop itself is not an AI: it is a small Python tool
+that measures and refuses, with no dependencies, no telemetry and no API keys.
 
-## Hand it to your AI
+## Quick start
 
-**If your AI can run commands** (Claude Code, Codex, Cursor, Copilot,
-Gemini CLI, Aider and similar), paste this into it and fill in the last
-line:
+**(a) Hand it to your AI.** If it can run commands, paste this and fill in
+the last line:
 
 ```text
 Clone https://github.com/johnha912/keeploop next to my project (not inside it),
@@ -58,17 +55,20 @@ run `python prepare.py` in the clone, then read its AGENTS.md and act as the CEO
 it describes. What I want better: <for example "make my test suite faster">
 ```
 
-That is all. You never type `kl` and there are no flags to learn. The
-first time, your AI asks you in plain words what "better" means and how to
-measure it, then proposes an `evaluate.py` (a small script that prints
-that number) for you to approve before anything changes. In Claude Code, `/keeploop 3` inside the clone runs three
-cycles.
+You never type `kl` and there are no flags to learn. The first time, your
+AI asks in plain words what "better" means and how to measure it, then
+proposes an `evaluate.py` (a small script that prints that number) for you
+to approve before anything changes. In Claude Code, `/keeploop 3` inside
+the clone runs three cycles.
 
-**If your AI is a chat app that cannot open links or run commands**
-(the ChatGPT or Gemini apps), paste the whole of
-[`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead. The AI then gives
-you one `python kl.py ...` command at a time to run in a clone, and you
-paste the output back.
+<details>
+<summary><b>Chat app that cannot run commands (ChatGPT, Gemini apps)</b></summary>
+
+Paste the whole of [`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead.
+The AI then gives you one `python kl.py ...` command at a time to run in a
+clone, and you paste the output back.
+
+</details>
 
 <details>
 <summary><b>If you are an AI agent reading this</b></summary>
@@ -91,10 +91,7 @@ paste the output back.
 
 </details>
 
-## Try it offline
-
-Want to see it before you hand it to an AI? Needs Python 3.10+ and git.
-No AI and no API key; it takes a few seconds.
+**(b) Try it offline.** Needs Python 3.10+ and git; no AI, no API key, a few seconds.
 
 ```bash
 git clone https://github.com/johnha912/keeploop.git && cd keeploop
@@ -103,82 +100,42 @@ python run.py --mock --iterations 5
 ```
 
 ```text
-cycle 1: keep  metric=0.942  best=0.942000  tokens=3501
-cycle 2: keep  metric=0.992  best=0.992000  tokens=3568
 cycle 3: discard  metric=0.942  best=0.992000  tokens=2820
 cycle 4: crash  metric=None  best=0.992000  tokens=3510  lesson=L-001
-cycle 5: keep  metric=1.0  best=1.000000  tokens=3860
 run complete: 3 keeps, 1 discards, 1 crashes, 1 lessons, 17259 tokens. Best metric: 1.000000
 ```
 
-(Timings trimmed.) The mock is a scripted stand-in for a real AI, so you
-can watch a keep, a discard and a crash happen. It shows how the loop
-works, not how good a real model is. Every keep is a real commit:
+The mock is a scripted stand-in for a real AI. It shows how the loop works,
+not how good a real model is. Every keep is a real commit:
 `git -C .keeploop/workspace log --oneline`.
 
-## Worked examples
+## Examples
 
-<table>
-<tr>
-<td width="50%" valign="top">
+| Example | Field | What happened | Link |
+|---|---|---|---|
+| Offline demo | Toy config | 3 keeps, 1 discard, 1 crash that became lesson L-001; no AI | [Transcript](docs/DEMO-OUTPUT.txt) |
+| Marketing research | Consumer insight report | 1 real cycle: 0.970000 to 1.000000, audit APPROVED, kept | [Read](examples/marketing-research/) |
+| Prompt optimization | AI/LLM prompt | 8 headless cycles, 2 kept, 6 discarded (a 0.915 refused on re-run). Dev 0.873333 to 0.900000; holdout 0.835 to 0.855 | [Read](examples/prompt-optimization/) |
 
-**Offline demo (toy config)**
+Set up any example as a sandbox with
+`python tools/make_sandbox.py examples/<name> <new short folder>`
+([details](docs/GUIDE.md#run-a-worked-example)).
 
-The GIF above. A scripted mock tunes a demo `config.json` through five
-cycles: three keeps, one discard and one crash that becomes lesson L-001.
-Runs in seconds with no AI.
+## Why keeploop
 
-[Transcript](docs/DEMO-OUTPUT.txt) · [Try it](#try-it-offline)
-
-</td>
-<td width="50%" valign="top">
-
-<a href="examples/marketing-research/"><img src="docs/assets/example-marketing-research.png" alt="Top of the marketing research example's cover board: the one-line answer and three headline numbers" width="100%"></a>
-
-**Consumer insight report (marketing research)**
-
-A social-listening study of five fast-fashion brands, with a dashboard
-and a 30-page PDF. One real cycle, run in Claude Code, fixed two
-unsupported claims: score 0.970000 → 1.000000, audit APPROVED, kept. The
-page also says what the score does not measure.
-
-[Read the example](examples/marketing-research/)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top">
-
-<a href="examples/prompt-optimization/"><img src="examples/prompt-optimization/run/score-by-cycle.png" alt="Dev accuracy by cycle: two prompt edits kept, six discarded, and a 0.915 that did not confirm on re-run" width="100%"></a>
-
-**Prompt optimization (headless, 8 cycles)**
-
-An AI team improves the system prompt of a banking-ticket classifier
-(Claude Haiku, Banking77 data). Two edits kept, six refused, including a
-0.915 that the Auditor approved but a re-run did not confirm. Dev accuracy
-0.873333 → 0.900000; a hidden holdout rose 0.835 → 0.855. The page also
-shows a deliberate cheating probe and four gaps it found in keeploop.
-
-[Read the example](examples/prompt-optimization/)
-
-</td>
-</tr>
-</table>
-
-## Why not just let the AI loop on its own?
-
-Because an agent saying "done" is not a measurement.
+An agent saying "done" is not a measurement.
 
 | The usual way | With keeploop |
 |---|---|
 | The model that wrote the change also says it is fine | A **fresh session or a different vendor** audits the real diff; the maker never checks its own work |
 | "Looks good to me" | Only `kl keep` commits. It re-runs the evaluation itself, and the number must beat the best by more than the evaluation's own noise, or the change is reset |
 | A fluent answer passes for a correct one | Every change starts as a **written hypothesis card** with a measurable rule that would reject it, fixed before the evaluation runs |
-| The same mistake again next week | Every crash, refusal or complaint becomes a **lesson**, optionally with a check that runs before every keep |
 | An agent quietly edits the tests or leaks a key | **Code gates, not prompts**, stop it: protected paths, a secret scan, banned slop patterns, diff size and a content-hash fence |
 | A great score that does not generalize | An optional **holdout** score the agents never see, with a warning when its gain lags the main score |
-| You find new techniques by scrolling | A **trend scout** ranks new GitHub repos, Hacker News threads and arXiv papers; its ideas still go through a card |
-| Locked to one vendor | `AGENTS.md` is read by Codex, Cursor, Copilot, Jules, Aider and more; Claude Code and Gemini CLI get pointer files |
+
+Also in the guide: [lessons](docs/GUIDE.md#never-repeat-lessons) so a
+mistake is not repeated, a [trend scout](docs/GUIDE.md#trend-scout), and one
+`AGENTS.md` that Codex, Cursor, Copilot and others read.
 
 ## How it works
 
@@ -200,51 +157,45 @@ flowchart LR
     L -. read next time .-> A
 ```
 
-1. **Analyst** writes one card: the hypothesis, the smallest change, what
-   should happen, and the result that would prove it wrong.
-2. **Engineer** makes exactly that change, and is the only role that may
-   edit files.
-3. **Code gates** (`kl check`) refuse changes outside the workspace, edits
-   to protected files, credentials and oversized diffs.
-4. **evaluate.py** prints one number. The loop cannot edit it.
-5. **Auditor**, in a fresh context or from another vendor, checks the diff
-   against the card without seeing the Engineer's reasoning.
-6. **`kl keep`** commits only if every check passes and the number beats
-   the bar; otherwise **`kl discard`** resets and records why.
-
-The full cycle, the critic round for heavy changes, lessons, the trend
+An Analyst writes one card, an Engineer makes exactly that change, code
+gates and `evaluate.py` check it, and a fresh Auditor reads the diff. Only
+`kl keep` commits. The full cycle, the critic round, lessons, the trend
 scout and speed tuning are in the [guide](docs/GUIDE.md#how-a-cycle-works).
 
-## Use it on your own work
+## Your own work: packs
 
-keeploop works on any folder in git with an automatic score. A **pack**
-gives the team the craft rules and review checklist for one field:
+A **pack** gives the team the craft rules and review checklist for one field.
 
 | Pack | For | Status |
 |---|---|---|
-| `software` | code | Ready: tests and benchmarks make honest metrics |
-| `ui-design` | UI/UX | Experimental: Lighthouse or axe scores measure the floor, not taste |
-| `marketing-content` | marketing copy | Experimental: real outcomes arrive late and noisy |
-| `marketing-research` | consumer insight reports | Experimental: checks rules and traceability, not whether the insight is right |
+| `software` | code | Ready |
+| `ui-design` | UI/UX | Experimental |
+| `marketing-content` | marketing copy | Experimental |
+| `marketing-research` | consumer insight reports | Experimental |
+| `prompt-engineering` | LLM system prompts | Experimental |
 
 New field? `python kl.py pack new NAME` scaffolds one. Setup for your own
-repo, `team.yaml`, vendors and the headless overnight mode
-(`python run.py`) are in [docs/GUIDE.md](docs/GUIDE.md#use-it-on-your-own-repo).
+repo, `team.yaml`, vendors and the headless overnight mode (`python run.py`)
+are in [docs/GUIDE.md](docs/GUIDE.md#use-it-on-your-own-repo). Why the
+experimental ones are experimental: [guide](docs/GUIDE.md#profession-packs).
 
-## Safety, in short
+## Safety
 
-- keeploop never executes text from a model or a web page. Vendor CLIs get
-  the prompt on stdin, and only the Engineer gets edit rights.
+- keeploop never executes text from a model or a web page. Only the
+  Engineer gets edit rights; changed files are scanned for credentials, and
+  token-like environment variables are removed before any vendor CLI or
+  evaluation starts.
 - While code you did not write runs, every file in the project folder
   outside the workspace is content-hashed. Any change stops the run.
-- Changed files are scanned for credentials, and token-like environment
-  variables are removed before any vendor CLI or evaluation starts.
 - The fence detects changes; **it is not a sandbox**. Run real vendors in a
   container or VM if that matters to you.
 
 Details: [docs/GUIDE.md](docs/GUIDE.md#safety) and [SECURITY.md](SECURITY.md).
 
 ## FAQ
+
+<details>
+<summary><b>Four questions skeptics ask</b></summary>
 
 **Doesn't keeping the best of many tries overfit the score?**
 Yes, that is the main risk of any keep/discard loop. keeploop measures the
@@ -264,6 +215,8 @@ stays.
 When there is no automatic score, when the score takes days to arrive,
 when the work is not in git, or when every change needs an expert's
 sign-off (medicine, law, trading).
+
+</details>
 
 More questions: [docs/GUIDE.md](docs/GUIDE.md#faq-for-skeptics).
 
@@ -287,8 +240,8 @@ turns it into an org chart any AI can run, and adds roles, cross-vendor
 audit, code gates, lessons and a trend scout. No code from autoresearch
 is copied. If you like this repo, star his first.
 
-Ideas were also borrowed (re-implemented, no code copied) from tools we
-use daily:
+<details>
+<summary>Ideas also borrowed from tools we use daily (re-implemented, no code copied)</summary>
 
 | Project | Idea taken |
 |---|---|
@@ -297,6 +250,8 @@ use daily:
 | [Playwright MCP](https://github.com/microsoft/playwright-mcp) (Apache-2.0) | Judge the rendered page in a real browser: a principle in the `ui-design` pack |
 | [OmniRoute](https://github.com/cheaper-inference/OmniRoute) (MIT) | Ordered per-role vendor fallback |
 | [graphify](https://github.com/Graphify-Labs/graphify) (Apache-2.0) | A cached code index with an "imported by" lookup (`kl map`) instead of raw file dumps |
+
+</details>
 
 The banner is set in [Google Sans Flex](https://fonts.google.com/specimen/Google+Sans+Flex).
 
