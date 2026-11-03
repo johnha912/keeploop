@@ -163,7 +163,7 @@ the fence snapshot; every later command refuses (exit 2) if it changed.
 | 1c Challenge | `debate ID --critic FILE` / `--reply FILE` | One critique (must end `VERDICT: proceed\|revise`), one reply; append-only `debate/<id>.md`. |
 | 2 Implement | (your Engineer edits the workspace) | |
 | 3 Gates | `check` | PASS/FAIL, tier, `diff=<id>` (sha256 prefix of the diff). |
-| 4-5 Evaluate | `eval` | Fenced `evaluate.py` against the keep bar. |
+| 4-5 Evaluate | `eval` | Fenced `evaluate.py` against the keep bar. With an open card it first re-runs the `check` gates and refuses (exit 1, no evaluation) if one fails. |
 | 6 Audit | (fresh-context Auditor) or `audit --vendor NAME [--model M]` | The only command that needs an AI CLI. Output ends with `DIFF: <id>`. |
 | 7 Decide | `keep [--audit-verdict FILE]` | Re-runs fence, gates, evaluation, bar, audit verdict (diff id must match; heavy requires it), rubric regression, confirm, lesson replay; commits only if all hold. |
 | 7 Decide | `discard [--refuted] [--reason]` | Reset to best, ledger row, verdict, lesson if a gate failed. `--refuted` (needs `--reason`, refused after a crash) records verdict `refuted`. |
@@ -191,6 +191,7 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `confirm_keep` | true | yes | Re-run before a keep when sigma > 0 (heavy always re-runs) |
 | `engineer_repairs` | 1 | yes | Extra Engineer calls for a repairable failure |
 | `repo_map_max_chars` | 3000 | yes (`run.py`); `kl map` uses the default | Analyst repo map size |
+| `eval_stderr_max_chars` | 1500 | yes (`run.py`) | `evaluate.py` stderr of the current best shown to the Analyst (control characters stripped, secrets redacted); 0 = off. Never `holdout.py` |
 | `max_diff_lines` | 400 | yes | Size gate, added+removed lines |
 | `max_consecutive_crashes` | 3 | yes | Crashes in a row that stop a run |
 | `eval_timeout_s` | 120 | no | Evaluation and lesson-check timeout |
@@ -255,8 +256,11 @@ value.
 ```json
 {"cycle": 3, "ts": "...", "hypothesis": "... (300 chars max)",
  "reject_if": "... (200 chars max)", "verdict": "rejected",
- "metric": 0.942, "best_before": 0.992}
+ "metric": 0.942, "best_before": 0.992, "confirm_metric": 0.931}
 ```
+`confirm_metric` is present only when the confirm re-run produced a score.
+A keep refused by it also puts `unconfirmed: re-run <score> below the bar`
+right after the verdict in the ledger description, before the 240-character cut.
 Verdicts (`verdict_of`, plus the duplicate path): `supported` (keep),
 `rejected` (metric did not beat the bar), `inconclusive` (metric beat the
 bar, keep blocked by audit, rubric, confirm or replay), `untested` (crash,
@@ -289,7 +293,19 @@ from vendor or web output. Derived standing (`kl lesson review`): `enforced`
 ### `best.json`
 `{"metric": float, "sigma": float, "rubric": float | null, "commit": "<sha>"}`.
 In interactive mode `fence.json` stores its sha256; a change made outside
-`kl` is refused until a human runs `kl begin --accept-changes`.
+`kl` is refused until a human runs `kl begin --accept-changes`. A `run.py`
+run that ends normally writes `fence.json` too, but only if there was none or
+it still held when the run started, and nothing it covers changed during the
+run; otherwise it leaves the old one and says so, so a headless run never
+re-seals a change made outside `kl`. A run that stops on a broken fence
+writes `tampered.txt` (the changed paths): while it exists no run writes a
+fence and `kl begin` refuses; `kl begin --accept-changes` removes it.
+
+### `scorer_notes.json`
+`{"commit": "<best sha>", "stderr": "..."}`: `evaluate.py`'s stderr from the
+run that set the current best (baseline or keep, either mode), control
+characters stripped and secrets redacted before it is saved. `run.py`
+shows it to the Analyst only while `commit` matches `best.json`.
 
 ### `debate/<card>.md`
 Append-only, written by `kl debate`: `## Critique` then `## Reply`, one each.

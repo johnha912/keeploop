@@ -26,7 +26,33 @@ the entry says so under **Changed** with the migration step.
 
 ## [Unreleased]
 
+### Fixed
+
+Four gaps found by the prompt-optimization worked example:
+
+- `run.py` now leaves the `.keeploop/fence.json` that `kl` expects, so
+  `kl card`, `check`, `eval` and `discard` work after a headless run
+  without `kl begin --accept-changes`. It refreshes the fence only if the
+  old one still held at the start and nothing changed during the run, so
+  a headless run never re-seals a change made outside `kl`. A run that
+  stops on a broken fence leaves `.keeploop/tampered.txt`, which blocks
+  any re-seal (and plain `kl begin`) until `kl begin --accept-changes`.
+- `kl eval` with an open card re-runs the `kl check` gates first and
+  refuses, without running the evaluation, when one fails (as `kl keep`
+  already did).
+- A keep refused by the confirm re-run keeps the re-run score:
+  `confirm_metric` in `hypotheses.jsonl`, and `unconfirmed: re-run <score>
+  below the bar` right after the verdict in the ledger, before the
+  240-character cut. Both modes; a passing re-run's score is kept too.
+
 ### Added
+
+- The headless Analyst sees `evaluate.py`'s stderr for the current best
+  (per-label breakdowns and the like), with control characters stripped and
+  secrets redacted. Never `holdout.py`'s. Capped by the new loop key
+  `eval_stderr_max_chars` (default 1500, `0` = off). About +200 tokens per
+  cycle on the example's breakdown, no extra vendor call. The Goodhart
+  trade-off is in docs/GUIDE.md.
 
 - README demo GIF of the offline mock run (baseline, keeps, a discard, a
   crash that becomes a lesson), re-recorded with `python docs/record_demo.py`.
