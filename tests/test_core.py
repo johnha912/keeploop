@@ -1337,6 +1337,8 @@ class TestVersion(unittest.TestCase):
         self.assertRegex(__version__, r"^\d+\.\d+\.\d+$")
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         self.assertIn(f"## [{__version__}]", changelog)
+        for readme in ("README.md", "README.vi.md", "README.zh-CN.md"):  # the version badge
+            self.assertIn(f"badge/version-{__version__}-", (ROOT / readme).read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

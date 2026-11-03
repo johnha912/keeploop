@@ -4,26 +4,27 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "keeploop"
-dynamic = ["version"]
+dynamic = ["version", "readme"]  # setup.py: prepare.__version__, README pinned to the tag
 description = "An autoresearch-style keep/discard loop for any git repo, with cross-vendor audit, deterministic QC gates, a never-repeat lesson engine and a trend scout."
-readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/johnha912/keeploop"
+Changelog = "https://github.com/johnha912/keeploop/blob/main/CHANGELOG.md"
+Issues = "https://github.com/johnha912/keeploop/issues"
+
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
 [project.scripts]
-kl = "kl:main"
+kl = "keeploop:main"
 
 [tool.setuptools]
-# The engine only. evaluate.py and holdout.py are project files, not modules: the
-# demo evaluate.py ships as an asset that `kl init` copies (setup.py packs the
-# assets into keeploop_assets/; scaffold.py lists them).
-py-modules = ["prepare", "run", "kl", "vendors", "ledger", "lessons", "scout",
-              "packs", "rubric", "bm25", "codemap", "scaffold"]
-
-[tool.setuptools.dynamic]
-version = { attr = "prepare.__version__" }
+# Nothing is discovered: setup.py puts the engine (scaffold.ENGINE) in the wheel's
+# keeploop/ folder and the files `kl init` copies (scaffold.bundle_files) in
+# keeploop/_assets/. evaluate.py and holdout.py are project files, not modules.
+py-modules = []
+packages = []

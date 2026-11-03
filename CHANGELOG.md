@@ -15,14 +15,27 @@ the entry says so under **Changed** with the migration step.
 
 ## Releasing
 
+One-time setup: on PyPI and on TestPyPI, add a Trusted Publisher (pending
+publisher for a new project) for repository `johnha912/keeploop`, workflow
+`publish.yml`, environment `pypi` (TestPyPI: `testpypi`). No API token is
+stored anywhere.
+
 1. Move the items under **Unreleased** into a new version section with
    today's date.
-2. Set `__version__` in `prepare.py`; it is the only place the version
-   lives (`pyproject.toml` reads it, a test checks this file matches).
-3. Run `python -m unittest discover -s tests`.
-4. Commit, then tag and push: `git tag -a vX.Y.Z -m "keeploop X.Y.Z"`,
-   `git push --follow-tags`, and create the GitHub release from the tag
-   with this section as its notes.
+2. Set `__version__` in `prepare.py`, the only place the version lives
+   (`setup.py` reads it), and the version badge in the three READMEs; a
+   test checks both.
+3. Run `python -m unittest discover -s tests` and
+   `python tools/check_dist.py` (build, contents, clean-venv install,
+   smoke test). Merge to `main`.
+4. Rehearse: Actions -> publish -> Run workflow on `main`. It uploads
+   `X.Y.Z.devN` to TestPyPI and installs it back with pip and pipx on
+   Linux and Windows.
+5. Tag once: `git tag -a vX.Y.Z -m "keeploop X.Y.Z"` and
+   `git push origin vX.Y.Z`. The publish workflow refuses a tag that does
+   not match `__version__`, runs the same gate, uploads to PyPI, installs
+   it back from PyPI with pip and pipx, and only then creates the GitHub
+   release with this section as its notes.
 
 ## [Unreleased]
 
@@ -30,11 +43,17 @@ the entry says so under **Changed** with the migration step.
 
 ### Changed
 
-- The wheel no longer installs `evaluate.py` and `holdout.py` as top-level
-  modules (`evaluate` clashed with an unrelated PyPI package); the demo
-  `evaluate.py` ships as a file `kl init` copies. The engine modules are
-  still top-level (`kl`, `run`, `prepare`, ...): install with pipx, or in a
-  venv of its own.
+- The wheel installs one top-level name, `keeploop/`: the engine modules
+  live inside it, and the `kl` command is `keeploop:main`, which puts that
+  folder on `sys.path` only while kl runs. Before, `kl`, `run`, `prepare`,
+  `packs` and the others were top-level modules that could clash with other
+  packages. `evaluate.py` and `holdout.py` are no longer installed as
+  modules at all (`evaluate` clashed with an unrelated PyPI package); the
+  demo `evaluate.py` ships as a file `kl init` copies. A clone still runs
+  `python kl.py` from the repo root, unchanged.
+- The PyPI description is README.md with every relative link and image
+  pinned to the release tag (PyPI cannot resolve repo paths). The version
+  badge in the READMEs said 0.1.0; it now matches, and a test keeps it so.
 - `project.license` is an SPDX string; building needs setuptools 77 or newer.
 
 ### Fixed
@@ -95,7 +114,14 @@ Four gaps found by the prompt-optimization worked example:
   (`keeploop_assets/`) and the sdist; `tools/check_dist.py` builds both,
   checks their contents, installs the wheel in a clean venv and runs
   `kl init` -> `kl begin` -> `kl status` -> `kl run --mock`, plus the
-  marketing-research sandbox. CI runs it on Linux and Windows.
+  marketing-research sandbox. CI runs it on Linux and Windows. With
+  `--from-index SPEC` it installs from an index instead, with `--kl PATH`
+  it smoke-tests an existing install (pipx).
+- `.github/workflows/publish.yml`: a `vX.Y.Z` tag runs the gate, uploads to
+  PyPI with Trusted Publishing (OIDC, no token), installs the release back
+  from PyPI with pip and pipx on Linux and Windows, then creates the GitHub
+  release from `tools/release_notes.py` (this file's section). Run by hand,
+  it rehearses on TestPyPI with an `X.Y.Z.devN` version.
 - The headless Analyst sees `evaluate.py`'s stderr for the current best
   (per-label breakdowns and the like), with control characters stripped and
   secrets redacted. Never `holdout.py`'s. Capped by the new loop key
