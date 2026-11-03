@@ -11,6 +11,22 @@ git clone https://github.com/johnha912/keeploop.git && cd keeploop
 python prepare.py
 ```
 
+Or as a command instead of a clone (pip installs only the engine, `kl`; the
+files you edit are copied into your folder, never read from the install):
+
+```bash
+pip install .                 # from a clone; pipx works the same way
+mkdir my-loop && cd my-loop
+kl init                       # AGENTS.md, program.md, team.yaml, demo evaluate.py, packs/, .claude/
+kl begin                      # the demo baseline
+```
+
+`kl init` never overwrites a file; it lists what it kept and warns when the
+folder already has its own `AGENTS.md`, `team.yaml` or `evaluate.py` (run it
+in a new folder then). In the copies every command reads `kl ...` instead of
+`python kl.py ...`, `kl run` is the headless `python run.py`, and
+`kl init --example NAME DEST` builds a worked example's sandbox.
+
 Then open the folder in your AI and **just say what you want better**:
 "make the tests faster", "raise the benchmark score". You never type `kl`
 and there are no flags to learn. Your AI reads the org chart, runs the
@@ -318,6 +334,9 @@ removes the demo `holdout.py` (it scores the demo config; lesson L-001),
 puts the example's root files on top, and makes the workspace its
 `team.yaml` names (here `../klpo/ws`) a fresh git repo with one commit.
 Then it prints the next command: `cd ../klpo/kl && python kl.py begin`.
+With a pip-installed `kl` the same sandbox is `kl init --example
+prompt-optimization ../klpo`: the control folder then holds only the editable
+files, and the next command is `cd ../klpo/kl && kl begin`.
 `DEST` must be new or empty and outside the repo, so no sandbox or
 `.keeploop/` state ever lands in it. On Windows keep `DEST` short
 (MAX_PATH).
@@ -326,14 +345,27 @@ An example says what goes where in two lines of its `team.yaml` header,
 paths relative to the example folder:
 
 ```yaml
-# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, data/holdout.jsonl
+# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, FORMAT.md, data/holdout.jsonl
 # sandbox workspace: prompt.md, data/dev.jsonl
 ```
 
 Root files are the fixed scorers and config the agents never edit; holdout
 data goes there too, never in the workspace (the script refuses any
 `holdout*` file for the workspace). A new example needs only these two
-lines.
+lines. Two optional extras:
+
+```yaml
+# sandbox requires: claude (the scorer calls Claude CLI; install it and log in first)
+loop:
+  metric_max: 1.0
+```
+
+The first makes `make_sandbox.py` print a warning before the `next:` line
+when that command is not on PATH (the prompt-optimization scorer calls the
+`claude` CLI itself, so without it `kl begin` stops at the baseline). The
+second is the top of the metric's scale: when the keep bar is at or above it (a
+baseline already at the maximum), `kl begin`, `kl status` and `run.py`
+warn that every cycle will be discarded until the score has headroom.
 
 Any CLI that reads a prompt on stdin can be a vendor for the headless mode
 or for `kl audit`, configured in `team.yaml` without code changes:

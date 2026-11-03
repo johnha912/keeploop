@@ -15,18 +15,73 @@ the entry says so under **Changed** with the migration step.
 
 ## Releasing
 
+One-time setup: on PyPI and on TestPyPI, add a Trusted Publisher (pending
+publisher for a new project) for repository `johnha912/keeploop`, workflow
+`publish.yml`, environment `pypi` (TestPyPI: `testpypi`). No API token is
+stored anywhere.
+
 1. Move the items under **Unreleased** into a new version section with
    today's date.
-2. Set `__version__` in `prepare.py`; it is the only place the version
-   lives (`pyproject.toml` reads it, a test checks this file matches).
-3. Run `python -m unittest discover -s tests`.
-4. Commit, then tag and push: `git tag -a vX.Y.Z -m "keeploop X.Y.Z"`,
-   `git push --follow-tags`, and create the GitHub release from the tag
-   with this section as its notes.
+2. Set `__version__` in `prepare.py`, the only place the version lives
+   (`setup.py` reads it), and the version badge in the three READMEs; a
+   test checks both.
+3. Run `python -m unittest discover -s tests` and
+   `python tools/check_dist.py` (build, contents, clean-venv install,
+   smoke test). Merge to `main`.
+4. Rehearse: Actions -> publish -> Run workflow on `main`. It uploads
+   `X.Y.Z.devN` to TestPyPI and installs it back with pip and pipx on
+   Linux and Windows.
+5. Tag once: `git tag -a vX.Y.Z -m "keeploop X.Y.Z"` and
+   `git push origin vX.Y.Z`. The publish workflow refuses a tag that does
+   not match `__version__`, runs the same gate, uploads to PyPI, installs
+   it back from PyPI with pip and pipx, and only then creates the GitHub
+   release with this section as its notes.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-03
+
+### Changed
+
+- The wheel installs one top-level name, `keeploop/`: the engine modules
+  live inside it, and the `kl` command is `keeploop:main`, which puts that
+  folder on `sys.path` only while kl runs. Before, `kl`, `run`, `prepare`,
+  `packs` and the others were top-level modules that could clash with other
+  packages. `evaluate.py` and `holdout.py` are no longer installed as
+  modules at all (`evaluate` clashed with an unrelated PyPI package); the
+  demo `evaluate.py` ships as a file `kl init` copies. A clone still runs
+  `python kl.py` from the repo root, unchanged.
+- The PyPI description is README.md with every relative link and image
+  pinned to the release tag (PyPI cannot resolve repo paths). The version
+  badge in the READMEs said 0.1.0; it now matches, and a test keeps it so.
+- `project.license` is an SPDX string; building needs setuptools 77 or newer.
+
 ### Fixed
+
+First-run gaps found by building the worked examples' sandboxes from a fresh clone:
+
+- `kl begin`, `kl status` and `run.py` warn "baseline at ceiling" when the
+  keep bar is at or above the top of the metric's scale, so every cycle
+  would be discarded (for example a 1.000000 baseline on a 0..1 score with
+  `keep_threshold: 0.01` gives a bar of 1.010000). The top is the new
+  optional loop key `metric_max` (both examples set `1.0`); without it, a
+  best of exactly 1.0 prints a hint to set it.
+- The marketing-research example has its own `program.md` with market
+  research hypotheses; its sandbox no longer opens with the framework's demo
+  hypothesis about learning rates. The sandbox also carries `FORMAT.md` and
+  `samples/`, which that charter and `evaluate.py --self-check` refer to.
+  Its README points to the verbatim transcript instead of embedding it, and
+  the reproduce step now commits the reversed draft (`kl begin` refuses a
+  dirty workspace, which the old step left behind).
+- `tools/make_sandbox.py` reads an optional `# sandbox requires: CMD (why)`
+  line and prints a warning before the `next:` command when CMD is not on
+  PATH. The prompt-optimization example declares `claude`: its scorer calls
+  Claude CLI, and its "claude CLI not found" error now says so and names the
+  offline `--self-check`.
+
+- On Windows a pip-installed `kl` called itself `python kl.py` in every
+  hint it printed: the launcher reports `kl.EXE` and the name check was
+  case-sensitive. Found by the new Windows dist job.
 
 Four gaps found by the prompt-optimization worked example:
 
@@ -47,6 +102,30 @@ Four gaps found by the prompt-optimization worked example:
 
 ### Added
 
+- `kl init [DIR]`: a pip/pipx install is the engine only; `kl init` copies
+  the files a project edits (AGENTS.md, CLAUDE.md, GEMINI.md, BOOTSTRAP.md,
+  program.md, team.yaml, the demo evaluate.py, packs/, .claude/ agents,
+  skill and settings, a .gitignore) into the folder. It never overwrites a
+  file, and warns when the folder has its own AGENTS.md, team.yaml or
+  evaluate.py. In the copies, `python kl.py` reads `kl`, `python run.py`
+  reads `kl run`.
+- `kl init --example NAME DEST`: the worked example's sandbox for a pip
+  install (no code copy; `tools/make_sandbox.py` stays for a clone, and
+  both use the new `scaffold.py`).
+- `kl run [--mock] [--iterations N]`: the headless loop from a pip install
+  (same as `python run.py`).
+- Packaging: `setup.py` packs every file `scaffold.py` lists into the wheel
+  (`keeploop_assets/`) and the sdist; `tools/check_dist.py` builds both,
+  checks their contents, installs the wheel in a clean venv and runs
+  `kl init` -> `kl begin` -> `kl status` -> `kl run --mock`, plus the
+  marketing-research sandbox. CI runs it on Linux and Windows. With
+  `--from-index SPEC` it installs from an index instead, with `--kl PATH`
+  it smoke-tests an existing install (pipx).
+- `.github/workflows/publish.yml`: a `vX.Y.Z` tag runs the gate, uploads to
+  PyPI with Trusted Publishing (OIDC, no token), installs the release back
+  from PyPI with pip and pipx on Linux and Windows, then creates the GitHub
+  release from `tools/release_notes.py` (this file's section). Run by hand,
+  it rehearses on TestPyPI with an `X.Y.Z.devN` version.
 - The headless Analyst sees `evaluate.py`'s stderr for the current best
   (per-label breakdowns and the like), with control characters stripped and
   secrets redacted. Never `holdout.py`'s. Capped by the new loop key

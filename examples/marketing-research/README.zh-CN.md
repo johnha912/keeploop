@@ -298,140 +298,7 @@ MISSING: A cited, dated source on Reddit's user demographics in the US and Canad
 
 ### 该周期的完整转录（原样）
 
-<details>
-<summary>run/cycle-2/transcript.txt，原样记录</summary>
-
-```text
-# Real transcript of keeploop cycle 2 (interactive mode), consumer insight report, 2026-11-02.
-# Only change to real output: the sandbox folder path is shown as <sandbox>.
-# Lines starting with # are notes added by the person running the cycle.
-# Before this transcript: the unchanged first-draft report scored 1.000000 on the first
-# version of evaluate.py (saturated: no room to keep anything). With the user's approval,
-# two checks were added (B1 claim binding, U1 unsourced skew claims) before `kl begin`;
-# the draft itself was not changed. See ../LOG.md. kl numbers cycles per sandbox, so
-# "card 1" / "cycle 1" below is this folder's cycle 2.
-
-$ python kl.py begin
-kl: baseline metric = 0.970000  sigma = 0.000000 (3 runs)
-best 0.970000  sigma 0.000000  keep-bar 0.979700  | cycles 0 (keep 0, discard 0, crash 0)
-workspace: <sandbox>\workspace
-pending card: none
-open lessons: none
-open questions: 0
-next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
-
-$ python kl.py status
-best 0.970000  sigma 0.000000  keep-bar 0.979700  | cycles 0 (keep 0, discard 0, crash 0)
-workspace: <sandbox>\workspace
-pending card: none
-open lessons: none
-open questions: 0
-next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
-
-# The 'next hypothesis' line is the demo seed shipped with the repo; it does not apply here.
-
-# Analyst reads the per-check breakdown (stderr) before writing a card.
-
-$ python evaluate.py ../workspace
-0.970000
-O1 10  6/6  Clear research objectives: each of the 6 modules has a Question line
-O2 10  6/6  Clear research objectives: each of the 6 modules has a Decision line
-E1  5  16/16  Non-leading, unbiased evidence: no slop pattern in headings or So what lines
-E2  5  4/4  Non-leading, unbiased evidence: each comparative module names all 5 core brands
-E3  4  5/5  Non-leading, unbiased evidence: each quote is attributed to the cell it came from
-E4  3  1/1  Non-leading, unbiased evidence: a Quote rule line states how quotes were chosen
-B1  5  185/185  Non-leading, unbiased evidence: each number on a one-brand or one-segment line is filed under that brand or segment
-U1  3  0/2  Non-leading, unbiased evidence: skew claims carry a traced number or a (Source, year); none = full credit
-M1  8  25/25  Correct measure choice: every percentage has n= and a 95% interval in the same line or bullet
-M2  6  25/25  Correct measure choice: no percentage on a base under 30
-M3  6  10/10  Correct measure choice: penetration and top-of-mind percentages say proxy
-F1  5  1/1  Logical flow: answer-first summary is the first section
-F2  5  6/6  Logical flow: modules appear in brief order
-F3  5  1/1  Logical flow: Method and limits come after the modules
-D1  8  6/6  Decision-ready insight output: each module has a So what line
-D2  8  6/6  Decision-ready insight output: each module has a Recommendation line naming Fieldnote
-D3  4  1/1  Decision-ready insight output: the summary names the target segment
-
-$ python kl.py recall unsupported claims about who posts on Reddit
-usage: kl [-h]
-          {begin,status,card,check,eval,audit,keep,discard,debate,report,cite,lesson,scout,staff,slow,map,recall,pack} ...
-kl: error: unrecognized arguments: claims about who posts on Reddit
-
-# Operator error: the recall query must be one quoted argument. Re-run:
-
-$ python kl.py recall "unsupported claims about who posts on Reddit"
-nothing in memory matches; it is new
-
-$ python kl.py card ../card2.md
-card 1 registered
-
-$ python kl.py status
-best 0.970000  sigma 0.000000  keep-bar 0.979700  | cycles 0 (keep 0, discard 0, crash 0)
-workspace: <sandbox>\workspace
-pending card: 1  The draft makes two claims about who is talking that the data does not support: 
-open lessons: none
-open questions: 1 (ask the human)
-  - (cycle 1) A cited, dated source on Reddit's user demographics in the US and Canada would let the report keep that context instead of delet
-next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
-
-# Engineer (fresh subagent) edited report.md to implement card 1: the two lines named in CHANGE, nothing else.
-
-$ python kl.py check
-PASS tier=light files=1 lines=4 diff=171e030b8149
-
-$ python kl.py eval
-metric 1.000000  keep-bar 0.979700  best 0.970000  -> beats the bar
-
-# Analyst re-reads the per-check breakdown after the edit.
-
-$ python evaluate.py ../workspace
-1.000000
-O1 10  6/6  Clear research objectives: each of the 6 modules has a Question line
-O2 10  6/6  Clear research objectives: each of the 6 modules has a Decision line
-E1  5  16/16  Non-leading, unbiased evidence: no slop pattern in headings or So what lines
-E2  5  4/4  Non-leading, unbiased evidence: each comparative module names all 5 core brands
-E3  4  5/5  Non-leading, unbiased evidence: each quote is attributed to the cell it came from
-E4  3  1/1  Non-leading, unbiased evidence: a Quote rule line states how quotes were chosen
-B1  5  185/185  Non-leading, unbiased evidence: each number on a one-brand or one-segment line is filed under that brand or segment
-U1  3  1/1  Non-leading, unbiased evidence: skew claims carry a traced number or a (Source, year); none = full credit
-M1  8  25/25  Correct measure choice: every percentage has n= and a 95% interval in the same line or bullet
-M2  6  25/25  Correct measure choice: no percentage on a base under 30
-M3  6  10/10  Correct measure choice: penetration and top-of-mind percentages say proxy
-F1  5  1/1  Logical flow: answer-first summary is the first section
-F2  5  6/6  Logical flow: modules appear in brief order
-F3  5  1/1  Logical flow: Method and limits come after the modules
-D1  8  6/6  Decision-ready insight output: each module has a So what line
-D2  8  6/6  Decision-ready insight output: each module has a Recommendation line naming Fieldnote
-D3  4  1/1  Decision-ready insight output: the summary names the target segment
-
-# A fresh-context Auditor judged the card, the diff, the metric and data/metrics.json; its reply was saved to verdict2.txt (first line: APPROVED).
-
-$ python kl.py keep --audit-verdict ../verdict2.txt
-KEPT cycle 1: metric 1.000000 (bar 0.979700); best is now 1.000000
-
-$ python kl.py report
-keeploop report (from .keeploop/, not from memory)
-cycles: 1  keeps: 1  discards: 0  crashes: 0
-baseline: 0.970000  best: 1.000000
-gain over baseline: +0.030000
-hypotheses: supported 1
-lessons: none
-open questions: 1
-tokens recorded: 0
-time per phase: eval 0s, agent 105s  | slowest: agent (100%)  | last cycle: 105s
-
-$ python kl.py status
-best 1.000000  sigma 0.000000  keep-bar 1.010000  | cycles 1 (keep 1, discard 0, crash 0)
-workspace: <sandbox>\workspace
-pending card: none
-open lessons: none
-open questions: 1 (ask the human)
-  - (cycle 1) A cited, dated source on Reddit's user demographics in the US and Canada would let the report keep that context instead of delet
-next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
-
-```
-
-</details>
+原样记录见 [`run/cycle-2/transcript.txt`](run/cycle-2/transcript.txt)：该周期的每条 `kl` 命令及其输出，包括编辑前后逐项检查的得分。它录制于本示例拥有自己的 `program.md` 之前，因此其中的 `next hypothesis to test:` 行显示的是框架通用的演示章程，而不是本研究。现在搭建的沙盒会读取 [`program.md`](program.md)，并以本研究的第一个假设开场（为关于谁在 Reddit 上发帖的说法注明来源，或删去这些说法）。
 
 转录中包含一次操作失误：`kl recall` 的查询最初没有加引号，被 `kl` 拒绝，随后加上引号重新运行。它是 [`run/LOG.md`](run/LOG.md) 中的第 15 项。
 
@@ -439,8 +306,8 @@ next hypothesis to test: A learning rate near 0.03 scores higher than 0.01.
 
 以下步骤取自 `team.yaml` 的头部注释和转录。
 
-1. 在 keeploop 仓库根目录下搭建沙盒（约一秒；Windows 上请使用较短的 `DEST`）：`python tools/make_sandbox.py examples/marketing-research DEST`。它把本文件夹中的 `evaluate.py` 和 `team.yaml` 放入位于 `DEST/kl` 的 keeploop 副本，删除演示用的 `holdout.py`，并把 `DEST/mr-workspace` 建成一个新的 git 仓库，存放 `brief.md`、`report.md`、`data/metrics.json` 和 `data/quotes.json`。其余步骤在 `DEST/kl` 中运行。
-2. 从初稿开始。本文件夹中的 `report.md` 是保留后的版本。要得到得分 0.970000 的初稿，请在工作区内反向应用该周期的编辑：`git apply -R run/cycle-2/cycle.diff`（在 diff 中的 `report.md` 路径能够解析的位置运行）。我们核实过：反向还原后的报告得分为 0.970000，保留后的报告得分为 1.000000。
+1. 在 keeploop 仓库根目录下搭建沙盒（约一秒；Windows 上请使用较短的 `DEST`）：`python tools/make_sandbox.py examples/marketing-research DEST`。它把本文件夹中的 `evaluate.py`、`team.yaml`、`program.md`、`FORMAT.md` 和 `samples/` 放入位于 `DEST/kl` 的 keeploop 副本，删除演示用的 `holdout.py`，并把 `DEST/mr-workspace` 建成一个新的 git 仓库，存放 `brief.md`、`report.md`、`data/metrics.json` 和 `data/quotes.json`。其余步骤在 `DEST/kl` 中运行。
+2. 从初稿开始。本文件夹中的 `report.md` 是保留后的版本。要得到得分 0.970000 的初稿，请在工作区内反向应用该周期的编辑：在 `DEST/mr-workspace` 内运行 `git apply -R <keeploop 仓库>/examples/marketing-research/run/cycle-2/cycle.diff`，然后在那里提交（`git commit -am draft`）：`kl begin` 会拒绝有未提交更改的工作区。如果跳过这一步，`kl begin` 会把保留后的报告评为 1.000000，并警告基线已触顶：在评分获得更多余量之前，任何周期都无法被保留。我们核实过：反向还原后的报告得分为 0.970000，保留后的报告得分为 1.000000。
 3. 运行该周期：
 
 ```text

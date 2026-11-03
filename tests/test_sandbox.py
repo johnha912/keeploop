@@ -56,6 +56,27 @@ class TestMakeSandbox(unittest.TestCase):
         self.assertTrue((root / "data" / "holdout.jsonl").exists())
         self.assertEqual(repo_status(), before)
 
+    def test_marketing_sandbox_first_run(self):
+        """kl begin on the shipped (kept) report: this study's hypothesis, not the ML
+        demo seed, and a ceiling warning because the bar is above the 0..1 scale."""
+        root, _ = self.build("marketing-research")
+        out = subprocess.run([sys.executable, "-X", "utf8", "kl.py", "begin"], cwd=root,
+                             capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+        self.assertIn("keep-bar 1.010000", out.stdout)
+        self.assertIn("baseline at ceiling", out.stdout)
+        self.assertIn("next hypothesis to test: Dropping or sourcing every claim", out.stdout)
+        self.assertNotIn("learning rate", out.stdout.lower())
+
+    def test_requirements_warn_when_missing(self):
+        po = ROOT / "examples" / "prompt-optimization"
+        self.assertEqual([c for c, _ in ms.requirements(po)], ["claude"])
+        self.assertEqual(ms.missing_requirements(po, which=lambda c: "/bin/" + c), [])
+        warn = ms.missing_requirements(po, which=lambda c: None)
+        self.assertEqual(len(warn), 1)
+        self.assertIn("`claude`", warn[0])
+        self.assertEqual(ms.requirements(ROOT / "examples" / "marketing-research"), [])
+
     def test_refusals(self):
         fake = self.tmp / "ex"
         fake.mkdir()

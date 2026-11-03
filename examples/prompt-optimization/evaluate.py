@@ -76,7 +76,9 @@ def call_claude(system_prompt: str, user: str) -> str:
     """One scoring call. --safe-mode keeps the user's CLAUDE.md and hooks out (OAuth login stays)."""
     exe = shutil.which("claude")
     if not exe:
-        raise RuntimeError("claude CLI not found")
+        raise RuntimeError("claude CLI not found: this example scores prompts with real Claude "
+                           "calls; install Claude CLI and log in (README, Reproduce), or run "
+                           "evaluate.py --self-check for the offline check")
     argv = [exe, "-p", "--safe-mode", "--model", MODEL, "--tools", "",
             "--no-session-persistence", "--system-prompt", system_prompt]
     proc = subprocess.run(argv, input=user, capture_output=True, text=True, encoding="utf-8",

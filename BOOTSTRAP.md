@@ -141,7 +141,7 @@ In this interactive mode you have the same file rights as `kl`. Its fence snapsh
 
 ## Command list
 
-`begin` `status` `card` `debate` `check` `eval` `audit --vendor` `keep` `discard` `report` `slow` `recall` `map` `lesson` `scout` `staff` `pack new` `cite`. `python kl.py --help` has one line each.
+`begin` `status` `card` `debate` `check` `eval` `audit --vendor` `keep` `discard` `report` `slow` `recall` `map` `lesson` `scout` `staff` `pack new` `cite` `init` `run`. `python kl.py --help` has one line each.
 <!-- END AGENTS.md -->
 
 ## 4. Chat-mode rules (you have no files and no terminal)
