@@ -150,6 +150,24 @@ kiểm toán APPROVED, được giữ lại. Trang đó cũng nói rõ điểm s
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top">
+
+<a href="examples/prompt-optimization/"><img src="examples/prompt-optimization/run/score-by-cycle.png" alt="Độ chính xác trên tập dev qua từng chu kỳ: giữ hai lần sửa prompt, bỏ sáu lần, và một điểm 0.915 không được xác nhận khi chạy lại" width="100%"></a>
+
+**Tối ưu prompt (chạy tự động, 8 chu kỳ)**
+
+Một nhóm AI cải thiện system prompt của bộ phân loại ticket ngân hàng
+(Claude Haiku, dữ liệu Banking77). Giữ hai lần sửa, bỏ sáu lần, trong đó
+có một điểm 0.915 mà Auditor đã duyệt nhưng lần chạy lại không xác nhận.
+Độ chính xác trên dev 0.873333 → 0.900000; tập holdout ẩn tăng
+0.835 → 0.855. Trang này cũng có một bài thử gian lận có chủ đích và bốn
+lỗ hổng mà nó tìm ra trong keeploop.
+
+[Đọc ví dụ](examples/prompt-optimization/)
+
+</td>
+</tr>
 </table>
 
 ## Sao không để AI tự lặp?

@@ -1,0 +1,200 @@
+{"text": "I topped up but the app reverted it", "label": "top_up_reverted"}
+{"text": "When I topped up, the app reverted my funds.", "label": "top_up_reverted"}
+{"text": "How can the recipient see my money transaction?", "label": "transfer_not_received_by_recipient"}
+{"text": "I was attempting to purchase a golf club off eBay yesterday, but my credit card was declined. I tried multiple times, and again this morning. Can you check into my card please?", "label": "declined_transfer"}
+{"text": "I transferred some money but the recipient is having trouble withdrawing.", "label": "transfer_not_received_by_recipient"}
+{"text": "I'm attempting to top-up my account but it has been pending for an hour.", "label": "pending_top_up"}
+{"text": "Why does my top up say still pending when I used my card to do it.", "label": "pending_top_up"}
+{"text": "I tried topping up but my funds seem to be pending. I want to buy something right now, what do I do?", "label": "pending_top_up"}
+{"text": "How long can I expect a transfer to pend for?", "label": "pending_transfer"}
+{"text": "Why did a transfer get declined?", "label": "declined_transfer"}
+{"text": "I have a pending cash withdrawal", "label": "pending_cash_withdrawal"}
+{"text": "Is the system down? I've been trying to do a transfer and have failed?", "label": "failed_transfer"}
+{"text": "My top-up showed as complete, but it's no longer there! What's going on here?", "label": "top_up_reverted"}
+{"text": "How long does it take for a transfer to get to a recipient?", "label": "transfer_not_received_by_recipient"}
+{"text": "Fix your system. I can't make transfers, I've tried like 5 times already.", "label": "failed_transfer"}
+{"text": "I tried to make a transfer and it was declined. Why?", "label": "declined_transfer"}
+{"text": "Please help me as i am continuously facing the issue in transferring money to my friends, as all my transactions are getting failed.", "label": "failed_transfer"}
+{"text": "how long dies it take for transfers to reflect on my balance", "label": "transfer_timing"}
+{"text": "Is there a reason why my transaction is taking so long?", "label": "transfer_not_received_by_recipient"}
+{"text": "My transfer is still pending and I know the account numbers are correct.  Please help.", "label": "pending_transfer"}
+{"text": "How can I fix my card, it got declined twice.", "label": "declined_transfer"}
+{"text": "When will my funds transfer?", "label": "transfer_not_received_by_recipient"}
+{"text": "Why is a transaction showing as pending when I recieved cash from an ATM?", "label": "pending_cash_withdrawal"}
+{"text": "The top-up has a definite problem! I regularly use your service and haven't had a problem before, but now the top-up just shows pending. Please tell my why it continues to show pending.", "label": "pending_top_up"}
+{"text": "When will the transfer go through?", "label": "pending_transfer"}
+{"text": "I tried to make a transfer but it failed", "label": "failed_transfer"}
+{"text": "Why does it say pending cash withdrawal on my statement?", "label": "pending_cash_withdrawal"}
+{"text": "What would the approximate delivery date be if I transferred something urgently to China?", "label": "transfer_timing"}
+{"text": "Why caused my top up to not work?", "label": "top_up_failed"}
+{"text": "My transfer hasn't gone through yet.", "label": "pending_transfer"}
+{"text": "Why didn't the ATM give me my money?", "label": "declined_cash_withdrawal"}
+{"text": "Hi,I tried to get some money out but the machine was not working .The transaction still seems in progress! Can you please check what's going on.I don't want to be charged for money that I did not received.", "label": "pending_cash_withdrawal"}
+{"text": "My transfer was declined", "label": "declined_transfer"}
+{"text": "Why is my transfer not done yet?", "label": "pending_transfer"}
+{"text": "I am still waiting for a transaction to be completed", "label": "transfer_not_received_by_recipient"}
+{"text": "Why was I not able to complete a transfer?", "label": "failed_transfer"}
+{"text": "The day before yesterday, I performed a transfer which was within this country. It still hasn't gone through. Can you check on that? The account number is definitely correct, as I've checked and double checked.", "label": "transfer_not_received_by_recipient"}
+{"text": "I've just moved address from a place in Durham to a place in Walton-On-The-Naze.  I have a new landlord at my new house and they haven't got my payment but I know I sent it on time, can you check they got it please?", "label": "transfer_not_received_by_recipient"}
+{"text": "I think my top up did not work", "label": "top_up_failed"}
+{"text": "The top-up is pending.", "label": "pending_top_up"}
+{"text": "There is an important thing from China that I need to transfer. Approximately how long will this take?", "label": "transfer_timing"}
+{"text": "Why could I not get cash?", "label": "declined_cash_withdrawal"}
+{"text": "Trouble transferring transaction contact for help", "label": "declined_transfer"}
+{"text": "How long is it going to take for my funds to show in my account?", "label": "transfer_timing"}
+{"text": "When will the transfer be completed?", "label": "pending_transfer"}
+{"text": "What would lead to my top up still pending?", "label": "pending_top_up"}
+{"text": "Why would my transfer be declined? I've checked that I've put in all the right details, but it is still declined.", "label": "declined_transfer"}
+{"text": "I think my top-up was cancelled.", "label": "top_up_reverted"}
+{"text": "My transfer is still coming up as pending.", "label": "pending_transfer"}
+{"text": "I can't get money out of the ATM", "label": "declined_cash_withdrawal"}
+{"text": "I transferred my funds, why did it not go through?", "label": "failed_transfer"}
+{"text": "When will a transfer reach my account?", "label": "transfer_timing"}
+{"text": "The ATM didn't let me get any cash", "label": "declined_cash_withdrawal"}
+{"text": "why hasn't my top up gone through yet", "label": "pending_top_up"}
+{"text": "How long do transfer pend for?", "label": "pending_transfer"}
+{"text": "Please explain why the transfers shows up as pending?", "label": "pending_transfer"}
+{"text": "Will my transfer immediately show up in my account?", "label": "transfer_timing"}
+{"text": "My top up hasn't worked, it's been stuck in pending for the last couple hours", "label": "pending_top_up"}
+{"text": "Someone transferred money to me and it doesn't show", "label": "pending_transfer"}
+{"text": "Can you provide a reason as to why my transfer did not work?", "label": "failed_transfer"}
+{"text": "It seems my top up is reverted?", "label": "top_up_reverted"}
+{"text": "Can you tell me why my top up was reverted?", "label": "top_up_reverted"}
+{"text": "I have a top up that didn't go through.  Why?", "label": "top_up_failed"}
+{"text": "The card got declined twice when I tried to use it to buy something online yesterday.", "label": "declined_transfer"}
+{"text": "How long can an EU transfer take?", "label": "pending_transfer"}
+{"text": "I was at the ATM trying to made a withdraw and I was declined.", "label": "declined_cash_withdrawal"}
+{"text": "I have a pending transfer", "label": "pending_transfer"}
+{"text": "how long til my cash out goes through?", "label": "pending_cash_withdrawal"}
+{"text": "What is the wait time for a transfer from the US?", "label": "transfer_timing"}
+{"text": "Hi, i don't know what's going on i've just paid for my top up twice by accident can you help me get a refund please.", "label": "top_up_reverted"}
+{"text": "Why did I get a transfer declined?", "label": "declined_transfer"}
+{"text": "How long does it take for transfers to finish?  I sent funds to my pal, and she says that she has not gotten anything.", "label": "transfer_not_received_by_recipient"}
+{"text": "How can I check to see if my top-up worked?", "label": "top_up_failed"}
+{"text": "Why is a money transfer not showing?", "label": "pending_transfer"}
+{"text": "I  do not see a top-up processed.", "label": "pending_top_up"}
+{"text": "The app wouldn't accept my top up.", "label": "top_up_reverted"}
+{"text": "Why would my top up be cancelled?", "label": "top_up_reverted"}
+{"text": "The ATM isn't giving out any money.", "label": "declined_cash_withdrawal"}
+{"text": "Hi, I was trying to use my card but it was declining by ATM. I have cross checked with two different ATMs but i was facing the same issue. Could you please check my account.", "label": "declined_cash_withdrawal"}
+{"text": "Why is my ATM cash withdrawal showing up as a pending transaction?", "label": "pending_cash_withdrawal"}
+{"text": "How long does it take for funds to come through the US to my account?", "label": "transfer_timing"}
+{"text": "What are your policies for card transfers?", "label": "failed_transfer"}
+{"text": "Why did my top up not work?", "label": "top_up_failed"}
+{"text": "The ATM keeps declining my card. I tried at a couple different ATMs. Can you tell me if there's a problem with my account?", "label": "declined_cash_withdrawal"}
+{"text": "How long does a transfer take from china?", "label": "transfer_timing"}
+{"text": "Why would my topup not go through?", "label": "top_up_failed"}
+{"text": "The withdrawal was declined I am unsure as to why this happened?", "label": "declined_cash_withdrawal"}
+{"text": "Why is my top-up still outstanding?", "label": "pending_top_up"}
+{"text": "Hi. I'm a new customer to your system and I think something isn't working right - or maybe it is. Maybe you can confirm. I tried to top up today (my first time ever) and it's been stuck at \"pending\" for over an hour now. Is it supposed to do this or is there something wrong in the system?", "label": "pending_top_up"}
+{"text": "Why was I declined getting cash?", "label": "declined_cash_withdrawal"}
+{"text": "How many days until the money will be in my account?", "label": "transfer_timing"}
+{"text": "I need your help to check my account, please! My card keeps being declined at the ATM, and I've already tried two different ones!", "label": "declined_cash_withdrawal"}
+{"text": "I tried to take money from my card, but it didn't work. Later I saw that the transaction is still in progress. What's goign on?", "label": "pending_cash_withdrawal"}
+{"text": "My top-up was cancelled; will I receive a refund?", "label": "top_up_reverted"}
+{"text": "I tried to send someone money but they haven't received it.", "label": "transfer_not_received_by_recipient"}
+{"text": "I am still awaiting the completion of the transaction.", "label": "transfer_not_received_by_recipient"}
+{"text": "I attempted to top up but the app denied it.", "label": "top_up_failed"}
+{"text": "Why was the transfer declined?", "label": "declined_transfer"}
+{"text": "I got topped up but the application reverted it.", "label": "top_up_reverted"}
+{"text": "My transfer got declined.", "label": "declined_transfer"}
+{"text": "I attempted to get cash but was declined.", "label": "declined_cash_withdrawal"}
+{"text": "How long do transfers need to come through? I sent some money to a friend, she needs it urgently, but seems it's still not there yet after a couple hours.", "label": "transfer_not_received_by_recipient"}
+{"text": "If the transfer details have already but reviewed and confirmed that they are correct, what other reason would cause my transfer to be declined?", "label": "declined_transfer"}
+{"text": "Why hasn't my transfer gone through yet?", "label": "pending_transfer"}
+{"text": "My top-up has failed.", "label": "top_up_failed"}
+{"text": "How many days does it take until funds are in my account?", "label": "transfer_timing"}
+{"text": "I would like to know why my payment is still pending, can you help?", "label": "pending_transfer"}
+{"text": "What is going on? My top-up is still pending. I use your system all the time but now it is just showing as pending.", "label": "pending_top_up"}
+{"text": "How long is the wait for a US transfer?", "label": "transfer_timing"}
+{"text": "What are some reasons that would cause ATM machines to decline my card? It has happened to me multiple times!", "label": "declined_cash_withdrawal"}
+{"text": "I made a withdrawal from my account but it has not posted?", "label": "pending_cash_withdrawal"}
+{"text": "Where is the money I topped off with?", "label": "pending_top_up"}
+{"text": "I completed an in country transfer a few days ago and was sure to check the account information several times since the transaction was completed, but the funds are still not available. What is the problem?", "label": "transfer_not_received_by_recipient"}
+{"text": "How long for money transfer to show?", "label": "pending_transfer"}
+{"text": "dont understand why transfer failed", "label": "failed_transfer"}
+{"text": "My withdrawl is still pending.  Why?", "label": "pending_cash_withdrawal"}
+{"text": "What reason did my top-up fail for?", "label": "top_up_failed"}
+{"text": "how come my transfer didn't work", "label": "failed_transfer"}
+{"text": "My account was charged for a withdraw I tried to make that was decline.", "label": "pending_cash_withdrawal"}
+{"text": "there's a delay in my top-up", "label": "pending_top_up"}
+{"text": "How long does it take to process transfers from Europe?", "label": "transfer_timing"}
+{"text": "I topped up but the app did not accept it.", "label": "top_up_failed"}
+{"text": "When should I expect to see my transfer hit my account?", "label": "transfer_timing"}
+{"text": "The app denied my topped up.", "label": "top_up_failed"}
+{"text": "You keep declining my transfers? It's always been working really well so far, but when I tried to buy something just now the card got declined. I tried couple times already but same thing.", "label": "declined_transfer"}
+{"text": "I'd like to know why my top-up was canceled please.", "label": "top_up_reverted"}
+{"text": "I couldn't get cash at the atm", "label": "declined_cash_withdrawal"}
+{"text": "My transfer didn't work", "label": "failed_transfer"}
+{"text": "Why was I unable to do a transfer?", "label": "declined_transfer"}
+{"text": "When I try and to buy something using my card it keeps getting declined.", "label": "declined_transfer"}
+{"text": "This is very frustrating. I can't get my card to work on any ATM I try and I've tried 3 of them so far. What's going on? Can you please fix this issue immediately?", "label": "declined_cash_withdrawal"}
+{"text": "I submitted my transfer but it has been pending for quite a while and I was wondering what takes so long? why hasn't it completed", "label": "pending_transfer"}
+{"text": "I've now been trying to do a really standard transfer 5 times already. What's going on, is your system broken or something?!", "label": "failed_transfer"}
+{"text": "Cash withdrawal still pending?", "label": "pending_cash_withdrawal"}
+{"text": "How long does a transfer take to be confirmed?", "label": "pending_transfer"}
+{"text": "I tried to top up. Why was it denied?", "label": "top_up_failed"}
+{"text": "Why was my ATM transaction cancelled?", "label": "declined_cash_withdrawal"}
+{"text": "Why didn`t my topup go through?", "label": "top_up_failed"}
+{"text": "I believed crypto top up with something you offered. This does not seem to be working. The money has been removed from my account though so what's going on?", "label": "top_up_reverted"}
+{"text": "I believe my money did not go through with my top up, was there a problem on your end?", "label": "top_up_reverted"}
+{"text": "My transfer will not go through.", "label": "failed_transfer"}
+{"text": "Do you know if my top-up has been cancelled?", "label": "top_up_reverted"}
+{"text": "when will i receive a US transfer", "label": "transfer_timing"}
+{"text": "If I need to do a quick transfer from China, how long should I expect the transfer to take?", "label": "transfer_timing"}
+{"text": "The cash I tried to draw from the ATM was not approved.", "label": "declined_cash_withdrawal"}
+{"text": "How long will it take for my transaction to be completed?", "label": "transfer_not_received_by_recipient"}
+{"text": "I don't think my top up is working correctly", "label": "top_up_failed"}
+{"text": "Why does my transfer say \"pending\"?", "label": "pending_transfer"}
+{"text": "How do I contact customer support about a transfer?", "label": "declined_transfer"}
+{"text": "I just finished sending money, but it's not logging on the recipient side.", "label": "transfer_not_received_by_recipient"}
+{"text": "atm would not give me cash", "label": "declined_cash_withdrawal"}
+{"text": "What happened to my top-up?", "label": "top_up_reverted"}
+{"text": "Why would a transfer fail?", "label": "failed_transfer"}
+{"text": "Has my top up been reverted?", "label": "top_up_reverted"}
+{"text": "I made a cash withdrawal but the pending status is taking forever.", "label": "pending_cash_withdrawal"}
+{"text": "I am still waiting for a cash withdrawal to show", "label": "pending_cash_withdrawal"}
+{"text": "Why is it taking so long for my cash withdrawal to no longer show as pending?", "label": "pending_cash_withdrawal"}
+{"text": "Why did my transfer fail?", "label": "failed_transfer"}
+{"text": "Is it possible to tell if my top up has reverted?", "label": "top_up_reverted"}
+{"text": "I was declined when I tried to get cash.", "label": "declined_cash_withdrawal"}
+{"text": "I need to know why my credit card was declined for top up? What is the deal here and why did it not go through?", "label": "top_up_failed"}
+{"text": "Why is my cash withdrawal from the ATM still not yet showing as confirmed in my account?", "label": "pending_cash_withdrawal"}
+{"text": "help me with my transfer", "label": "failed_transfer"}
+{"text": "Is there something wrong with your website? I tried topping up my account and it's been close to two hours now and it's still at \"pending\" for some reason. I just joined with you guys and this is the first attempt at this, so maybe I'm wrong, but shouldn't this be instant?", "label": "pending_top_up"}
+{"text": "please tell me why my top-up failed.", "label": "top_up_failed"}
+{"text": "How long does a funds transfer take from one back to another?", "label": "transfer_timing"}
+{"text": "I made a money transaction but the recipient can't see it", "label": "transfer_not_received_by_recipient"}
+{"text": "top up did not complete", "label": "pending_top_up"}
+{"text": "I'm not sure why my top up request was denied", "label": "top_up_failed"}
+{"text": "Topping up my card is not working because I believe the top up is pending", "label": "pending_top_up"}
+{"text": "Could you explain why my top-up has gone through yet?", "label": "pending_top_up"}
+{"text": "How can I speed up a transfer?  Mine is pending.", "label": "pending_transfer"}
+{"text": "Why can't I get cash?", "label": "declined_cash_withdrawal"}
+{"text": "My card was denied at an ATM earlier today but the transaction is pending. Please cancel it as I did not receive my money.", "label": "pending_cash_withdrawal"}
+{"text": "Do transfers from Europe take longer?", "label": "transfer_timing"}
+{"text": "Heyy I tried to top up with my card today but it failed! I just got the couple days before but it has worked last time. What's going on, can you double check please?", "label": "top_up_failed"}
+{"text": "What's a pending transaction? My card was declined at an ATM, but my account says it's still pending. Can I cancel the payment?", "label": "pending_cash_withdrawal"}
+{"text": "I've attempted to do a very standard transfer and have tried 5 times at this point. Can you tell me what the issue is? Is the system down?", "label": "failed_transfer"}
+{"text": "Why did my my transfer get declined?", "label": "declined_transfer"}
+{"text": "Why am I unable to take money from my card but the statement says the transaction is still pending?", "label": "pending_cash_withdrawal"}
+{"text": "Why do you keep declining my transfers?it was always been working really well so far but when I tried to buy something just now the card got declined . I tried couple of times already  but same thing is happening.", "label": "declined_transfer"}
+{"text": "Was my top up reversed?", "label": "top_up_reverted"}
+{"text": "When will money be available in my account?", "label": "transfer_timing"}
+{"text": "For what reason was my transfer declined?", "label": "declined_transfer"}
+{"text": "my atm cash out is still pending", "label": "pending_cash_withdrawal"}
+{"text": "Are there any restrictions causing my transfer to be declined?", "label": "declined_transfer"}
+{"text": "How long do I have to wait for a transfer from the US?", "label": "transfer_timing"}
+{"text": "It doesn't look like the top-up completed.", "label": "pending_top_up"}
+{"text": "My top-up failed, WHY?", "label": "top_up_failed"}
+{"text": "The transfer I did hasn't arrived", "label": "transfer_not_received_by_recipient"}
+{"text": "The person I sent money to hasn't gotten it yet!", "label": "transfer_not_received_by_recipient"}
+{"text": "So I just put my top-up into the card and it hasn't changed.", "label": "pending_top_up"}
+{"text": "Please help me make a transfer. I keep receiving an error and I'm trying to make the initial mortgage payment for a flat I'm buying. What is the deal here?", "label": "failed_transfer"}
+{"text": "My transfer didn't go through.", "label": "failed_transfer"}
+{"text": "How did my top-up fail?", "label": "top_up_failed"}
+{"text": "transaction failed?", "label": "transfer_not_received_by_recipient"}
+{"text": "I transferred money but the recipient says it has not arrived. Why would this be?", "label": "transfer_not_received_by_recipient"}
+{"text": "My transfer did not go through.", "label": "failed_transfer"}
+{"text": "Hey I tried to get some money out earlier but the machine didn't work. Now just saw the transaction still seems in progress! Can you please check what's going there, seems something is broken, I don't want to be charged for money that I haven't actually received!", "label": "pending_cash_withdrawal"}
+{"text": "Causes of top-up cancellation", "label": "top_up_reverted"}
