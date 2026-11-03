@@ -79,6 +79,10 @@ First-run gaps found by building the worked examples' sandboxes from a fresh clo
   Claude CLI, and its "claude CLI not found" error now says so and names the
   offline `--self-check`.
 
+- On Windows a pip-installed `kl` called itself `python kl.py` in every
+  hint it printed: the launcher reports `kl.EXE` and the name check was
+  case-sensitive. Found by the new Windows dist job.
+
 Four gaps found by the prompt-optimization worked example:
 
 - `run.py` now leaves the `.keeploop/fence.json` that `kl` expects, so
