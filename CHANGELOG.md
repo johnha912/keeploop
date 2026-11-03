@@ -26,7 +26,30 @@ the entry says so under **Changed** with the migration step.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-03
+
 ### Fixed
+
+First-run gaps found by building the worked examples' sandboxes from a fresh clone:
+
+- `kl begin`, `kl status` and `run.py` warn "baseline at ceiling" when the
+  keep bar is at or above the top of the metric's scale, so every cycle
+  would be discarded (for example a 1.000000 baseline on a 0..1 score with
+  `keep_threshold: 0.01` gives a bar of 1.010000). The top is the new
+  optional loop key `metric_max` (both examples set `1.0`); without it, a
+  best of exactly 1.0 prints a hint to set it.
+- The marketing-research example has its own `program.md` with market
+  research hypotheses; its sandbox no longer opens with the framework's demo
+  hypothesis about learning rates. The sandbox also carries `FORMAT.md` and
+  `samples/`, which that charter and `evaluate.py --self-check` refer to.
+  Its README points to the verbatim transcript instead of embedding it, and
+  the reproduce step now commits the reversed draft (`kl begin` refuses a
+  dirty workspace, which the old step left behind).
+- `tools/make_sandbox.py` reads an optional `# sandbox requires: CMD (why)`
+  line and prints a warning before the `next:` command when CMD is not on
+  PATH. The prompt-optimization example declares `claude`: its scorer calls
+  Claude CLI, and its "claude CLI not found" error now says so and names the
+  offline `--self-check`.
 
 Four gaps found by the prompt-optimization worked example:
 

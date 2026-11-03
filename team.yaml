@@ -67,6 +67,7 @@ roles:
 loop:
   max_iterations: 20
   keep_threshold: 0.0
+  # metric_max: 1.0      # top of evaluate.py's scale: warns when the keep bar is above it
 
 # Optional: flag cycles slower than this many seconds in `kl report`, and use it as
 # the target `kl slow` proposes for a lesson check. Default: none.

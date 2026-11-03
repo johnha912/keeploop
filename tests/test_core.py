@@ -901,6 +901,16 @@ class TestNoise(unittest.TestCase):
         self.assertAlmostEqual(run_mod.keep_bar(0.5, 0.1, 2.0, 0.01), 0.55)
         self.assertAlmostEqual(run_mod.keep_bar(0.5, 0.0, 2.0, 0.0), 0.5)
 
+    def test_ceiling_warning(self):
+        warn = run_mod.ceiling_warning
+        self.assertIn("baseline at ceiling", warn(1.0, 1.01, 1.0))
+        self.assertIn("baseline at ceiling", warn(0.995, 1.005, 1))  # bar, not best, decides
+        self.assertIsNone(warn(0.97, 0.9797, 1.0))
+        self.assertIn("baseline at ceiling", warn(1.0, 1.0, 1.0))  # keep needs metric > bar
+        self.assertIsNone(warn(0.99, 0.999, 1.0))
+        self.assertIn("metric_max", warn(1.0, 1.01, None))  # no scale given: a hint at 1.0
+        self.assertIsNone(warn(42.0, 42.42, None))  # unbounded metric: silent
+
     def test_sigma_measured_at_baseline_and_zero_when_deterministic(self):
         def noisy(work):
             src = (work / "evaluate.py").read_text(encoding="utf-8")

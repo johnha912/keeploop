@@ -197,6 +197,7 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `eval_timeout_s` | 120 | no | Evaluation and lesson-check timeout |
 | `noise_runs` | 3 | yes | Baseline evaluations; their pstdev is sigma |
 | `noise_z` | 2.0 | yes | A keep must beat best by `noise_z * sigma` |
+| `metric_max` | none | yes | Top of `evaluate.py`'s scale, if it has one. A keep bar at or above it prints a "baseline at ceiling" warning in `kl begin`, `kl status` and `run.py`; with no value, a best of exactly 1.0 prints a hint |
 | `max_run_tokens` | 2,000,000 | yes | Estimated tokens per run; reached -> stop |
 | `duplicate_jaccard` | 0.8 | yes | Card vs a rejected one at or above this: no Engineer call |
 | `heavy_diff_lines` | 100 | yes | A bigger diff is heavy: forced confirm, heavy_model, required audit |

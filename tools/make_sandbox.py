@@ -12,6 +12,11 @@ What goes where is declared in the example's team.yaml header:
     # sandbox root: evaluate.py, holdout.py, team.yaml, data/holdout.jsonl
     # sandbox workspace: prompt.md, data/dev.jsonl
 
+An optional third line names a command the example needs on PATH; the next
+command is printed with a warning when it is missing:
+
+    # sandbox requires: claude (the scorer calls Claude CLI; install it and log in first)
+
 Paths are relative to the example folder and keep their relative path in the
 destination. A file named holdout* is refused for the workspace. DEST must be
 new (or empty) and outside the keeploop repo; keep it short on Windows.
@@ -43,6 +48,20 @@ def manifest(example: Path) -> dict[str, list[str]]:
     if missing := [p for p in found["root"] + found["workspace"] if not (example / p).is_file()]:
         raise SystemExit(f"missing in {example}: {missing}")
     return found
+
+
+def requirements(example: Path) -> list[tuple[str, str]]:
+    """'# sandbox requires: cmd (why)' lines -> [(cmd, why)]."""
+    text = (example / "team.yaml").read_text(encoding="utf-8")
+    return [(cmd, why.strip()) for cmd, why in
+            re.findall(r"^# sandbox requires:\s*(\S+)\s*(?:\((.*)\))?\s*$", text, re.M)]
+
+
+def missing_requirements(example: Path, which=shutil.which) -> list[str]:
+    """One warning line per required command that is not on PATH."""
+    return [f"warning: this example needs `{cmd}` on PATH and it was not found"
+            + (f": {why}" if why else "") + f". `kl begin` will fail until `{cmd}` works."
+            for cmd, why in requirements(example) if not which(cmd)]
 
 
 def copy(example: Path, rel: str, dest: Path) -> None:
@@ -79,8 +98,10 @@ def main(argv: list[str]) -> int:
         print(__doc__.strip().splitlines()[2].strip(), file=sys.stderr)
         return 2
     root, ws = make(Path(argv[0]), Path(argv[1]))
-    print(f"sandbox ready: workspace {ws}\nnext: cd {root} && python kl.py begin"
-          f"   (headless: python run.py)")
+    print(f"sandbox ready: workspace {ws}")
+    for line in missing_requirements(Path(argv[0])):
+        print(line)
+    print(f"next: cd {root} && python kl.py begin   (headless: python run.py)")
     return 0
 
 
