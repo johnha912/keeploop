@@ -81,7 +81,7 @@ def check_contents(wheel: Path, sdist: Path) -> None:
     expect("kl = keeploop:main" in ep, "entry point kl = keeploop:main")
     md = next((v for k, v in meta.items() if k.endswith("METADATA")), "")
     v = scaffold_version()
-    expect(f"\nVersion: {v}\n" in md, f"METADATA version {v}")
+    expect(re.search(rf"^Version: {re.escape(v)}\r?$", md, re.M) is not None, f"METADATA version {v}")
     rel = [m for m in re.findall(r'(?:\]\(|src="|href="|srcset=")([^)"\s]+)', md)
            if not re.match(r"[a-z][a-z0-9+.-]*:|#", m, re.I)]
     expect(not rel, "PyPI description has no relative links" + (f" (found {rel[:5]})" if rel else ""))

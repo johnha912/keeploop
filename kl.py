@@ -69,8 +69,10 @@ class Refuse(Exception):
 
 def kl() -> str:
     """How the user types this tool: `kl` when pip-installed, else `python kl.py`."""
-    # PureWindowsPath splits on both / and \ on every OS (Path does not on POSIX)
-    return "kl" if PureWindowsPath(sys.argv[0]).name in ("kl", "kl.exe") else "python kl.py"
+    # PureWindowsPath splits on both / and \ on every OS (Path does not on POSIX);
+    # Windows launchers report kl.EXE, so the name is compared case-insensitively
+    name = PureWindowsPath(sys.argv[0]).name.lower()
+    return "kl" if name in ("kl", "kl.exe") or scaffold.BUNDLE.is_dir() else "python kl.py"
 
 
 # --- context and state ------------------------------------------------------
