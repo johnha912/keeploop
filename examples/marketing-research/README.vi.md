@@ -174,13 +174,12 @@ Tóm lại: một card, một chỉnh sửa hai dòng, điểm từ 0.970000 lê
 
 ```yaml
 # team.yaml - marketing research example (consumer insight report).
-# Set up: copy this folder's evaluate.py to the keeploop root as evaluate.py
-# (it replaces the demo), delete the demo holdout.py (it imports the demo
-# scorer; lesson L-001, see run/LOG.md and run/cycle-1/transcript.txt), make a
-# fresh git repo for the workspace holding brief.md, report.md and a data/
-# folder (copy data/metrics.json and data/quotes.json from this folder), and
-# point `workspace:` at it (relative to the keeploop folder, or absolute).
-# Then: python kl.py begin
+# Set up (seconds): python tools/make_sandbox.py examples/marketing-research DEST
+# It copies keeploop to DEST/kl with these files on top, removes the demo
+# holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
+# makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
+# sandbox root: evaluate.py, team.yaml
+# sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
 
@@ -438,16 +437,16 @@ Bản ghi có một lỗi của người vận hành: câu truy vấn `kl recall
 
 ## Cách tái hiện
 
-Chạy mọi thứ từ thư mục gốc của repo keeploop. Đây là các bước lấy từ phần đầu `team.yaml` và bản ghi.
+Đây là các bước lấy từ phần đầu `team.yaml` và bản ghi.
 
-1. Thiết lập workspace (xem phần đầu `team.yaml` ở trên): sao chép `evaluate.py` của thư mục này vào thư mục gốc repo thành `evaluate.py`, xóa `holdout.py` demo, tạo một repo git mới chứa `brief.md`, `report.md` và một thư mục `data/` (sao chép `data/metrics.json` và `data/quotes.json`), và trỏ `workspace:` trong `team.yaml` tới nó.
+1. Tạo sandbox từ thư mục gốc của repo keeploop (khoảng một giây; trên Windows dùng `DEST` ngắn): `python tools/make_sandbox.py examples/marketing-research DEST`. Lệnh này đặt `evaluate.py` và `team.yaml` của thư mục này vào một bản sao keeploop tại `DEST/kl`, xóa `holdout.py` demo, và tạo `DEST/mr-workspace` thành một repo git mới chứa `brief.md`, `report.md`, `data/metrics.json` và `data/quotes.json`. Chạy các bước còn lại từ `DEST/kl`.
 2. Bắt đầu từ bản nháp. `report.md` trong thư mục này là phiên bản đã được giữ lại. Để có bản nháp đạt 0.970000, hãy áp dụng ngược chỉnh sửa của chu kỳ trong workspace: `git apply -R run/cycle-2/cycle.diff` (chạy ở nơi đường dẫn `report.md` của diff phân giải được). Chúng tôi đã kiểm tra: báo cáo áp dụng ngược đạt 0.970000 và báo cáo đã giữ đạt 1.000000.
 3. Chạy chu kỳ:
 
 ```text
 python kl.py begin
 python kl.py status
-python evaluate.py ../workspace
+python evaluate.py ../mr-workspace
 python kl.py recall "unsupported claims about who posts on Reddit"
 python kl.py card ../card2.md
 python kl.py check

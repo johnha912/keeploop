@@ -1,12 +1,11 @@
 # team.yaml - prompt optimization example (banking support-ticket classifier).
-# Set up: copy this folder's evaluate.py, holdout.py, holdout.jsonl (from data/),
-# team.yaml and program.md to the keeploop root (evaluate.py and holdout.py
-# REPLACE the demo ones: the demo holdout.py scores the demo config and `kl begin`
-# refuses while it fails; lesson L-001). Make a fresh git repo for the workspace
-# holding prompt.md and data/dev.jsonl (copy both from this folder), with one
-# commit, and point `workspace:` at it (relative to the keeploop folder, or absolute).
-# Keep the keeploop folder and the workspace on SHORT paths (Windows MAX_PATH).
-# Then: python run.py   (headless) or python kl.py begin (interactive).
+# Set up (seconds): python tools/make_sandbox.py examples/prompt-optimization DEST
+# It copies keeploop to DEST/kl with the root files below on top (they REPLACE
+# the demo evaluate.py and holdout.py; lesson L-001) and makes the workspace a
+# fresh git repo; the holdout set stays out of it. Use a SHORT DEST on Windows.
+# Then: cd DEST/kl && python run.py (headless) or python kl.py begin (interactive).
+# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, data/holdout.jsonl
+# sandbox workspace: prompt.md, data/dev.jsonl
 # The Engineer sees only FORMAT.md, never evaluate.py or holdout.py.
 # Format of prompt.md: examples/prompt-optimization/FORMAT.md
 
