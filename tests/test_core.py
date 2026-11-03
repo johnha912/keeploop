@@ -183,7 +183,8 @@ class TestEvaluate(unittest.TestCase):
 class TestPacksAndRubric(unittest.TestCase):
     def test_professions_discovered(self):
         self.assertEqual(packs.discover(ROOT),
-                         ["marketing-content", "marketing-research", "software", "ui-design"])
+                         ["marketing-content", "marketing-research", "prompt-engineering",
+                          "software", "ui-design"])
 
     def test_pack_loads_taste_and_rubric(self):
         pack = packs.load_pack(ROOT, "ui-design")

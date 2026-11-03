@@ -1,0 +1,8 @@
+{"cycle": 1, "analyst": 43.45, "critic": 0.0, "engineer": 39.91, "eval": 13.09, "confirm": 15.59, "audit": 47.42}
+{"cycle": 2, "analyst": 88.89, "critic": 0.0, "engineer": 22.97, "eval": 15.59, "confirm": 14.55, "audit": 28.64}
+{"cycle": 3, "analyst": 48.74, "critic": 0.0, "engineer": 23.26, "eval": 15.06, "confirm": 0.0, "audit": 0.0}
+{"cycle": 4, "analyst": 51.83, "critic": 0.0, "engineer": 26.64, "eval": 12.54, "confirm": 13.51, "audit": 21.98}
+{"cycle": 5, "analyst": 77.25, "critic": 0.0, "engineer": 17.94, "eval": 15.96, "confirm": 0.0, "audit": 0.0}
+{"cycle": 6, "analyst": 55.11, "critic": 0.0, "engineer": 29.92, "eval": 18.3, "confirm": 0.0, "audit": 0.0}
+{"cycle": 7, "analyst": 43.04, "critic": 0.0, "engineer": 24.59, "eval": 14.9, "confirm": 0.0, "audit": 0.0}
+{"cycle": 8, "analyst": 45.37, "critic": 0.0, "engineer": 19.09, "eval": 10.28, "confirm": 0.0, "audit": 0.0}

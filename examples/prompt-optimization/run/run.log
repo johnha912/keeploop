@@ -1,0 +1,20 @@
+# Redaction note: the only change to this log is that the absolute sandbox folder
+# (the user's Windows temp path up to and including the folder named klp) is replaced by <sandbox>.
+# Nothing else was edited, reordered or removed.
+prepare: created results.tsv, lessons.jsonl, guardrails.md, workspace, best.json, scout_seen.json in <sandbox>\control\.keeploop
+run: baseline metric = 0.873333  sigma = 0.004714 (3 runs)  holdout baseline recorded
+cycle 1: keep  metric=0.89  best=0.890000  tokens=6258  time a=43s e=40s v=29s q=47s
+cycle 2: keep  metric=0.9  best=0.900000  tokens=6527  time a=89s e=23s v=30s q=29s
+cycle 3: discard  metric=0.875  best=0.900000  tokens=4067  time a=49s e=23s v=15s q=0s
+cycle 4: discard  metric=0.915  best=0.900000  tokens=5784  time a=52s e=27s v=26s q=22s
+cycle 5: discard  metric=0.895  best=0.900000  tokens=4172  time a=77s e=18s v=16s q=0s
+cycle 6: discard  metric=0.885  best=0.900000  tokens=4646  time a=55s e=30s v=18s q=0s
+cycle 7: discard  metric=0.905  best=0.900000  tokens=4535  time a=43s e=25s v=15s q=0s
+cycle 8: discard  metric=0.88  best=0.900000  tokens=4489  time a=45s e=19s v=10s q=0s
+holdout: 0.835000 -> 0.855000 (+0.020000); evaluation: 0.873333 -> 0.900000 (+0.026667)
+
+run complete: 2 keeps, 6 discards, 0 crashes, 0 lessons, 40478 tokens. Best metric: 0.900000
+time: analyst 454s, engineer 204s, eval 159s, audit 98s
+ledger: <sandbox>\control\.keeploop\results.tsv
+8 open questions in <sandbox>\control\.keeploop\questions.md
+exit 0
