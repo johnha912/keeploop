@@ -60,6 +60,11 @@ does, and the publisher then becomes a normal one for the project.
    git push origin vX.Y.Z
    ```
 
+   No terminal at hand? On GitHub: Releases, *Draft a new release*, *Choose
+   a tag*, type `vX.Y.Z`, *Create new tag on publish*, target `main`, leave
+   the notes empty, *Publish release*. That pushes the same tag; the
+   workflow fills in the release title and notes.
+
    The workflow refuses a tag that does not match `__version__`, runs the
    same gate, uploads to PyPI, installs the release back from PyPI with pip
    and pipx and smoke-tests it, and only then creates the GitHub release

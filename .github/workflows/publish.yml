@@ -115,6 +115,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python tools/release_notes.py "${{ needs.build.outputs.version }}" > notes.md
-      - run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "keeploop ${{ needs.build.outputs.version }}" --notes-file notes.md
+      # A tag made from the GitHub Releases page (e.g. on a phone) already has a
+      # release: fill in its title and notes instead of failing on "already exists".
+      - run: |
+          TITLE="keeploop ${{ needs.build.outputs.version }}"
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --title "$TITLE" --notes-file notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" --verify-tag --title "$TITLE" --notes-file notes.md
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
