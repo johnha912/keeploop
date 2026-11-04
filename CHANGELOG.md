@@ -39,6 +39,21 @@ stored anywhere.
 
 ## [Unreleased]
 
+### Added
+
+- `lite/`: keeploop-lite, the chat-only edition. `KEEPLOOP-LITE.md` is one
+  self-contained file you paste into a chat app (ChatGPT, Claude, Gemini).
+  The chat AI runs the same keep-or-discard loop on everyday work, such as
+  a post, a CV or a plan. It runs a setup interview, then a locked
+  scorecard with pass/fail gates and a scored baseline. Each cycle is a
+  hypothesis card that waits for a yes, one change, and a fresh Auditor
+  pass under an evidence rule ("can't measure this here" = 0). The cycle
+  ends with a keep or a discard and a reprinted ledger, which is the
+  memory you carry to a new chat. The loop is self-enforced, not enforced
+  by machine. Includes a Vietnamese version (`KEEPLOOP-LITE.vi.md`), an
+  illustrative example (`EXAMPLE.md`) and a routing block in the READMEs.
+  Docs only: no code, pack or contract changed.
+
 ## [0.2.0] - 2026-11-03
 
 ### Changed

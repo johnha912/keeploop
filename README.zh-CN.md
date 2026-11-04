@@ -44,6 +44,11 @@ AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 等。keeploop 本身不是 AI：它是一个小巧的 Python 工具，负责度量，也负责拒绝，
 没有依赖，不发送 telemetry，也不需要 API key。
 
+> **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.md)（英文；另有[越南语版](lite/KEEPLOOP-LITE.vi.md)）：
+> 把一个文件粘贴进聊天，就能对一篇帖子、一份简历或一个计划跑同样的保留/丢弃循环
+> （[示例](lite/EXAMPLE.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
+
 ## 快速开始
 
 **(a) 交给你的 AI。** 如果它能运行命令，把下面这段话粘贴给它，并补全最后
@@ -65,6 +70,10 @@ it describes. What I want better: <for example "make my test suite faster">
 <details>
 <summary><b>无法运行命令的聊天应用（ChatGPT、Gemini 应用）</b></summary>
 
+要改进日常工作（一篇帖子、一份简历、一个计划），请用
+[keeploop-lite](lite/KEEPLOOP-LITE.md)：不用克隆，也不用命令。
+
+要在聊天应用里改进一个代码项目，
 请改为把 [`BOOTSTRAP.md`](BOOTSTRAP.md) 的全部内容粘贴到一个新的聊天中。之后
 AI 会每次给你一条 `python kl.py ...` 命令，让你在克隆目录里运行，再把输出贴
 回去。
@@ -224,6 +233,7 @@ commit。完整的周期、critic 环节、经验教训、trend scout 和速度�
 | [docs/GUIDE.md](docs/GUIDE.md) | 完整手册：每一步、经验教训、scout、速度、pack、安全、目录结构 |
 | [AGENTS.md](AGENTS.md) | 你的 AI 所遵循的组织架构图和确切命令 |
 | [BOOTSTRAP.md](BOOTSTRAP.md) | 一个可以粘贴进聊天应用的文件 |
+| [lite/KEEPLOOP-LITE.md](lite/KEEPLOOP-LITE.md) | keeploop-lite：只需聊天、无需代码的版本 |
 | [docs/SPEC.md](docs/SPEC.md) | 参数、文件格式、不变量 |
 | [SECURITY.md](SECURITY.md) | 威胁模型，以及如何报告漏洞 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本（[SemVer](https://semver.org)） |
