@@ -72,12 +72,12 @@ AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 一行：
 
 ```text
-Clone https://github.com/johnha912/keeploop next to my project (not inside it),
-run `python prepare.py` in the clone, then read its AGENTS.md and act as the CEO
-it describes. What I want better: <for example "make my test suite faster">
+把 https://github.com/johnha912/keeploop 克隆到我的项目旁边（不要放在项目里面），
+在克隆目录里运行 `python prepare.py`，然后阅读其中的 AGENTS.md，按它描述的方式担任 CEO。
+我想改进的是：<例如“让我的测试套件跑得更快”>
 ```
 
-这段提示词要保持英文原样粘贴给 AI；只有最后一行（你想改进什么）可以用中文写。
+AI 能读懂中文提示词；链接和命令保持原样。
 
 你从不需要输入 `kl`，也没有要学的参数。第一次使用时，你的 AI 会用大白话问你
 “更好”指什么、怎么度量，然后提出一个 `evaluate.py`（一个输出那个数字的小
@@ -184,16 +184,16 @@ Copilot 等都会读取。
 
 ```mermaid
 flowchart LR
-    A[Analyst<br/>writes one card] --> E[Engineer<br/>makes the change]
-    E --> G{Code gates<br/>fence · protected<br/>secrets · size}
-    G -- pass --> V[evaluate.py<br/>one number]
-    V --> U[Auditor<br/>fresh eyes,<br/>real diff]
-    U --> C{beats best<br/>+ noise?}
-    C -- yes --> K[git commit]
-    C -- no --> D[git reset]
-    G -- fail --> L[(lesson)]
-    D -. why .-> L
-    L -. read next time .-> A
+    A[Analyst<br/>写一张卡片] --> E[Engineer<br/>做出改动]
+    E --> G{代码关卡<br/>fence · 受保护路径<br/>密钥 · 大小}
+    G -- 通过 --> V[evaluate.py<br/>一个数字]
+    V --> U[Auditor<br/>全新视角,<br/>真实 diff]
+    U --> C{超过最佳<br/>+ 噪声?}
+    C -- 是 --> K[git commit]
+    C -- 否 --> D[git reset]
+    G -- 未通过 --> L[(经验教训)]
+    D -. 原因 .-> L
+    L -. 下次读取 .-> A
 ```
 
 Analyst 写一张卡片，Engineer 严格按卡片做出这一个改动，代码关卡和

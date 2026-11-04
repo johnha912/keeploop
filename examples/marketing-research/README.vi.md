@@ -4,7 +4,7 @@
 
 # Người mua thời trang nhanh thuộc Gen Z (thế hệ trẻ nhất) và Millennial (thế hệ trước đó) nói gì về năm thương hiệu, và keeploop đã siết chặt báo cáo như thế nào
 
-![Cover board: Fieldnote should enter with the Zara-led talk segment, positioned on trend and fit, and validate that choice with a survey first](report/charts/00-board.png)
+![Bảng tổng quan: Fieldnote nên gia nhập bằng nhóm thảo luận do Zara dẫn đầu, định vị theo xu hướng và độ vừa vặn, và kiểm chứng lựa chọn này bằng một khảo sát trước](report/charts/00-board.png)
 
 Đây là một nghiên cứu social listening (lắng nghe mạng xã hội) về những gì người dùng Reddit công khai nói về Aritzia, Zara, H&M, Shein và Uniqlo, viết cho một khách hàng hư cấu là Fieldnote Apparel, đang cân nhắc cách gia nhập thị trường Mỹ và Canada năm 2027. Một chu kỳ keeploop thật (keeploop là một bộ lệnh nhỏ dùng để đo, chặn cổng và ghi lại mọi thay đổi trong một thư mục công việc) đã siết chặt báo cáo; nửa sau của trang này trình bày chu kỳ đó cùng các con số thật. Hãy bắt đầu từ phần "Dữ liệu cho thấy gì"; bạn không cần nền tảng machine learning nào.
 
@@ -31,7 +31,7 @@ Sáu mô-đun dưới đây theo đúng thứ tự của brief (bản yêu cầu
 
 ### 1. Uniqlo được nêu đầu tiên thường xuyên hơn hẳn bốn thương hiệu cốt lõi còn lại, nhưng mẫu nghiêng về thời trang nam
 
-![Top-of-mind: share of brand-naming replies that name each brand first](report/charts/01-top-of-mind.png)
+![Top-of-mind: tỷ lệ câu trả lời có nêu thương hiệu mà nêu mỗi thương hiệu đầu tiên](report/charts/01-top-of-mind.png)
 
 *Trong mẫu này chỉ Uniqlo nổi bật (42.4% được nêu đầu tiên, KTC 95% từ 36.0% đến 49.0%); bốn khoảng còn lại chồng lên nhau, và phần lớn các chủ đề là thời trang nam.*
 Nguồn: `data/metrics.json` (`modules.top_of_mind`); n=217 phản hồi có nêu thương hiệu, lấy từ 2140 phản hồi cấp một trong 60 chủ đề xin gợi ý.
@@ -40,7 +40,7 @@ Khuyến nghị trong báo cáo: đừng đọc đây là bảng xếp hạng th
 
 ### 2. Lời tự kể về việc mua hàng tương tự nhau giữa năm thương hiệu
 
-![Penetration proxy: share of brand-mentioning authors who say they bought or own each brand](report/charts/02-penetration-proxy.png)
+![Proxy độ thâm nhập: tỷ lệ tác giả nhắc đến thương hiệu nói rằng họ đã mua hoặc đang sở hữu từng thương hiệu](report/charts/02-penetration-proxy.png)
 
 *Các giá trị nhỏ do cách xây dựng chỉ số (1.7% đến 2.3%) và năm khoảng chồng lên nhau, nên dữ liệu này không phân biệt được các thương hiệu về mức sở hữu.*
 Nguồn: `data/metrics.json` (`modules.penetration_proxy`); n=1453 tác giả có nhắc đến bất kỳ thương hiệu nào.
@@ -49,7 +49,7 @@ Khuyến nghị trong báo cáo: không khẳng định có khoảng cách về 
 
 ### 3. Ít tác giả nêu tuổi, nên không thể mô tả đối tượng một cách đáng tin cậy
 
-![Profiling: how many authors report age, gender and country](report/charts/03-profiling.png)
+![Chân dung: bao nhiêu tác giả cho biết tuổi, giới tính và quốc gia](report/charts/03-profiling.png)
 
 *Chỉ 33 trên 1453 tác giả có nhắc đến thương hiệu (2.3%) nêu tuổi. Trong số đó Gen Z chiếm 57.6% và Millennial chiếm 39.4%, nhưng các khoảng chồng lên nhau, và dữ liệu không thể tách Mỹ khỏi Canada.*
 Nguồn: `data/metrics.json` (`modules.profiling`).
@@ -58,12 +58,12 @@ Khuyến nghị trong báo cáo: xây dựng chân dung đối tượng Mỹ và
 
 ### 4. Shein mang các cuộc thảo luận về tính bền vững và đạo đức, Uniqlo mang các cuộc thảo luận về phong cách và xu hướng
 
-![Perceptual map: brands and attributes placed by how they are talked about together](report/charts/04-perceptual-map.png)
+![Bản đồ nhận thức: thương hiệu và thuộc tính được đặt theo mức độ chúng được nhắc đến cùng nhau](report/charts/04-perceptual-map.png)
 
 *Giá/giá trị và chất lượng/độ bền xuất hiện ở mọi thương hiệu cốt lõi, nên không tạo ra khác biệt; phong cách/xu hướng đã gắn với Uniqlo, và Shein mang cuộc thảo luận về đạo đức.*
 Nguồn: `data/metrics.json` (`modules.positioning.correspondence_analysis`); chỉ mang tính tham khảo, vì một tác giả có thể đóng góp nhiều câu.
 
-![Positioning residuals: which brand-by-attribute cells depart from expectation](report/charts/05-positioning-residuals.png)
+![Phần dư định vị: những ô thương hiệu × thuộc tính lệch khỏi mức kỳ vọng](report/charts/05-positioning-residuals.png)
 
 *Sau khi hiệu chỉnh Bonferroni (một phép kiểm định chặt hơn, dùng khi kiểm tra nhiều ô cùng lúc), ba ô của các thương hiệu cốt lõi lệch khỏi kỳ vọng: Shein ở tính bền vững/đạo đức (z=6.03), Shein ở độ vừa vặn/kích cỡ (z=-3.36) và Uniqlo ở phong cách/xu hướng (z=3.37).*
 Nguồn: `data/metrics.json` (`modules.positioning.adjusted_std_residuals`, `bonferroni_z`).
@@ -72,7 +72,7 @@ Khuyến nghị trong báo cáo: thử nghiệm một đề xuất giá trị th
 
 ### 5. Shein và Zara có nhiều câu tiêu cực hơn Aritzia hay Uniqlo, nhưng công cụ đánh giá thấp mức độ tiêu cực
 
-![Perception: positive and negative share of single-brand sentences, by brand](report/charts/06-perception.png)
+![Cảm nhận: tỷ lệ tích cực và tiêu cực của các câu chỉ nhắc một thương hiệu, theo thương hiệu](report/charts/06-perception.png)
 
 *Khoảng cách về thảo luận tiêu cực là phát hiện về nhận thức đứng vững nhất ở đây: tỷ lệ tiêu cực của Shein hoặc Zara không chồng lên của Aritzia hoặc Uniqlo. Công cụ bỏ sót nhiều lời chê, và cảm xúc đo được hướng vào các câu, không phải vào người mua.*
 Nguồn: `data/metrics.json` (`modules.perception`); các câu được chấm điểm bằng VADER, một bộ từ điển cảm xúc đa dụng.
@@ -81,7 +81,7 @@ Khuyến nghị trong báo cáo: coi tỷ lệ thảo luận tiêu cực cao hơ
 
 ### 6. Xuất hiện năm nhóm thảo luận, và nhóm do Zara dẫn đầu là mục tiêu đầu tiên được đề xuất
 
-![Segments: five groups of authors by brand and attribute talk, with size and negative share](report/charts/07-segments.png)
+![Phân khúc: năm nhóm tác giả theo cách nói về thương hiệu và thuộc tính, kèm quy mô và tỷ lệ tiêu cực](report/charts/07-segments.png)
 
 *Phân khúc 1 nhỏ nhất trong năm phân khúc, nhưng được xây quanh thương hiệu gần nhất với định vị của Fieldnote, và các cuộc thảo luận của nhóm này có tỷ lệ câu tiêu cực cao hơn các nhóm do Aritzia hoặc Uniqlo dẫn đầu. Quy mô các phân khúc chồng lên nhau, nên chỉ riêng quy mô không quyết định được.*
 Nguồn: `data/metrics.json` (`modules.segmentation`); n=525 tác giả có ít nhất hai câu nhắc đến thương hiệu.
@@ -90,7 +90,7 @@ Khuyến nghị trong báo cáo: nhắm vào phân khúc do Zara dẫn đầu tr
 
 ### Bối cảnh bổ sung: mức độ quan tâm tìm kiếm
 
-![Wikipedia page views per brand next to monthly brand-mention counts](report/charts/08-interest-trend.png)
+![Lượt xem trang Wikipedia của từng thương hiệu đặt cạnh số lần nhắc thương hiệu theo tháng](report/charts/08-interest-trend.png)
 
 *Lượt xem trang và số lượt nhắc được đặt cạnh nhau chỉ để mô tả; số lượt nhắc bị giới hạn bởi các mức trần khi thu thập, nên hãy dùng share of voice (tỷ trọng tiếng nói, tức phần trăm lượt nhắc của mỗi thương hiệu trong tổng), đừng dùng tốc độ tăng trưởng.*
 Nguồn: `data/metrics.json` (`modules.trend`; lưu ý riêng của nó và ghi chú n=12 tháng). `report.md` không có mô-đun nào cho biểu đồ này, nên chú thích này được lấy từ tệp metrics.
@@ -114,7 +114,7 @@ Nguồn: `data/metrics.json` (`modules.trend`; lưu ý riêng của nó và ghi 
 
 ### Phễu thương hiệu (proxy từ social listening)
 
-![Brand funnel: share of each brand's authors who were aware, considering and bought](report/charts/09-brand-funnel.png)
+![Phễu thương hiệu: tỷ lệ tác giả của mỗi thương hiệu đã biết đến, đang cân nhắc và đã mua](report/charts/09-brand-funnel.png)
 
 *Tỷ lệ tác giả nhắc đến mỗi thương hiệu mà cũng dùng cụm từ ý định (Considering) hoặc cụm từ sở hữu (Bought): Considering từ 8.1% đến 14.7% và Bought từ 7.4% đến 13.5% trên năm thương hiệu cốt lõi.*
 Nguồn: `data/metrics.json` (`supplementary.funnel`). Aware n: Aritzia 209, Zara 331, H&M 251, Shein 327, Uniqlo 443. Considering / Bought, % của Aware: Aritzia 12.4 / 12.0, Zara 10.6 / 10.0, H&M 14.7 / 13.5, Shein 10.4 / 8.9, Uniqlo 8.1 / 7.4.
@@ -123,24 +123,24 @@ Giới hạn: giai đoạn Advocate có 0 hoặc 1 tác giả mỗi thương hi�
 
 ### Bản đồ định vị hai trục
 
-![Positioning map: price/value share against style/trend share of attribute talk, bubble size mentions, colour net sentiment](report/charts/10-positioning-map.png)
+![Bản đồ định vị: tỷ lệ giá/giá trị so với tỷ lệ phong cách/xu hướng trong các câu nói về thuộc tính, kích thước bong bóng là số lần nhắc, màu là cảm nhận ròng](report/charts/10-positioning-map.png)
 
 *Mỗi thương hiệu có ít nhất 30 lượt gắn thuộc tính (7 thương hiệu) được đặt theo tỷ trọng giá/giá trị (x) và tỷ trọng phong cách/xu hướng (y) trong các cuộc thảo luận về thuộc tính; kích thước bong bóng là số câu nhắc đến và màu là cảm xúc ròng.*
 Nguồn: `data/metrics.json` (`supplementary.positioning_map`). Giá/giá trị, phong cách/xu hướng (%): Aritzia 27.7, 20.8; Zara 27.9, 20.3; H&M 26.6, 21.7; Shein 20.2, 15.4; Uniqlo 24.8, 28.1. Cảm xúc ròng: Aritzia 0.412, Zara 0.265, H&M 0.329, Shein 0.202, Uniqlo 0.435.
 
 ### Hình ảnh thương hiệu
 
-![Brand image grid: share of each brand's image-coded sentences by image](report/charts/11-brand-image-grid.png)
+![Lưới hình ảnh thương hiệu: tỷ lệ câu được mã hóa hình ảnh của mỗi thương hiệu, theo từng hình ảnh](report/charts/11-brand-image-grid.png)
 
 *Tỷ lệ các câu được gán hình ảnh của mỗi thương hiệu mang từng hình ảnh trong 13 hình ảnh. Basic/everyday của Uniqlo là 66.7% (50 trên 75), cheap/disposable của Shein 31.4% (22 trên 70), premium/aspirational của Zara 26.1% (18 trên 69), premium/aspirational của H&M 28.9% (13 trên 45).*
 Nguồn: `data/metrics.json` (`supplementary.brand_image.association_grid`). Các câu được gán hình ảnh: Zara 69, H&M 45, Shein 70, Uniqlo 75.
 
-![Image strengths: adjusted standardised residuals by brand and image, flagged above the Bonferroni threshold](report/charts/12-image-strengths.png)
+![Điểm mạnh hình ảnh: phần dư chuẩn hóa đã điều chỉnh theo thương hiệu và hình ảnh, đánh dấu những ô vượt ngưỡng Bonferroni](report/charts/12-image-strengths.png)
 
 *Sáu ô thương hiệu theo hình ảnh vượt ngưỡng Bonferroni (|z| trên 3.3): Uniqlo basic/everyday z 8.90 (cao hơn kỳ vọng), Shein basic/everyday -4.53 (thấp hơn), Shein ethical/responsible 4.04, Shein cheap/disposable 3.95, Shein unethical/exploitative 3.72 (đều cao hơn), Uniqlo trendy/fashion-forward -3.87 (thấp hơn).*
 Nguồn: `data/metrics.json` (`supplementary.brand_image.strengths_and_weaknesses_bonferroni`). Chi bình phương trên bảng thương hiệu theo hình ảnh: 169.45, df 36, p khoảng 3e-19 (chỉ mang tính tham khảo: 32 trên 52 ô có số đếm kỳ vọng dưới 5, và một tác giả có thể viết nhiều câu).
 
-![Image priority quadrant: brand-by-image cells with at least 30 sentences, by share index and net sentiment](report/charts/13-image-priority.png)
+![Góc phần tư ưu tiên hình ảnh: các ô thương hiệu × hình ảnh có ít nhất 30 câu, theo chỉ số tỷ lệ và cảm nhận ròng](report/charts/13-image-priority.png)
 
 *Chỉ một ô thương hiệu theo hình ảnh có ít nhất 30 câu: Uniqlo basic/everyday (n 50, chỉ số 2.54 so với mức trung bình của tập, cảm xúc ròng 0.62), nằm ở góc phần tư "defend" (bảo vệ).*
 Nguồn: `data/metrics.json` (`supplementary.brand_image.priority_quadrant`).
@@ -170,7 +170,7 @@ Tóm lại: một card, một chỉnh sửa hai dòng, điểm từ 0.970000 lê
 
 ### (a) team.yaml: ai làm việc, cái gì được bảo vệ, ngưỡng nghiêm ngặt đến đâu
 
-`team.yaml` là tệp duy nhất do con người viết trước khi vòng lặp bắt đầu. Nó nêu tên pack (bộ quy tắc và gu thẩm mỹ cho nghề này), workspace, các đường dẫn được bảo vệ, các vai và ngưỡng giữ lại. Người viết báo cáo chỉ thấy `FORMAT.md`, không bao giờ thấy bộ chấm điểm.
+`team.yaml` là tệp duy nhất do con người viết trước khi vòng lặp bắt đầu. Nó nêu tên pack (bộ quy tắc và gu thẩm mỹ cho nghề này), workspace, các đường dẫn được bảo vệ, các vai và ngưỡng giữ lại. Người viết báo cáo chỉ thấy `FORMAT.md`, không bao giờ thấy bộ chấm điểm. Khối dưới đây là nguyên văn file `team.yaml`, nên các dòng chú thích (bắt đầu bằng `#`) giữ tiếng Anh như trong file.
 
 ```yaml
 # team.yaml - marketing research example (consumer insight report).
@@ -178,7 +178,7 @@ Tóm lại: một card, một chỉnh sửa hai dòng, điểm từ 0.970000 lê
 # It copies keeploop to DEST/kl with these files on top, removes the demo
 # holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
 # makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
-# sandbox root: evaluate.py, team.yaml
+# sandbox root: evaluate.py, team.yaml, program.md, FORMAT.md, samples/good.md, samples/bad.md
 # sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
@@ -207,9 +207,11 @@ roles:
 
 # The score is deterministic, so noise is zero; 1% relative gain keeps a
 # single fixed check from being kept on rounding alone.
+# The score runs 0 to 1: kl warns when the keep bar is above 1.0 (nothing can be kept).
 loop:
   max_iterations: 20
   keep_threshold: 0.01
+  metric_max: 1.0
 ```
 
 Hai dòng quan trọng nhất. `protect: brief.md, data` nghĩa là không ai được đổi mục tiêu của khách hàng hay bằng chứng để thắng điểm. `keep_threshold: 0.01` nghĩa là một thay đổi phải vượt điểm tốt nhất ít nhất 1% mới được tính.
