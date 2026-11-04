@@ -68,7 +68,7 @@ telemetry và không cần API key.
 > **Chỉ có ứng dụng chat** (ChatGPT, Claude, Gemini, không code)? Dùng
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
 > cùng vòng giữ-hay-bỏ cho một bài đăng, một CV hay một kế hoạch
-> ([English](lite/KEEPLOOP-LITE.md), [ví dụ](lite/EXAMPLE.md)).
+> ([English](lite/KEEPLOOP-LITE.md), [ví dụ](lite/EXAMPLE.vi.md)).
 > **AI của bạn chạy được code?** Dùng bản đầy đủ bên dưới.
 
 ## Bắt đầu nhanh
