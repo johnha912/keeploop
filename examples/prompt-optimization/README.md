@@ -1,3 +1,7 @@
+<p align="center">
+  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
 # An AI team edited a prompt for 8 cycles: two edits kept, six refused
 
 Two prompt edits kept, six refused, and the one score above the bar (0.915) refused too, because it did not survive the check. Dev accuracy went from 0.873 to 0.900; on 200 messages the loop never saw, 0.835 to 0.855. Every number below comes from a file in [`run/`](run/), and the section on known issues lists what this run got wrong or could not show.
