@@ -139,6 +139,20 @@ The mock is a scripted stand-in for a real AI. It shows how the loop works,
 not how good a real model is. Every keep is a real commit:
 `git -C .keeploop/workspace log --oneline`.
 
+**(c) Install it as a command.** `kl` without a clone, from PyPI:
+
+```bash
+pipx install keeploop      # or: pip install keeploop (in a venv of its own)
+mkdir my-loop && cd my-loop
+kl init                    # copies AGENTS.md, program.md, team.yaml, packs/, .claude/ here
+kl begin                   # the demo baseline
+```
+
+`kl init` puts the files you edit in your own folder and never overwrites
+one. Then open the folder in your AI as in (a), and follow
+[AGENTS.md](AGENTS.md) to point it at your repo. `kl run` is the headless
+mode. Keep the clone if you want to read or change keeploop itself.
+
 ## Examples
 
 | Example | Field | What happened | Link |
@@ -147,9 +161,9 @@ not how good a real model is. Every keep is a real commit:
 | Marketing research | Consumer insight report | 1 real cycle: 0.970000 to 1.000000, audit APPROVED, kept | [Read](examples/marketing-research/) |
 | Prompt optimization | AI/LLM prompt | 8 headless cycles, 2 kept, 6 discarded (a 0.915 refused on re-run). Dev 0.873333 to 0.900000; holdout 0.835 to 0.855 | [Read](examples/prompt-optimization/) |
 
-Set up any example as a sandbox with
-`python tools/make_sandbox.py examples/<name> <new short folder>`
-([details](docs/GUIDE.md#run-a-worked-example)).
+Set up any example as a sandbox with `kl init --example <name> <new short folder>`
+(installed `kl`) or `python tools/make_sandbox.py examples/<name> <new short folder>`
+(clone) ([details](docs/GUIDE.md#run-a-worked-example)).
 
 ## Why keeploop
 
