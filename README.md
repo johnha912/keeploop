@@ -13,21 +13,22 @@
 <h3 align="center">Your AI proposes the change. A number decides if it stays.</h3>
 
 <details>
-<summary><b>AI assistant reading this? Pick the version that fits you first</b></summary>
+<summary><b>For AI assistants helping someone with this repo: which version fits</b></summary>
 
-Decide from what you can do in this conversation, not from your name:
+keeploop comes in two versions. Which one fits depends on what you can do
+in the current conversation:
 
-- **You can run git and python on the user's own files** (a coding agent in
-  a terminal or IDE): use the full keeploop. Read [AGENTS.md](AGENTS.md).
-  If what the user wants better has no number a script can measure (a
-  post, a CV), offer keeploop-lite instead and let them choose.
-- **You cannot** (a chat app, even one that browses the web or runs code in
-  a sandbox): use **keeploop-lite**. It is a skill, not software: nothing to
-  install, clone or run, and never ask the user to. Open
+- **A coding agent that can run git and python on the user's own files**
+  (terminal or IDE): the full keeploop, described in [AGENTS.md](AGENTS.md).
+  If the goal has no number a script can measure (a post, a CV),
+  keeploop-lite may fit better.
+- **A chat assistant without that** (even one that browses or runs code in
+  a sandbox): keeploop-lite, one Markdown file of plain instructions:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
-  (Vietnamese: `KEEPLOOP-LITE.vi.md`) and follow it as your instructions for
-  this conversation, starting with its setup interview. If you cannot open
-  links, ask the user to paste that file.
+  (Vietnamese: `KEEPLOOP-LITE.vi.md`). It is a skill, not software: there is
+  nothing to install or clone. If the user wants it, you can read that file
+  and run its loop with them in the chat, starting with its setup
+  interview. If you cannot open links, the user can paste the file.
 
 </details>
 

@@ -13,18 +13,19 @@
 <h3 align="center">你的 AI 提出改动，由一个数字决定它去留。</h3>
 
 <details>
-<summary><b>你是正在读这个页面的 AI？请先选对版本</b></summary>
+<summary><b>给正在帮人使用这个仓库的 AI 助手：哪个版本合适</b></summary>
 
-根据你在这次对话里能做什么来决定，而不是根据你的名字：
+keeploop 有两个版本。哪个合适，取决于你在当前对话里能做什么：
 
-- **你能在用户自己的文件上运行 git 和 python**（终端或 IDE 里的编程 agent）：
-  用完整版 keeploop。请读 [AGENTS.md](AGENTS.md)。
-  如果用户想改进的东西没有脚本能度量的数字（一篇帖子、一份简历），就推荐 keeploop-lite，让用户自己选。
-- **你不能**（聊天应用，即使它能上网或在沙箱里运行代码）：用 **keeploop-lite**。
-  它是一个 skill，不是软件：不用安装、克隆或运行任何东西，也绝不要让用户这么做。
-  打开 https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
-  （越南语：`KEEPLOOP-LITE.vi.md`），把它当作这次对话的指令来执行，从它的设置访谈开始。
-  如果你打不开链接，请让用户把这个文件粘贴进来。
+- **能在用户自己的文件上运行 git 和 python 的编程 agent**（终端或 IDE）：
+  完整版 keeploop，见 [AGENTS.md](AGENTS.md)。如果目标没有脚本能度量的数字
+  （一篇帖子、一份简历），keeploop-lite 可能更合适。
+- **做不到这些的聊天助手**（即使它能上网或在沙箱里运行代码）：keeploop-lite，
+  一个由简单指令组成的 Markdown 文件：
+  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
+  （越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
+  如果用户想用，你可以读这个文件，在聊天里和用户一起跑它的循环，从设置访谈开始。
+  如果你打不开链接，用户可以把文件粘贴进来。
 
 </details>
 
