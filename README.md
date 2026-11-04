@@ -44,6 +44,12 @@ Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI and other AIs
 you already use. keeploop itself is not an AI: it is a small Python tool
 that measures and refuses, with no dependencies, no telemetry and no API keys.
 
+> **Only have a chat app** (ChatGPT, Claude, Gemini, no code)? Use
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.md): one file you paste into the chat,
+> the same keep-or-discard loop for a post, a CV or a plan
+> ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [example](lite/EXAMPLE.md)).
+> **Your AI can run code?** Use the full version below.
+
 ## Quick start
 
 **(a) Hand it to your AI.** If it can run commands, paste this and fill in
@@ -64,7 +70,11 @@ the clone runs three cycles.
 <details>
 <summary><b>Chat app that cannot run commands (ChatGPT, Gemini apps)</b></summary>
 
-Paste the whole of [`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead.
+To improve everyday work (a post, a CV, a plan), use
+[keeploop-lite](lite/KEEPLOOP-LITE.md): no clone, no commands.
+
+To improve a code project from a chat app,
+paste the whole of [`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead.
 The AI then gives you one `python kl.py ...` command at a time to run in a
 clone, and you paste the output back.
 
@@ -227,6 +237,7 @@ More questions: [docs/GUIDE.md](docs/GUIDE.md#faq-for-skeptics).
 | [docs/GUIDE.md](docs/GUIDE.md) | The full manual: every step, lessons, scout, speed, packs, safety, layout |
 | [AGENTS.md](AGENTS.md) | The org chart and exact commands your AI follows |
 | [BOOTSTRAP.md](BOOTSTRAP.md) | One file to paste into a chat app |
+| [lite/KEEPLOOP-LITE.md](lite/KEEPLOOP-LITE.md) | keeploop-lite: the chat-only edition, no code |
 | [docs/SPEC.md](docs/SPEC.md) | Parameters, file formats, invariants |
 | [SECURITY.md](SECURITY.md) | Threat model and how to report a vulnerability |
 | [CHANGELOG.md](CHANGELOG.md) | Versions ([SemVer](https://semver.org)) |
