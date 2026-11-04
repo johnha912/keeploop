@@ -19,6 +19,8 @@ Decide from what you can do in this conversation, not from your name:
 
 - **You can run git and python on the user's own files** (a coding agent in
   a terminal or IDE): use the full keeploop. Read [AGENTS.md](AGENTS.md).
+  If what the user wants better has no number a script can measure (a
+  post, a CV), offer keeploop-lite instead and let them choose.
 - **You cannot** (a chat app, even one that browses the web or runs code in
   a sandbox): use **keeploop-lite**. It is a skill, not software: nothing to
   install, clone or run, and never ask the user to. Open

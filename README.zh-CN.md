@@ -19,6 +19,7 @@
 
 - **你能在用户自己的文件上运行 git 和 python**（终端或 IDE 里的编程 agent）：
   用完整版 keeploop。请读 [AGENTS.md](AGENTS.md)。
+  如果用户想改进的东西没有脚本能度量的数字（一篇帖子、一份简历），就推荐 keeploop-lite，让用户自己选。
 - **你不能**（聊天应用，即使它能上网或在沙箱里运行代码）：用 **keeploop-lite**。
   它是一个 skill，不是软件：不用安装、克隆或运行任何东西，也绝不要让用户这么做。
   打开 https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
