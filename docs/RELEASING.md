@@ -44,8 +44,8 @@ does, and the publisher then becomes a normal one for the project.
 1. Move the items under **Unreleased** in `CHANGELOG.md` into a new
    version section with today's date.
 2. Set `__version__` in `prepare.py`, the only place the version lives
-   (`setup.py` reads it), and the version badge in the three READMEs. A
-   test checks both.
+   (`setup.py` reads it). The README badge reads the version from PyPI, so
+   it updates by itself once the release is uploaded.
 3. Run `python -m unittest discover -s tests` and
    `python tools/check_dist.py` (build, contents, clean-venv install,
    smoke test). Merge to `main` with CI green.

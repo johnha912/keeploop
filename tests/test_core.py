@@ -1337,8 +1337,11 @@ class TestVersion(unittest.TestCase):
         self.assertRegex(__version__, r"^\d+\.\d+\.\d+$")
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         self.assertIn(f"## [{__version__}]", changelog)
-        for readme in ("README.md", "README.vi.md", "README.zh-CN.md"):  # the version badge
-            self.assertIn(f"badge/version-{__version__}-", (ROOT / readme).read_text(encoding="utf-8"))
+        for readme in ("README.md", "README.vi.md", "README.zh-CN.md"):
+            text = (ROOT / readme).read_text(encoding="utf-8")
+            # the version badge reads PyPI and links there; a hand-written one goes stale
+            self.assertIn('<a href="https://pypi.org/project/keeploop/"><img src="https://img.shields.io/pypi/v/keeploop', text)
+            self.assertNotIn("badge/version-", text)
 
 
 if __name__ == "__main__":
