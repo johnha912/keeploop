@@ -25,7 +25,7 @@ gì trong cuộc trò chuyện hiện tại:
 - **Một trợ lý chat không làm được vậy** (kể cả khi nó duyệt web hay chạy
   code trong sandbox): keeploop-lite, một file Markdown gồm chỉ dẫn đơn giản:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.vi.md
-  (tiếng Anh: `KEEPLOOP-LITE.md`). Đây là một skill, không phải phần mềm:
+  (tiếng Anh: `KEEPLOOP-LITE.md`, tiếng Trung: `KEEPLOOP-LITE.zh-CN.md`). Đây là một skill, không phải phần mềm:
   không có gì để cài hay clone. Nếu người dùng muốn, bạn có thể đọc file đó
   và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
   lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
@@ -68,7 +68,7 @@ telemetry và không cần API key.
 > **Chỉ có ứng dụng chat** (ChatGPT, Claude, Gemini, không code)? Dùng
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
 > cùng vòng giữ-hay-bỏ cho một bài đăng, một CV hay một kế hoạch
-> ([English](lite/KEEPLOOP-LITE.md), [ví dụ](lite/EXAMPLE.md)).
+> ([English](lite/KEEPLOOP-LITE.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [ví dụ](lite/EXAMPLE.vi.md)).
 > **AI của bạn chạy được code?** Dùng bản đầy đủ bên dưới.
 
 ## Bắt đầu nhanh

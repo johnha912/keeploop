@@ -22,8 +22,8 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   （一篇帖子、一份简历），keeploop-lite 可能更合适。
 - **做不到这些的聊天助手**（即使它能上网或在沙箱里运行代码）：keeploop-lite，
   一个由简单指令组成的 Markdown 文件：
-  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
-  （越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
+  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.zh-CN.md
+  （英文：`KEEPLOOP-LITE.md`，越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
   如果用户想用，你可以读这个文件，在聊天里和用户一起跑它的循环，从设置访谈开始。
   如果你打不开链接，用户可以把文件粘贴进来。
 
@@ -62,9 +62,9 @@ AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 没有依赖，不发送 telemetry，也不需要 API key。
 
 > **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
-> [**keeploop-lite**](lite/KEEPLOOP-LITE.md)（英文；另有[越南语版](lite/KEEPLOOP-LITE.vi.md)）：
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.zh-CN.md)（另有 [English](lite/KEEPLOOP-LITE.md)、[Tiếng Việt](lite/KEEPLOOP-LITE.vi.md) 版）：
 > 把一个文件粘贴进聊天，就能对一篇帖子、一份简历或一个计划跑同样的保留/丢弃循环
-> （[示例](lite/EXAMPLE.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
+> （[示例](lite/EXAMPLE.zh-CN.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
 
 ## 快速开始
 
@@ -88,7 +88,7 @@ AI 能读懂中文提示词；链接和命令保持原样。
 <summary><b>无法运行命令的聊天应用（ChatGPT、Gemini 应用）</b></summary>
 
 要改进日常工作（一篇帖子、一份简历、一个计划），请用
-[keeploop-lite](lite/KEEPLOOP-LITE.md)：不用克隆，也不用命令。
+[keeploop-lite](lite/KEEPLOOP-LITE.zh-CN.md)：不用克隆，也不用命令。
 
 要在聊天应用里改进一个代码项目，
 请改为把 [`BOOTSTRAP.md`](BOOTSTRAP.md) 的全部内容粘贴到一个新的聊天中。之后
@@ -263,7 +263,7 @@ commit。完整的周期、critic 环节、经验教训、trend scout 和速度�
 | [docs/GUIDE.md](docs/GUIDE.md) | 完整手册：每一步、经验教训、scout、速度、pack、安全、目录结构 |
 | [AGENTS.md](AGENTS.md) | 你的 AI 所遵循的组织架构图和确切命令 |
 | [BOOTSTRAP.md](BOOTSTRAP.md) | 一个可以粘贴进聊天应用的文件 |
-| [lite/KEEPLOOP-LITE.md](lite/KEEPLOOP-LITE.md) | keeploop-lite：只需聊天、无需代码的版本 |
+| [lite/KEEPLOOP-LITE.zh-CN.md](lite/KEEPLOOP-LITE.zh-CN.md) | keeploop-lite：只需聊天、无需代码的版本 |
 | [docs/SPEC.md](docs/SPEC.md) | 参数、文件格式、不变量 |
 | [SECURITY.md](SECURITY.md) | 威胁模型，以及如何报告漏洞 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本（[SemVer](https://semver.org)） |

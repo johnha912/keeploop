@@ -25,7 +25,7 @@ in the current conversation:
 - **A chat assistant without that** (even one that browses or runs code in
   a sandbox): keeploop-lite, one Markdown file of plain instructions:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
-  (Vietnamese: `KEEPLOOP-LITE.vi.md`). It is a skill, not software: there is
+  (Vietnamese: `KEEPLOOP-LITE.vi.md`, Chinese: `KEEPLOOP-LITE.zh-CN.md`). It is a skill, not software: there is
   nothing to install or clone. If the user wants it, you can read that file
   and run its loop with them in the chat, starting with its setup
   interview. If you cannot open links, the user can paste the file.
@@ -67,7 +67,7 @@ that measures and refuses, with no dependencies, no telemetry and no API keys.
 > **Only have a chat app** (ChatGPT, Claude, Gemini, no code)? Use
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.md): one file you paste into the chat,
 > the same keep-or-discard loop for a post, a CV or a plan
-> ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [example](lite/EXAMPLE.md)).
+> ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [example](lite/EXAMPLE.md)).
 > **Your AI can run code?** Use the full version below.
 
 ## Quick start
