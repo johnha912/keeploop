@@ -4,7 +4,7 @@
 
 # Z 世代与千禧一代快时尚消费者如何谈论五个品牌，以及 keeploop 如何收紧这份报告
 
-![Cover board: Fieldnote should enter with the Zara-led talk segment, positioned on trend and fit, and validate that choice with a survey first](report/charts/00-board.png)
+![总览看板：Fieldnote 应从以 Zara 为首的讨论人群切入，主打潮流与版型，并先用问卷验证这一选择](report/charts/00-board.png)
 
 这是一项社交聆听（social listening）研究，基于 Reddit 上公开讨论中关于 Aritzia、Zara、H&M、Shein 和 Uniqlo 的内容，面向一位虚构客户 Fieldnote Apparel，该客户正在决定 2027 年如何进入美国和加拿大市场。一个真实的 keeploop 周期（keeploop 是一组小型命令，用来衡量、把关并记录对一个工作文件夹所做的每一次改动）收紧了这份报告；本页后半部分用真实数字展示了这个周期。请从“数据说明了什么”读起；你不需要任何机器学习背景。
 
@@ -31,7 +31,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 1. Uniqlo 被第一个提到的频率远高于其他四个核心品牌，但样本偏向男装
 
-![Top-of-mind: share of brand-naming replies that name each brand first](report/charts/01-top-of-mind.png)
+![第一提及：在提到品牌的回复中，把各品牌放在第一位的比例](report/charts/01-top-of-mind.png)
 
 *在本样本中只有 Uniqlo 明显突出（42.4% 被第一个提到，95% CI 36.0% 至 49.0%）；其余四个品牌的区间相互重叠，且大多数帖子与男装有关。*
 来源：`data/metrics.json`（`modules.top_of_mind`）；n=217 条提及品牌的回复，取自 60 个推荐帖中的 2140 条一级回复。
@@ -40,7 +40,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 2. 五个品牌的自述购买相关讨论相近
 
-![Penetration proxy: share of brand-mentioning authors who say they bought or own each brand](report/charts/02-penetration-proxy.png)
+![渗透率代理指标：提到品牌的作者中，自称买过或拥有各品牌的比例](report/charts/02-penetration-proxy.png)
 
 *这些数值按其构造本来就很小（1.7% 至 2.3%），且五个区间重叠，因此这份数据无法在拥有率上区分各品牌。*
 来源：`data/metrics.json`（`modules.penetration_proxy`）；n=1453 位提及过任一品牌的作者。
@@ -49,7 +49,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 3. 报告年龄的作者很少，因此无法可靠地描述受众
 
-![Profiling: how many authors report age, gender and country](report/charts/03-profiling.png)
+![人群画像：有多少作者报告了年龄、性别和国家](report/charts/03-profiling.png)
 
 *在提及品牌的 1453 位作者中，只有 33 位（2.3%）给出了年龄。其中 Z 世代占 57.6%，千禧一代占 39.4%，但两个区间重叠，而且数据无法区分美国和加拿大。*
 来源：`data/metrics.json`（`modules.profiling`）。
@@ -58,12 +58,12 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 4. Shein 承载了可持续与伦理方面的讨论，Uniqlo 承载了风格与潮流方面的讨论
 
-![Perceptual map: brands and attributes placed by how they are talked about together](report/charts/04-perceptual-map.png)
+![感知图：按共同被提及的程度摆放品牌和属性](report/charts/04-perceptual-map.png)
 
 *价格/价值和质量/耐用性在每个核心品牌上都会被提到，因此不具备区分度；风格/潮流已经与 Uniqlo 关联，而 Shein 承载了伦理方面的讨论。*
 来源：`data/metrics.json`（`modules.positioning.correspondence_analysis`）；仅供参考，因为同一位作者可能贡献多条语句。
 
-![Positioning residuals: which brand-by-attribute cells depart from expectation](report/charts/05-positioning-residuals.png)
+![定位残差：哪些“品牌 × 属性”单元格偏离了预期](report/charts/05-positioning-residuals.png)
 
 *经过 Bonferroni 校正（在同时检验许多单元格时使用的更严格的检验）后，有三个核心品牌的单元格偏离期望：Shein 在可持续/伦理上（z=6.03）、Shein 在版型/尺码上（z=-3.36）以及 Uniqlo 在风格/潮流上（z=3.37）。*
 来源：`data/metrics.json`（`modules.positioning.adjusted_std_residuals`、`bonferroni_z`）。
@@ -72,7 +72,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 5. Shein 和 Zara 的负面语句多于 Aritzia 或 Uniqlo，但该工具会低估负面情绪
 
-![Perception: positive and negative share of single-brand sentences, by brand](report/charts/06-perception.png)
+![品牌感知：只提到一个品牌的句子中，正面和负面所占比例，按品牌划分](report/charts/06-perception.png)
 
 *负面讨论的差距是这里最站得住脚的感知类发现：Shein 或 Zara 与 Aritzia 或 Uniqlo 的负面占比区间不重叠。该工具漏掉了大量批评，而且情感倾向针对的是语句，而不是买家。*
 来源：`data/metrics.json`（`modules.perception`）；语句使用 VADER 打分，这是一种通用的情感词表。
@@ -81,7 +81,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 6. 出现五个讨论人群，建议把以 Zara 为首的人群作为首个目标
 
-![Segments: five groups of authors by brand and attribute talk, with size and negative share](report/charts/07-segments.png)
+![人群细分：按品牌与属性讨论划分的五组作者，附规模和负面比例](report/charts/07-segments.png)
 
 *细分人群 1 是五个人群中规模最小的，但它围绕与 Fieldnote 定位最接近的品牌构建，其讨论中的负面语句占比高于以 Aritzia 为首或以 Uniqlo 为首的人群。各细分人群的规模区间重叠，因此仅凭规模无法做出决定。*
 来源：`data/metrics.json`（`modules.segmentation`）；n=525 位至少有两条品牌提及语句的作者。
@@ -90,7 +90,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 补充背景：搜索兴趣
 
-![Wikipedia page views per brand next to monthly brand-mention counts](report/charts/08-interest-trend.png)
+![各品牌的 Wikipedia 页面浏览量与每月品牌提及次数并列](report/charts/08-interest-trend.png)
 
 *页面浏览量与提及次数并列展示，仅作描述；提及次数受采集上限限制，因此请使用声量份额（share of voice），而不要用它看增长。*
 来源：`data/metrics.json`（`modules.trend`；其自带的注意事项以及 n=12 个月的说明）。`report.md` 中没有对应此图的模块，因此该图注取自指标文件。
@@ -114,7 +114,7 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 品牌漏斗（社交聆听代理指标）
 
-![Brand funnel: share of each brand's authors who were aware, considering and bought](report/charts/09-brand-funnel.png)
+![品牌漏斗：各品牌作者中知晓、考虑和已购买的比例](report/charts/09-brand-funnel.png)
 
 *在提及各品牌的作者中，同时使用意向措辞（Considering，考虑）或拥有措辞（Bought，已购买）的作者占比：在五个核心品牌中，Considering 为 8.1% 至 14.7%，Bought 为 7.4% 至 13.5%。*
 来源：`data/metrics.json`（`supplementary.funnel`）。Aware n：Aritzia 209，Zara 331，H&M 251，Shein 327，Uniqlo 443。Considering / Bought，占 Aware 的 %：Aritzia 12.4 / 12.0，Zara 10.6 / 10.0，H&M 14.7 / 13.5，Shein 10.4 / 8.9，Uniqlo 8.1 / 7.4。
@@ -123,24 +123,24 @@ Reddit 上的公开讨论是一种信号，而不是对消费者的测量。在�
 
 ### 双轴定位图
 
-![Positioning map: price/value share against style/trend share of attribute talk, bubble size mentions, colour net sentiment](report/charts/10-positioning-map.png)
+![定位图：属性讨论中价格/性价比所占比例对比风格/潮流所占比例，气泡大小为提及次数，颜色为净情感](report/charts/10-positioning-map.png)
 
 *每个至少有 30 次属性命中的品牌（7 个品牌）按其在属性讨论中的价格/价值占比（x）和风格/潮流占比（y）定位；气泡大小为提及语句数，颜色为净情感。*
 来源：`data/metrics.json`（`supplementary.positioning_map`）。价格/价值、风格/潮流（%）：Aritzia 27.7，20.8；Zara 27.9，20.3；H&M 26.6，21.7；Shein 20.2，15.4；Uniqlo 24.8，28.1。净情感：Aritzia 0.412，Zara 0.265，H&M 0.329，Shein 0.202，Uniqlo 0.435。
 
 ### 品牌形象
 
-![Brand image grid: share of each brand's image-coded sentences by image](report/charts/11-brand-image-grid.png)
+![品牌形象网格：各品牌被编码为形象的句子中，每种形象所占比例](report/charts/11-brand-image-grid.png)
 
 *每个品牌的形象编码语句中，带有 13 种形象之一的占比。Uniqlo 的基础款/日常为 66.7%（75 条中的 50 条），Shein 的廉价/一次性为 31.4%（70 条中的 22 条），Zara 的高端/向往为 26.1%（69 条中的 18 条），H&M 的高端/向往为 28.9%（45 条中的 13 条）。*
 来源：`data/metrics.json`（`supplementary.brand_image.association_grid`）。形象编码语句数：Zara 69，H&M 45，Shein 70，Uniqlo 75。
 
-![Image strengths: adjusted standardised residuals by brand and image, flagged above the Bonferroni threshold](report/charts/12-image-strengths.png)
+![形象优势：按品牌和形象计算的调整后标准化残差，超过 Bonferroni 阈值的已标出](report/charts/12-image-strengths.png)
 
 *六个品牌乘形象的单元格超过 Bonferroni 阈值（|z| 大于 3.3）：Uniqlo 基础款/日常 z 8.90（偏多），Shein 基础款/日常 -4.53（偏少），Shein 道德/负责 4.04、Shein 廉价/一次性 3.95、Shein 不道德/剥削 3.72（均偏多），Uniqlo 潮流/引领时尚 -3.87（偏少）。*
 来源：`data/metrics.json`（`supplementary.brand_image.strengths_and_weaknesses_bonferroni`）。品牌乘形象表的卡方检验：169.45，df 36，p 约 3e-19（仅供参考：52 个单元格中有 32 个期望计数低于 5，并且同一位作者可以写很多条语句）。
 
-![Image priority quadrant: brand-by-image cells with at least 30 sentences, by share index and net sentiment](report/charts/13-image-priority.png)
+![形象优先象限：至少有 30 个句子的“品牌 × 形象”单元格，按份额指数和净情感划分](report/charts/13-image-priority.png)
 
 *只有一个品牌乘形象的单元格至少有 30 条语句：Uniqlo 基础款/日常（n 50，相对集合平均值的指数 2.54，净情感 0.62），它落在“防守”象限。*
 来源：`data/metrics.json`（`supplementary.brand_image.priority_quadrant`）。
@@ -170,7 +170,7 @@ keeploop 像一家小公司一样运作。**Analyst（分析师）**在一张书
 
 ### (a) team.yaml：谁来工作、什么受保护、门槛有多严
 
-`team.yaml` 是循环开始前由人类编写的唯一文件。它指明了 pack（这个职业的规则与品味）、工作区、受保护路径、各个角色以及保留阈值。报告撰写者只能看到 `FORMAT.md`，看不到评分程序。
+`team.yaml` 是循环开始前由人类编写的唯一文件。它指明了 pack（这个职业的规则与品味）、工作区、受保护路径、各个角色以及保留阈值。报告撰写者只能看到 `FORMAT.md`，看不到评分程序。下面是 `team.yaml` 的原文，因此注释行（以 `#` 开头）保留文件中的英文。
 
 ```yaml
 # team.yaml - marketing research example (consumer insight report).
@@ -178,7 +178,7 @@ keeploop 像一家小公司一样运作。**Analyst（分析师）**在一张书
 # It copies keeploop to DEST/kl with these files on top, removes the demo
 # holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
 # makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
-# sandbox root: evaluate.py, team.yaml
+# sandbox root: evaluate.py, team.yaml, program.md, FORMAT.md, samples/good.md, samples/bad.md
 # sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
@@ -207,9 +207,11 @@ roles:
 
 # The score is deterministic, so noise is zero; 1% relative gain keeps a
 # single fixed check from being kept on rounding alone.
+# The score runs 0 to 1: kl warns when the keep bar is above 1.0 (nothing can be kept).
 loop:
   max_iterations: 20
   keep_threshold: 0.01
+  metric_max: 1.0
 ```
 
 最关键的是两行。`protect: brief.md, data` 意味着任何人都不能为了拿高分而改动客户的目标或证据。`keep_threshold: 0.01` 意味着一项改动必须比最佳得分至少高出 1% 才算数。

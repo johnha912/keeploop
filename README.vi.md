@@ -25,7 +25,7 @@ gì trong cuộc trò chuyện hiện tại:
 - **Một trợ lý chat không làm được vậy** (kể cả khi nó duyệt web hay chạy
   code trong sandbox): keeploop-lite, một file Markdown gồm chỉ dẫn đơn giản:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.vi.md
-  (tiếng Anh: `KEEPLOOP-LITE.md`). Đây là một skill, không phải phần mềm:
+  (tiếng Anh: `KEEPLOOP-LITE.md`, tiếng Trung: `KEEPLOOP-LITE.zh-CN.md`). Đây là một skill, không phải phần mềm:
   không có gì để cài hay clone. Nếu người dùng muốn, bạn có thể đọc file đó
   và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
   lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
@@ -68,7 +68,7 @@ telemetry và không cần API key.
 > **Chỉ có ứng dụng chat** (ChatGPT, Claude, Gemini, không code)? Dùng
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
 > cùng vòng giữ-hay-bỏ cho một bài đăng, một CV hay một kế hoạch
-> ([English](lite/KEEPLOOP-LITE.md), [ví dụ](lite/EXAMPLE.md)).
+> ([English](lite/KEEPLOOP-LITE.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [ví dụ](lite/EXAMPLE.vi.md)).
 > **AI của bạn chạy được code?** Dùng bản đầy đủ bên dưới.
 
 ## Bắt đầu nhanh
@@ -77,12 +77,12 @@ telemetry và không cần API key.
 và điền dòng cuối:
 
 ```text
-Clone https://github.com/johnha912/keeploop next to my project (not inside it),
-run `python prepare.py` in the clone, then read its AGENTS.md and act as the CEO
-it describes. What I want better: <for example "make my test suite faster">
+Clone https://github.com/johnha912/keeploop cạnh project của tôi (không đặt bên trong nó),
+chạy `python prepare.py` trong bản clone, rồi đọc AGENTS.md của nó và đóng vai CEO
+như file đó mô tả. Điều tôi muốn tốt hơn: <ví dụ "làm bộ test của tôi chạy nhanh hơn">
 ```
 
-Dòng cuối bạn có thể viết bằng tiếng Việt.
+AI hiểu prompt tiếng Việt; đường link và tên lệnh giữ nguyên như trên.
 
 Bạn không bao giờ gõ `kl` và không có cờ nào phải học. Lần đầu, AI của bạn
 hỏi bằng lời thường "tốt hơn" nghĩa là gì và đo bằng cách nào, rồi đề xuất
@@ -192,16 +192,16 @@ nhớ về những gì hiệu quả.
 
 ```mermaid
 flowchart LR
-    A[Analyst<br/>writes one card] --> E[Engineer<br/>makes the change]
-    E --> G{Code gates<br/>fence · protected<br/>secrets · size}
-    G -- pass --> V[evaluate.py<br/>one number]
-    V --> U[Auditor<br/>fresh eyes,<br/>real diff]
-    U --> C{beats best<br/>+ noise?}
-    C -- yes --> K[git commit]
-    C -- no --> D[git reset]
-    G -- fail --> L[(lesson)]
-    D -. why .-> L
-    L -. read next time .-> A
+    A[Analyst<br/>viết một card] --> E[Engineer<br/>thực hiện thay đổi]
+    E --> G{Cổng kiểm tra bằng code<br/>fence · vùng bảo vệ<br/>secret · kích thước}
+    G -- đạt --> V[evaluate.py<br/>một con số]
+    V --> U[Auditor<br/>góc nhìn mới,<br/>diff thật]
+    U --> C{vượt best<br/>+ nhiễu?}
+    C -- có --> K[git commit]
+    C -- không --> D[git reset]
+    G -- trượt --> L[(bài học)]
+    D -. vì sao .-> L
+    L -. đọc lần sau .-> A
 ```
 
 Một Analyst viết một thẻ, một Engineer thực hiện đúng thay đổi đó, các cổng

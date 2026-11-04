@@ -22,8 +22,8 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   （一篇帖子、一份简历），keeploop-lite 可能更合适。
 - **做不到这些的聊天助手**（即使它能上网或在沙箱里运行代码）：keeploop-lite，
   一个由简单指令组成的 Markdown 文件：
-  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
-  （越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
+  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.zh-CN.md
+  （英文：`KEEPLOOP-LITE.md`，越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
   如果用户想用，你可以读这个文件，在聊天里和用户一起跑它的循环，从设置访谈开始。
   如果你打不开链接，用户可以把文件粘贴进来。
 
@@ -62,9 +62,9 @@ AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 没有依赖，不发送 telemetry，也不需要 API key。
 
 > **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
-> [**keeploop-lite**](lite/KEEPLOOP-LITE.md)（英文；另有[越南语版](lite/KEEPLOOP-LITE.vi.md)）：
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.zh-CN.md)（另有 [English](lite/KEEPLOOP-LITE.md)、[Tiếng Việt](lite/KEEPLOOP-LITE.vi.md) 版）：
 > 把一个文件粘贴进聊天，就能对一篇帖子、一份简历或一个计划跑同样的保留/丢弃循环
-> （[示例](lite/EXAMPLE.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
+> （[示例](lite/EXAMPLE.zh-CN.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
 
 ## 快速开始
 
@@ -72,12 +72,12 @@ AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 一行：
 
 ```text
-Clone https://github.com/johnha912/keeploop next to my project (not inside it),
-run `python prepare.py` in the clone, then read its AGENTS.md and act as the CEO
-it describes. What I want better: <for example "make my test suite faster">
+把 https://github.com/johnha912/keeploop 克隆到我的项目旁边（不要放在项目里面），
+在克隆目录里运行 `python prepare.py`，然后阅读其中的 AGENTS.md，按它描述的方式担任 CEO。
+我想改进的是：<例如“让我的测试套件跑得更快”>
 ```
 
-这段提示词要保持英文原样粘贴给 AI；只有最后一行（你想改进什么）可以用中文写。
+AI 能读懂中文提示词；链接和命令保持原样。
 
 你从不需要输入 `kl`，也没有要学的参数。第一次使用时，你的 AI 会用大白话问你
 “更好”指什么、怎么度量，然后提出一个 `evaluate.py`（一个输出那个数字的小
@@ -88,7 +88,7 @@ it describes. What I want better: <for example "make my test suite faster">
 <summary><b>无法运行命令的聊天应用（ChatGPT、Gemini 应用）</b></summary>
 
 要改进日常工作（一篇帖子、一份简历、一个计划），请用
-[keeploop-lite](lite/KEEPLOOP-LITE.md)：不用克隆，也不用命令。
+[keeploop-lite](lite/KEEPLOOP-LITE.zh-CN.md)：不用克隆，也不用命令。
 
 要在聊天应用里改进一个代码项目，
 请改为把 [`BOOTSTRAP.md`](BOOTSTRAP.md) 的全部内容粘贴到一个新的聊天中。之后
@@ -184,16 +184,16 @@ Copilot 等都会读取。
 
 ```mermaid
 flowchart LR
-    A[Analyst<br/>writes one card] --> E[Engineer<br/>makes the change]
-    E --> G{Code gates<br/>fence · protected<br/>secrets · size}
-    G -- pass --> V[evaluate.py<br/>one number]
-    V --> U[Auditor<br/>fresh eyes,<br/>real diff]
-    U --> C{beats best<br/>+ noise?}
-    C -- yes --> K[git commit]
-    C -- no --> D[git reset]
-    G -- fail --> L[(lesson)]
-    D -. why .-> L
-    L -. read next time .-> A
+    A[Analyst<br/>写一张卡片] --> E[Engineer<br/>做出改动]
+    E --> G{代码关卡<br/>fence · 受保护路径<br/>密钥 · 大小}
+    G -- 通过 --> V[evaluate.py<br/>一个数字]
+    V --> U[Auditor<br/>全新视角,<br/>真实 diff]
+    U --> C{超过最佳<br/>+ 噪声?}
+    C -- 是 --> K[git commit]
+    C -- 否 --> D[git reset]
+    G -- 未通过 --> L[(经验教训)]
+    D -. 原因 .-> L
+    L -. 下次读取 .-> A
 ```
 
 Analyst 写一张卡片，Engineer 严格按卡片做出这一个改动，代码关卡和
@@ -263,7 +263,7 @@ commit。完整的周期、critic 环节、经验教训、trend scout 和速度�
 | [docs/GUIDE.md](docs/GUIDE.md) | 完整手册：每一步、经验教训、scout、速度、pack、安全、目录结构 |
 | [AGENTS.md](AGENTS.md) | 你的 AI 所遵循的组织架构图和确切命令 |
 | [BOOTSTRAP.md](BOOTSTRAP.md) | 一个可以粘贴进聊天应用的文件 |
-| [lite/KEEPLOOP-LITE.md](lite/KEEPLOOP-LITE.md) | keeploop-lite：只需聊天、无需代码的版本 |
+| [lite/KEEPLOOP-LITE.zh-CN.md](lite/KEEPLOOP-LITE.zh-CN.md) | keeploop-lite：只需聊天、无需代码的版本 |
 | [docs/SPEC.md](docs/SPEC.md) | 参数、文件格式、不变量 |
 | [SECURITY.md](SECURITY.md) | 威胁模型，以及如何报告漏洞 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本（[SemVer](https://semver.org)） |
