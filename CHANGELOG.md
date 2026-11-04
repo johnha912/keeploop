@@ -15,53 +15,13 @@ the entry says so under **Changed** with the migration step.
 
 ## Releasing
 
-One-time setup: on PyPI and on TestPyPI, add a Trusted Publisher (pending
-publisher for a new project) for repository `johnha912/keeploop`, workflow
-`publish.yml`, environment `pypi` (TestPyPI: `testpypi`). No API token is
-stored anywhere.
-
-1. Move the items under **Unreleased** into a new version section with
-   today's date.
-2. Set `__version__` in `prepare.py`, the only place the version lives
-   (`setup.py` reads it), and the version badge in the three READMEs; a
-   test checks both.
-3. Run `python -m unittest discover -s tests` and
-   `python tools/check_dist.py` (build, contents, clean-venv install,
-   smoke test). Merge to `main`.
-4. Rehearse: Actions -> publish -> Run workflow on `main`. It uploads
-   `X.Y.Z.devN` to TestPyPI and installs it back with pip and pipx on
-   Linux and Windows.
-5. Tag once: `git tag -a vX.Y.Z -m "keeploop X.Y.Z"` and
-   `git push origin vX.Y.Z`. The publish workflow refuses a tag that does
-   not match `__version__`, runs the same gate, uploads to PyPI, installs
-   it back from PyPI with pip and pipx, and only then creates the GitHub
-   release with this section as its notes.
+One tag, `vX.Y.Z` on `main`, publishes to PyPI and creates the GitHub
+release. The one-time PyPI setup and the steps are in
+[docs/RELEASING.md](docs/RELEASING.md).
 
 ## [Unreleased]
 
-### Added
-
-- `lite/`: keeploop-lite, the chat-only edition. `KEEPLOOP-LITE.md` is one
-  self-contained file you paste into a chat app (ChatGPT, Claude, Gemini).
-  The chat AI runs the same keep-or-discard loop on everyday work, such as
-  a post, a CV or a plan. It runs a setup interview, then a locked
-  scorecard with pass/fail gates, a team whose roles are named for the
-  task (propose, make, check, plus at most one specialist), and a scored
-  baseline. Each cycle is a hypothesis card that waits for a yes, one
-  change, and a fresh check under an evidence rule ("can't measure this
-  here" = 0). The cycle ends with a keep or a discard and a reprinted
-  ledger, which is the memory you carry to a new chat. The file is
-  model-agnostic and has skill frontmatter, so the same file works
-  pasted, as Project or Gem instructions, or as a skill. The loop is
-  self-enforced, not enforced by machine. Includes a Vietnamese version
-  (`KEEPLOOP-LITE.vi.md`) and an illustrative example (`EXAMPLE.md`).
-  The READMEs gain a routing block for people and a short note for AI
-  assistants: a coding agent uses the full version, a chat assistant
-  uses lite. The note informs rather than instructs, so assistants do
-  not treat it as prompt injection. Docs only: no code, pack or contract
-  changed.
-
-## [0.2.0] - 2026-11-03
+## [0.2.0] - 2026-11-04
 
 ### Changed
 
@@ -124,6 +84,30 @@ Four gaps found by the prompt-optimization worked example:
 
 ### Added
 
+- `lite/`: keeploop-lite, the chat-only edition. `KEEPLOOP-LITE.md` is one
+  self-contained file you paste into a chat app (ChatGPT, Claude, Gemini).
+  The chat AI runs the same keep-or-discard loop on everyday work, such as
+  a post, a CV or a plan. It runs a setup interview, then a locked
+  scorecard with pass/fail gates, a team whose roles are named for the
+  task (propose, make, check, plus at most one specialist), and a scored
+  baseline. Each cycle is a hypothesis card that waits for a yes, one
+  change, and a fresh check under an evidence rule ("can't measure this
+  here" = 0). The cycle ends with a keep or a discard and a reprinted
+  ledger, which is the memory you carry to a new chat. The file is
+  model-agnostic and has skill frontmatter, so the same file works
+  pasted, as Project or Gem instructions, or as a skill. The loop is
+  self-enforced, not enforced by machine. Includes a Vietnamese version
+  (`KEEPLOOP-LITE.vi.md`) and an illustrative example (`EXAMPLE.md`).
+  The READMEs gain a routing block for people and a short note for AI
+  assistants: a coding agent uses the full version, a chat assistant
+  uses lite. The note informs rather than instructs, so assistants do
+  not treat it as prompt injection. Docs only: no code, pack or contract
+  changed.
+- README: a third way to start, `pipx install keeploop` then `kl init`
+  in a new folder; the clone stays for reading the source. The examples
+  line names `kl init --example`.
+- `docs/RELEASING.md`: the one-time PyPI and TestPyPI setup (Trusted
+  Publishing) and the release steps.
 - `kl init [DIR]`: a pip/pipx install is the engine only; `kl init` copies
   the files a project edits (AGENTS.md, CLAUDE.md, GEMINI.md, BOOTSTRAP.md,
   program.md, team.yaml, the demo evaluate.py, packs/, .claude/ agents,

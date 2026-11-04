@@ -135,6 +135,19 @@ mock 是一个按剧本演出的“假 AI”，用来替代真实的 AI。它展
 而不是真实模型有多强。每次保留都是一个真实的 commit：
 `git -C .keeploop/workspace log --oneline`。
 
+**(c) 作为命令安装。** 不用克隆，从 PyPI 安装 `kl`：
+
+```bash
+pipx install keeploop      # 或：pip install keeploop（放在单独的 venv 里）
+mkdir my-loop && cd my-loop
+kl init                    # 把 AGENTS.md、program.md、team.yaml、packs/、.claude/ 复制到这里
+kl begin                   # 演示的基线
+```
+
+`kl init` 把你要编辑的文件放进你自己的文件夹，绝不覆盖已有文件。然后像 (a)
+那样在你的 AI 中打开这个文件夹，并按 [AGENTS.md](AGENTS.md) 把它指向你的仓库。
+`kl run` 是无头模式。如果你想阅读或修改 keeploop 本身，请保留克隆。
+
 ## 实战示例
 
 | 示例 | 领域 | 发生了什么 | 链接 |
@@ -143,8 +156,8 @@ mock 是一个按剧本演出的“假 AI”，用来替代真实的 AI。它展
 | 营销研究 | 消费者洞察报告 | 1 个真实周期：0.970000 → 1.000000，审计 APPROVED，保留 | [阅读](examples/marketing-research/) |
 | 提示词优化 | AI/LLM 提示词 | 8 个无人值守周期，保留 2 次，丢弃 6 次（其中一次 0.915 在复跑时被拒绝）。开发集 0.873333 → 0.900000；保留集 0.835 → 0.855 | [阅读](examples/prompt-optimization/) |
 
-任何示例都可以用
-`python tools/make_sandbox.py examples/<name> <new short folder>`
+任何示例都可以用 `kl init --example <name> <new short folder>`（已安装 `kl`）或
+`python tools/make_sandbox.py examples/<name> <new short folder>`（克隆）
 建成沙盒（[详情](docs/GUIDE.md#run-a-worked-example)）。
 
 ## 为什么选 keeploop
