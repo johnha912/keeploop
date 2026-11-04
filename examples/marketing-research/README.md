@@ -174,7 +174,7 @@ In short: one card, one edit of two lines, score 0.970000 to 1.000000, audit APP
 # It copies keeploop to DEST/kl with these files on top, removes the demo
 # holdout.py (it imports the demo scorer; lesson L-001, see run/LOG.md), and
 # makes the workspace below a fresh git repo. Then: cd DEST/kl && python kl.py begin
-# sandbox root: evaluate.py, team.yaml
+# sandbox root: evaluate.py, team.yaml, program.md, FORMAT.md, samples/good.md, samples/bad.md
 # sandbox workspace: brief.md, report.md, data/metrics.json, data/quotes.json
 # The report writer sees only FORMAT.md, never evaluate.py.
 # Format of report.md: examples/marketing-research/FORMAT.md
@@ -203,9 +203,11 @@ roles:
 
 # The score is deterministic, so noise is zero; 1% relative gain keeps a
 # single fixed check from being kept on rounding alone.
+# The score runs 0 to 1: kl warns when the keep bar is above 1.0 (nothing can be kept).
 loop:
   max_iterations: 20
   keep_threshold: 0.01
+  metric_max: 1.0
 ```
 
 Two lines matter most. `protect: brief.md, data` means nobody can change the client's objectives or the evidence to win the score. `keep_threshold: 0.01` means a change must beat the best score by at least 1% to count.
