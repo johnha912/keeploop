@@ -32,11 +32,15 @@ what makes ordering easy instead. Your word limit becomes a gate.
 Gate: under 30 words
 ```
 
-Is this the scorecard we keep for every cycle? (yes / change it)
+Team: Local marketer (propose), Copywriter (make), Busy neighbour
+scrolling the group (check).
+
+Is this the scorecard we keep for every cycle, and is the team OK?
+(yes / change it)
 
 **Mai:** yes
 
-**AI:** **Auditor, fresh pass.**
+**AI:** **Busy neighbour, fresh pass.**
 
 | Criterion | Score | Evidence (quoted) |
 |---|---|---|
@@ -55,10 +59,10 @@ without knowing what we hope for.
 
 **Mai:** next cycle
 
-**AI:** **Analyst hat.**
+**AI:** **Local marketer.**
 
 ```
-HYPOTHESIS CARD - cycle 1
+HYPOTHESIS CARD - cycle 1 (Local marketer)
 Change: Add one line with price, size and pickup day.
 Should improve: Clear offer, because people keep asking the price.
 How we'll tell: Clear offer goes up from 2/10.
@@ -69,11 +73,11 @@ Go ahead? (yes / no)
 
 **Mai:** yes. $8 a loaf, pickup Saturday 9 to 12.
 
-**AI:** **Engineer hat.**
+**AI:** **Copywriter.**
 
 > Banana bread for sale. $8 a loaf, pickup Saturday 9–12. DM me to order.
 
-**Auditor, fresh pass.**
+**Busy neighbour, fresh pass.**
 
 | Criterion | Score | Evidence (quoted) |
 |---|---|---|
@@ -90,10 +94,10 @@ No new lesson.
 
 **Mai:** next cycle
 
-**AI:** **Analyst hat.** Trust is the weakest, at 0.
+**AI:** **Local marketer.** Trust is the weakest, at 0.
 
 ```
-HYPOTHESIS CARD - cycle 2
+HYPOTHESIS CARD - cycle 2 (Local marketer)
 Change: Open with a short, true line about where the recipe comes from.
 Should improve: Trust (and maybe Hook), because nothing shows it is homemade.
 How we'll tell: Trust goes up from 0/10.
@@ -105,13 +109,13 @@ Go ahead? (yes / no)
 **Mai:** yes. It's my grandma's recipe, I've made it every week for 10
 years and my kids fight over the last slice.
 
-**AI:** **Engineer hat.**
+**AI:** **Copywriter.**
 
 > Baked with my grandma's recipe. I've made it every week for 10 years,
 > and my kids still fight over the last slice! Banana bread for sale. $8 a
 > loaf, pickup Saturday 9–12. DM me to order.
 
-**Auditor, fresh pass.**
+**Busy neighbour, fresh pass.**
 
 | Criterion | Score | Evidence (quoted) |
 |---|---|---|
@@ -133,6 +137,7 @@ Scorecard (locked since cycle 0, max 30):
 2. Clear offer: price, size, pickup day and how to order are all stated
 3. Trust: a concrete, true detail shows it is homemade and fresh
 Gates (pass/fail): under 30 words
+Team: Local marketer (propose), Copywriter (make), Busy neighbour (check)
 Best so far: cycle 1, 10/30 (Hook 2, Clear offer 8, Trust 0)
 
 | # | Change | Score | Verdict |
@@ -155,4 +160,4 @@ Say **next cycle**, **status**, **audit this**, or **new baseline**.
 
 Mai copies the ledger into her notes. Next week she pastes it into a new
 chat, together with `KEEPLOOP-LITE.md`, and says "next cycle". The
-Analyst's next card can follow lesson L1.
+Local marketer's next card can follow lesson L1.
