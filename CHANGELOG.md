@@ -40,6 +40,11 @@ release. The one-time PyPI setup and the steps are in
 
 ### Fixed
 
+- `publish.yml` read `prepare.py` with the runner's default encoding; on
+  Windows (cp1252) the rehearsal's verify job failed before installing.
+  Found by the first TestPyPI rehearsal, before any tag: both version
+  patches now use UTF-8 and every step runs with `PYTHONUTF8=1`.
+
 First-run gaps found by building the worked examples' sandboxes from a fresh clone:
 
 - `kl begin`, `kl status` and `run.py` warn "baseline at ceiling" when the
@@ -103,6 +108,13 @@ Four gaps found by the prompt-optimization worked example:
   uses lite. The note informs rather than instructs, so assistants do
   not treat it as prompt injection. Docs only: no code, pack or contract
   changed.
+- Translations in sync: `lite/KEEPLOOP-LITE.zh-CN.md` (Chinese skill) and
+  `lite/EXAMPLE.vi.md` / `EXAMPLE.zh-CN.md`; the prompt-optimization example
+  README in Vietnamese and Chinese. Each README now routes to the
+  keeploop-lite file and example in its own language. In the translated
+  READMEs the quick-start prompt, the diagram labels and the chart alt texts
+  are translated; real program output and verbatim records stay English.
+  The marketing-research READMEs show the current `team.yaml`.
 - README: a third way to start, `pipx install keeploop` then `kl init`
   in a new folder; the clone stays for reading the source. The examples
   line names `kl init --example`.
