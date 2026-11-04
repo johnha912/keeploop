@@ -142,6 +142,20 @@ Bản mock là một AI giả viết theo kịch bản. Nó cho thấy vòng l�
 ra sao, không cho thấy một model thật giỏi đến đâu. Mỗi lần keep là một
 commit thật: `git -C .keeploop/workspace log --oneline`.
 
+**(c) Cài thành một lệnh.** Dùng `kl` không cần clone, cài từ PyPI:
+
+```bash
+pipx install keeploop      # hoặc: pip install keeploop (trong một venv riêng)
+mkdir my-loop && cd my-loop
+kl init                    # chép AGENTS.md, program.md, team.yaml, packs/, .claude/ vào đây
+kl begin                   # baseline của bản demo
+```
+
+`kl init` đặt các file bạn sẽ sửa vào chính thư mục của bạn và không bao giờ
+ghi đè file có sẵn. Sau đó mở thư mục này trong AI của bạn như ở (a), rồi
+làm theo [AGENTS.md](AGENTS.md) để trỏ nó vào repo của bạn. `kl run` là chế
+độ headless. Giữ bản clone nếu bạn muốn đọc hoặc sửa chính keeploop.
+
 ## Ví dụ thực tế
 
 | Ví dụ | Lĩnh vực | Điều đã xảy ra | Liên kết |
@@ -150,9 +164,9 @@ commit thật: `git -C .keeploop/workspace log --oneline`.
 | Nghiên cứu marketing | Báo cáo insight người tiêu dùng | 1 chu kỳ thật: 0.970000 → 1.000000, kiểm toán APPROVED, được giữ lại | [Đọc](examples/marketing-research/) |
 | Tối ưu prompt | Prompt AI/LLM | 8 chu kỳ headless, giữ 2, bỏ 6 (một lần đạt 0.915 bị từ chối khi chạy lại). Dev 0.873333 → 0.900000; holdout 0.835 → 0.855 | [Đọc](examples/prompt-optimization/) |
 
-Dựng bất kỳ ví dụ nào thành một sandbox bằng
-`python tools/make_sandbox.py examples/<name> <new short folder>`
-([chi tiết](docs/GUIDE.md#run-a-worked-example)).
+Dựng bất kỳ ví dụ nào thành một sandbox bằng `kl init --example <name> <new short folder>`
+(khi đã cài `kl`) hoặc `python tools/make_sandbox.py examples/<name> <new short folder>`
+(khi dùng bản clone) ([chi tiết](docs/GUIDE.md#run-a-worked-example)).
 
 ## Vì sao chọn keeploop
 
