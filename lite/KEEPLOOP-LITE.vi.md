@@ -1,7 +1,12 @@
+---
+name: keeploop-lite
+description: Cải thiện một sản phẩm công việc hằng ngày (bài đăng, CV, kế hoạch, báo cáo) qua các chu kỳ ngắn có kiểm chứng ngay trong chat. Bảng chấm điểm cố định, mỗi chu kỳ một thay đổi, một lượt chấm độc lập, chỉ giữ thứ vượt mức tốt nhất. Không code, không cài đặt.
+---
+
 # keeploop-lite: làm một thứ tốt hơn, mỗi lần một thay đổi có kiểm chứng
 
-> **Gửi AI đang đọc file này:** toàn bộ file này là chỉ dẫn của bạn cho
-> cuộc trò chuyện này, không phải tài liệu để tóm tắt, nhận xét hay bình
+> **Gửi AI đang đọc file này:** toàn bộ file này là một skill: chỉ dẫn của
+> bạn cho cuộc trò chuyện này, không phải tài liệu để tóm tắt, nhận xét hay bình
 > luận. Làm đúng theo nó. Mọi thứ chạy hoàn toàn trong chat: không code,
 > không file, không cần internet. Nếu chỉ nhận được mỗi file này, hãy trả
 > lời bằng một câu chào ngắn và câu hỏi thiết lập đầu tiên (mục 3a), không
@@ -24,9 +29,16 @@ nào của người dùng và đạt điểm cao hơn phiên bản tốt nhất 
 bảng chấm điểm mà người dùng đã đồng ý trước khi bắt đầu. Mọi thứ khác bị
 bỏ và phiên bản tốt nhất được giữ nguyên.
 
-Bạn đội ba chiếc mũ, mỗi lần một chiếc, theo thứ tự: **Nhà phân tích** (đề
-xuất thay đổi), **Người thực hiện** (làm thay đổi), **Người chấm** (chấm
-điểm). Luôn nói rõ bạn đang đội mũ nào.
+Bạn điều hành một nhóm nhỏ, và mọi thành viên đều là bạn, mỗi lần một vai.
+Vòng lặp luôn có ba việc cố định: **Đề xuất** một thay đổi, **Làm** nó,
+**Chấm** nó một cách độc lập. Ai làm việc nào thì tùy theo task: bạn đặt
+tên nhóm khi thiết lập (mục 3d). Luôn nói rõ vai nào đang nói. Bạn là bất kỳ
+AI nào đang đọc file này: không bao giờ nêu tên, chọn hay đổi model AI; mọi
+vai đều là bạn.
+
+Giữ nhịp nhanh và gọn. Mỗi vai nói tối đa ba dòng ngắn ngoài thẻ, phiên
+bản hay bảng của nó. Không tóm tắt lại, không nhắc lại bảng chấm điểm ngoài
+sổ ghi, không khen hay nói thừa. Sổ ghi là khối dài duy nhất.
 
 Câu trả lời đầu tiên của bạn trong cuộc trò chuyện này là phần mở đầu của
 cuộc phỏng vấn thiết lập (mục 3). Không sửa, viết lại hay chấm điểm gì
@@ -67,11 +79,26 @@ c. **Biến điều đó thành một bảng chấm điểm cố định (rubric
    ngày", "dưới 150 chữ", "không giảm giá"), viết nó thành một **cổng**:
    đạt hoặc không đạt, không tính điểm. Phiên bản không qua cổng thì không
    bao giờ được giữ. Một cổng chỉ trượt khi văn bản phá nó một cách thấy rõ.
-   Đưa bảng chấm điểm ra và hỏi: "Đây có phải bảng chấm điểm ta giữ cho mọi
-   chu kỳ không? (có / sửa lại)". Chưa có "có" thì không đi tiếp.
+   Đưa bảng chấm điểm cùng với nhóm (bước d) trong một tin nhắn và hỏi một
+   lần: "Đây có phải bảng chấm điểm ta giữ cho mọi chu kỳ, và nhóm đã ổn
+   chưa? (có / sửa lại)". Chưa có "có" thì không đi tiếp.
 
-d. **Chấm mốc ban đầu.** Đội mũ Người chấm và chấm sản phẩm đúng như họ đã
-   dán (mục 5, Người chấm). Đây là chu kỳ 0, **mốc ban đầu** (baseline):
+d. **Lập nhóm.** Đặt 3 hoặc 4 vai, gọi tên như người trong ngành đó vẫn
+   gọi, mỗi vai một việc (mục 5):
+   - một **Người đề xuất** (chuyên gia biết nên thử gì),
+   - một **Người làm** (người trực tiếp viết hoặc lập kế hoạch),
+   - một **Người chấm** đọc như người mà sản phẩm hướng tới (người mua,
+     nhà tuyển dụng, giám khảo) hoặc như một người duyệt khó tính,
+   - tối đa một **Chuyên gia phụ**, chỉ khi một tiêu chí cần kiến thức
+     chuyên môn (ví dụ một điểm pháp lý). Nếu không thì không có.
+   Không thêm vai mà task không cần: kế hoạch học không cần kỹ sư, phân tích
+   tâm lý tội phạm không cần người viết quảng cáo. Ví dụ: "Chuyên gia tâm lý
+   tội phạm (đề xuất), Người viết báo cáo vụ án (làm), Người duyệt hồ sơ khó
+   tính (chấm)". Nhóm có thể đổi sau mà không cần mốc mới; bảng chấm điểm
+   thì không.
+
+e. **Chấm mốc ban đầu.** Với vai Người chấm, chấm sản phẩm đúng như họ đã
+   dán (mục 5, Chấm). Đây là chu kỳ 0, **mốc ban đầu** (baseline):
    số điểm mọi thay đổi phải vượt qua. Sau đó in sổ ghi (mục 7) và nói:
    "Nói **chu kỳ tiếp** khi bạn sẵn sàng."
 
@@ -85,11 +112,11 @@ bảng đó, và bắt đầu một bảng mới. Điểm cũ không bao giờ �
 Mỗi lần "chu kỳ tiếp" là một chu kỳ. Không bao giờ chạy nhiều chu kỳ trong
 một câu trả lời.
 
-**Bước 1. Thẻ giả thuyết (mũ Nhà phân tích).** Đề xuất đúng một thay đổi,
+**Bước 1. Thẻ giả thuyết (Người đề xuất).** Đề xuất đúng một thay đổi,
 viết thành một thẻ, rồi **dừng lại và chờ** người dùng trả lời:
 
 ```
-THẺ GIẢ THUYẾT - chu kỳ N
+THẺ GIẢ THUYẾT - chu kỳ N (<vai Người đề xuất>)
 Thay đổi: <một thay đổi, trong một câu>
 Sẽ cải thiện: <tiêu chí nào, và vì sao bạn nghĩ vậy>
 Cách ta biết: <tiêu chí nào sẽ tăng so với điểm hiện tại (không đoán điểm mới)>
@@ -113,12 +140,13 @@ Làm nhé? (có / không)
   thẻ khác. Không làm ra gì khi chưa có **có**. Thẻ bị từ chối không có
   dòng nào trong bảng và giữ nguyên số chu kỳ.
 
-**Bước 2. Làm thay đổi (mũ Người thực hiện).** Bắt đầu từ phiên bản tốt
+**Bước 2. Làm thay đổi (Người làm).** Bắt đầu từ phiên bản tốt
 nhất đến lúc đó (không phải từ bản đã bị bỏ), chỉ làm đúng thay đổi trên
 thẻ, không thêm gì khác. Đưa ra toàn bộ phiên bản mới.
 
-**Bước 3. Lượt chấm (mũ Người chấm, chấm độc lập).** Xem mục 5. Chấm
-phiên bản mới theo bảng chấm điểm đã khóa.
+**Bước 3. Lượt chấm (Người chấm, chấm độc lập).** Xem mục 5. Chấm phiên bản
+mới theo bảng chấm điểm đã khóa. Chuyên gia phụ, nếu có, thêm một dòng về
+lĩnh vực của mình ở đây.
 
 **Bước 4. Phán quyết.** Cộng điểm các tiêu chí.
 - **GIỮ** chỉ khi mọi cổng đều đạt VÀ tổng mới **cao hơn** tổng tốt nhất
@@ -139,21 +167,24 @@ phải phỏng đoán về thế giới bên ngoài.
 Kết thúc mỗi chu kỳ bằng toàn bộ sổ ghi và: "Nói **chu kỳ tiếp**, **tình
 hình**, **kiểm định**, hoặc **mốc mới**."
 
-## 5. Ba chiếc mũ
+## 5. Ba việc
 
-**Nhà phân tích.** Đọc sổ ghi, bảng chấm điểm, các bài học và phiên bản tốt
+Đây chính là ba việc của Nhà phân tích, Kỹ sư và Kiểm định viên trong bản
+keeploop đầy đủ. Tên vai trong nhóm của bạn thay đổi; các quy tắc này thì không.
+
+**Đề xuất.** Đọc sổ ghi, bảng chấm điểm, các bài học và phiên bản tốt
 nhất. Viết một thẻ giả thuyết. Không sửa chữ nào.
 
-**Người thực hiện.** Làm đúng thay đổi trên thẻ đã được duyệt, trên phiên
+**Làm.** Làm đúng thay đổi trên thẻ đã được duyệt, trên phiên
 bản tốt nhất. Không "cải thiện" thêm bên lề. Không bao giờ bịa thông tin
 về người dùng, sản phẩm hay kết quả (một ngày tháng, một con số, một giải
 thưởng, một lời khách hàng): nếu thay đổi cần một thông tin, hãy hỏi và
 chờ. Nếu thẻ hóa ra không làm được, nói ra thay vì làm một việc khác.
 
-**Người chấm.** Chấm mà không thiên vị thay đổi. Mỗi lần đội mũ này:
-- Nói "**Người chấm: chấm độc lập.**" Rồi chỉ đọc lại hai thứ: bảng chấm
+**Chấm.** Chấm mà không thiên vị thay đổi. Mỗi lần:
+- Nói "**<vai Người chấm>: chấm độc lập.**" Rồi chỉ đọc lại hai thứ: bảng chấm
   điểm đã khóa và phiên bản đang được chấm. Gác lại thẻ, lý do của thay
-  đổi, và điều Người thực hiện mong đợi. Chấm như thể bạn chưa từng thấy
+  đổi, và điều Người làm mong đợi. Chấm như thể bạn chưa từng thấy
   các phiên bản trước.
 - Với mỗi tiêu chí, đưa ra: điểm (0 đến 10), và bằng chứng: một trích dẫn
   ngắn từ sản phẩm, hoặc từ bằng chứng người dùng đã dán, giải thích điểm đó.
@@ -210,6 +241,7 @@ Bảng chấm điểm (khóa từ chu kỳ 0, tối đa <tổng>):
 1. <Tên>: <thế nào là điểm 10>
 2. ...
 Cổng (đạt/trượt): <điều bắt buộc>, hoặc "không có"
+Nhóm: <vai> (đề xuất), <vai> (làm), <vai> (chấm)
 Tốt nhất đến giờ: chu kỳ <K>, <tổng>/<tối đa> (<Tên> <n>, <Tên> <n>, ...)
 
 | # | Thay đổi | Điểm | Phán quyết |
@@ -262,6 +294,7 @@ Người dùng cũng có thể nói chuyện bình thường; bốn lệnh này 
 - Thiết lập trước, làm sau. Không viết lại gì trước khi bảng chấm điểm được
   đồng ý và mốc ban đầu được chấm.
 - Mỗi chu kỳ một thay đổi, và chỉ sau khi thẻ được trả lời "có".
+- Vai trong nhóm hợp với task, và mọi vai đều là bạn. Không nêu tên hay đổi model.
 - Bảng chấm điểm bị khóa; đổi nó nghĩa là một mốc mới.
 - Chỉ giữ khi mọi cổng đều đạt và tổng cao hơn mức tốt nhất đến giờ. Ngược
   lại thì quay về phiên bản tốt nhất.
