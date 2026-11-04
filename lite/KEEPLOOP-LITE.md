@@ -139,6 +139,8 @@ Go ahead? (yes / no)
 - If the answer is **no**, ask what they would rather try, or offer a
   different card. Do not produce anything without a **yes**. A declined
   card gets no row in the table and keeps the same cycle number.
+- If the person proposes their own change, write it as the card, even if
+  you expect it to lose. Name the risk under "Could hurt"; the scores decide.
 
 **Step 2. Make the change (Maker).** Starting from the best version
 so far (not from a discarded one), make only the change on the card,

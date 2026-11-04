@@ -45,14 +45,21 @@ stored anywhere.
   self-contained file you paste into a chat app (ChatGPT, Claude, Gemini).
   The chat AI runs the same keep-or-discard loop on everyday work, such as
   a post, a CV or a plan. It runs a setup interview, then a locked
-  scorecard with pass/fail gates and a scored baseline. Each cycle is a
-  hypothesis card that waits for a yes, one change, and a fresh Auditor
-  pass under an evidence rule ("can't measure this here" = 0). The cycle
-  ends with a keep or a discard and a reprinted ledger, which is the
-  memory you carry to a new chat. The loop is self-enforced, not enforced
-  by machine. Includes a Vietnamese version (`KEEPLOOP-LITE.vi.md`), an
-  illustrative example (`EXAMPLE.md`) and a routing block in the READMEs.
-  Docs only: no code, pack or contract changed.
+  scorecard with pass/fail gates, a team whose roles are named for the
+  task (propose, make, check, plus at most one specialist), and a scored
+  baseline. Each cycle is a hypothesis card that waits for a yes, one
+  change, and a fresh check under an evidence rule ("can't measure this
+  here" = 0). The cycle ends with a keep or a discard and a reprinted
+  ledger, which is the memory you carry to a new chat. The file is
+  model-agnostic and has skill frontmatter, so the same file works
+  pasted, as Project or Gem instructions, or as a skill. The loop is
+  self-enforced, not enforced by machine. Includes a Vietnamese version
+  (`KEEPLOOP-LITE.vi.md`) and an illustrative example (`EXAMPLE.md`).
+  The READMEs gain a routing block for people and a short note for AI
+  assistants: a coding agent uses the full version, a chat assistant
+  uses lite. The note informs rather than instructs, so assistants do
+  not treat it as prompt injection. Docs only: no code, pack or contract
+  changed.
 
 ## [0.2.0] - 2026-11-03
 
