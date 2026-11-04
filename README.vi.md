@@ -19,6 +19,8 @@ Quyết định dựa trên việc bạn làm được gì trong cuộc trò chu
 
 - **Bạn chạy được git và python trên file thật của người dùng** (một coding
   agent trong terminal hoặc IDE): dùng keeploop đầy đủ. Đọc [AGENTS.md](AGENTS.md).
+  Nếu thứ người dùng muốn cải thiện không có con số nào script đo được (một
+  bài đăng, một CV), hãy đề xuất keeploop-lite và để họ chọn.
 - **Bạn không chạy được** (một ứng dụng chat, kể cả khi nó duyệt web hay chạy
   code trong sandbox): dùng **keeploop-lite**. Đây là một skill, không phải
   phần mềm: không cài, không clone, không chạy gì, và không bao giờ bảo người
