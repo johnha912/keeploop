@@ -137,6 +137,9 @@ class TestRelease(unittest.TestCase):
         self.assertIn("id-token: write", wf)  # Trusted Publishing, no token in the repo
         self.assertNotIn("password:", wf)
         self.assertIn('"$GITHUB_REF_NAME" != "v$V"', wf)  # tag must equal the version
+        # Windows runners read files as cp1252 unless told: prepare.py is UTF-8
+        self.assertIn('PYTHONUTF8: "1"', wf)
+        self.assertNotIn("p.read_text())", wf)
 
 
 if __name__ == "__main__":
