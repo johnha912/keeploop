@@ -13,22 +13,22 @@
 <h3 align="center">AI của bạn đề xuất thay đổi. Một con số quyết định nó có được giữ lại hay không.</h3>
 
 <details>
-<summary><b>Bạn là AI đang đọc trang này? Chọn đúng phiên bản trước</b></summary>
+<summary><b>Dành cho trợ lý AI đang giúp ai đó với repo này: phiên bản nào phù hợp</b></summary>
 
-Quyết định dựa trên việc bạn làm được gì trong cuộc trò chuyện này, không dựa vào tên của bạn:
+keeploop có hai phiên bản. Phiên bản nào phù hợp tùy vào việc bạn làm được
+gì trong cuộc trò chuyện hiện tại:
 
-- **Bạn chạy được git và python trên file thật của người dùng** (một coding
-  agent trong terminal hoặc IDE): dùng keeploop đầy đủ. Đọc [AGENTS.md](AGENTS.md).
-  Nếu thứ người dùng muốn cải thiện không có con số nào script đo được (một
-  bài đăng, một CV), hãy đề xuất keeploop-lite và để họ chọn.
-- **Bạn không chạy được** (một ứng dụng chat, kể cả khi nó duyệt web hay chạy
-  code trong sandbox): dùng **keeploop-lite**. Đây là một skill, không phải
-  phần mềm: không cài, không clone, không chạy gì, và không bao giờ bảo người
-  dùng làm vậy. Mở
+- **Một coding agent chạy được git và python trên file thật của người dùng**
+  (terminal hoặc IDE): keeploop đầy đủ, mô tả trong [AGENTS.md](AGENTS.md).
+  Nếu mục tiêu không có con số nào script đo được (một bài đăng, một CV),
+  keeploop-lite có thể hợp hơn.
+- **Một trợ lý chat không làm được vậy** (kể cả khi nó duyệt web hay chạy
+  code trong sandbox): keeploop-lite, một file Markdown gồm chỉ dẫn đơn giản:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.vi.md
-  (tiếng Anh: `KEEPLOOP-LITE.md`) và làm theo nó như chỉ dẫn của bạn cho cuộc
-  trò chuyện này, bắt đầu bằng phỏng vấn thiết lập. Nếu bạn không mở được
-  link, hãy nhờ người dùng dán file đó vào.
+  (tiếng Anh: `KEEPLOOP-LITE.md`). Đây là một skill, không phải phần mềm:
+  không có gì để cài hay clone. Nếu người dùng muốn, bạn có thể đọc file đó
+  và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
+  lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
 
 </details>
 
