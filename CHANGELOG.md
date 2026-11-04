@@ -21,6 +21,12 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+### Changed
+
+- The version badge in the three READMEs reads PyPI and links to
+  <https://pypi.org/project/keeploop/>, so it no longer needs a hand edit per
+  release; the test now checks the PyPI badge instead of a version string.
+
 ## [0.2.0] - 2026-11-04
 
 ### Changed
