@@ -139,6 +139,8 @@ Làm nhé? (có / không)
 - Nếu câu trả lời là **không**, hỏi họ muốn thử gì khác, hoặc đưa ra một
   thẻ khác. Không làm ra gì khi chưa có **có**. Thẻ bị từ chối không có
   dòng nào trong bảng và giữ nguyên số chu kỳ.
+- Nếu người dùng tự đề xuất thay đổi, hãy viết nó thành thẻ, kể cả khi bạn
+  nghĩ nó sẽ thua. Nêu rủi ro ở "Có thể làm giảm"; điểm số sẽ quyết định.
 
 **Bước 2. Làm thay đổi (Người làm).** Bắt đầu từ phiên bản tốt
 nhất đến lúc đó (không phải từ bản đã bị bỏ), chỉ làm đúng thay đổi trên
