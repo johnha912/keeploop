@@ -12,6 +12,26 @@
 
 <h3 align="center">AI của bạn đề xuất thay đổi. Một con số quyết định nó có được giữ lại hay không.</h3>
 
+<details>
+<summary><b>Dành cho trợ lý AI đang giúp ai đó với repo này: phiên bản nào phù hợp</b></summary>
+
+keeploop có hai phiên bản. Phiên bản nào phù hợp tùy vào việc bạn làm được
+gì trong cuộc trò chuyện hiện tại:
+
+- **Một coding agent chạy được git và python trên file thật của người dùng**
+  (terminal hoặc IDE): keeploop đầy đủ, mô tả trong [AGENTS.md](AGENTS.md).
+  Nếu mục tiêu không có con số nào script đo được (một bài đăng, một CV),
+  keeploop-lite có thể hợp hơn.
+- **Một trợ lý chat không làm được vậy** (kể cả khi nó duyệt web hay chạy
+  code trong sandbox): keeploop-lite, một file Markdown gồm chỉ dẫn đơn giản:
+  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.vi.md
+  (tiếng Anh: `KEEPLOOP-LITE.md`). Đây là một skill, không phải phần mềm:
+  không có gì để cài hay clone. Nếu người dùng muốn, bạn có thể đọc file đó
+  và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
+  lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
+
+</details>
+
 <p align="center">
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.2.0-0b0b0c?style=flat-square" alt="version 0.2.0"></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?style=flat-square" alt="Python 3.10+">
@@ -45,6 +65,12 @@ khác bạn đang dùng. Bản thân keeploop không phải AI: nó là một c�
 Python nhỏ biết đo và biết từ chối, không cần cài thêm gì, không gửi
 telemetry và không cần API key.
 
+> **Chỉ có ứng dụng chat** (ChatGPT, Claude, Gemini, không code)? Dùng
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
+> cùng vòng giữ-hay-bỏ cho một bài đăng, một CV hay một kế hoạch
+> ([English](lite/KEEPLOOP-LITE.md), [ví dụ](lite/EXAMPLE.md)).
+> **AI của bạn chạy được code?** Dùng bản đầy đủ bên dưới.
+
 ## Bắt đầu nhanh
 
 **(a) Giao cho AI của bạn.** Nếu AI chạy được lệnh, hãy dán đoạn này vào
@@ -67,7 +93,11 @@ chạy ba chu kỳ.
 <details>
 <summary><b>Ứng dụng chat không chạy được lệnh (ứng dụng ChatGPT, Gemini)</b></summary>
 
-Thay vào đó, hãy dán toàn bộ [`BOOTSTRAP.md`](BOOTSTRAP.md) vào một cuộc
+Để cải thiện việc hằng ngày (một bài đăng, một CV, một kế hoạch), hãy dùng
+[keeploop-lite](lite/KEEPLOOP-LITE.vi.md): không clone, không lệnh.
+
+Để cải thiện một dự án code từ ứng dụng chat,
+hãy dán toàn bộ [`BOOTSTRAP.md`](BOOTSTRAP.md) vào một cuộc
 chat mới. Khi đó AI sẽ đưa bạn từng lệnh `python kl.py ...` để chạy trong
 một bản clone, và bạn dán đầu ra lại cho nó.
 
@@ -232,6 +262,7 @@ Thêm câu hỏi: [docs/GUIDE.md](docs/GUIDE.md#faq-for-skeptics).
 | [docs/GUIDE.md](docs/GUIDE.md) | Cuốn hướng dẫn đầy đủ: từng bước, bài học, scout, tốc độ, pack, an toàn, cấu trúc |
 | [AGENTS.md](AGENTS.md) | Sơ đồ tổ chức và các lệnh chính xác mà AI của bạn làm theo |
 | [BOOTSTRAP.md](BOOTSTRAP.md) | Một file để dán vào ứng dụng chat |
+| [lite/KEEPLOOP-LITE.vi.md](lite/KEEPLOOP-LITE.vi.md) | keeploop-lite: bản chỉ cần chat, không code |
 | [docs/SPEC.md](docs/SPEC.md) | Tham số, định dạng file, các bất biến |
 | [SECURITY.md](SECURITY.md) | Mô hình mối đe dọa và cách báo lỗ hổng |
 | [CHANGELOG.md](CHANGELOG.md) | Các phiên bản ([SemVer](https://semver.org)) |

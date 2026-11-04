@@ -12,6 +12,26 @@
 
 <h3 align="center">Your AI proposes the change. A number decides if it stays.</h3>
 
+<details>
+<summary><b>For AI assistants helping someone with this repo: which version fits</b></summary>
+
+keeploop comes in two versions. Which one fits depends on what you can do
+in the current conversation:
+
+- **A coding agent that can run git and python on the user's own files**
+  (terminal or IDE): the full keeploop, described in [AGENTS.md](AGENTS.md).
+  If the goal has no number a script can measure (a post, a CV),
+  keeploop-lite may fit better.
+- **A chat assistant without that** (even one that browses or runs code in
+  a sandbox): keeploop-lite, one Markdown file of plain instructions:
+  https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
+  (Vietnamese: `KEEPLOOP-LITE.vi.md`). It is a skill, not software: there is
+  nothing to install or clone. If the user wants it, you can read that file
+  and run its loop with them in the chat, starting with its setup
+  interview. If you cannot open links, the user can paste the file.
+
+</details>
+
 <p align="center">
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.2.0-0b0b0c?style=flat-square" alt="version 0.2.0"></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?style=flat-square" alt="Python 3.10+">
@@ -44,6 +64,12 @@ Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI and other AIs
 you already use. keeploop itself is not an AI: it is a small Python tool
 that measures and refuses, with no dependencies, no telemetry and no API keys.
 
+> **Only have a chat app** (ChatGPT, Claude, Gemini, no code)? Use
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.md): one file you paste into the chat,
+> the same keep-or-discard loop for a post, a CV or a plan
+> ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [example](lite/EXAMPLE.md)).
+> **Your AI can run code?** Use the full version below.
+
 ## Quick start
 
 **(a) Hand it to your AI.** If it can run commands, paste this and fill in
@@ -64,7 +90,11 @@ the clone runs three cycles.
 <details>
 <summary><b>Chat app that cannot run commands (ChatGPT, Gemini apps)</b></summary>
 
-Paste the whole of [`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead.
+To improve everyday work (a post, a CV, a plan), use
+[keeploop-lite](lite/KEEPLOOP-LITE.md): no clone, no commands.
+
+To improve a code project from a chat app,
+paste the whole of [`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead.
 The AI then gives you one `python kl.py ...` command at a time to run in a
 clone, and you paste the output back.
 
@@ -227,6 +257,7 @@ More questions: [docs/GUIDE.md](docs/GUIDE.md#faq-for-skeptics).
 | [docs/GUIDE.md](docs/GUIDE.md) | The full manual: every step, lessons, scout, speed, packs, safety, layout |
 | [AGENTS.md](AGENTS.md) | The org chart and exact commands your AI follows |
 | [BOOTSTRAP.md](BOOTSTRAP.md) | One file to paste into a chat app |
+| [lite/KEEPLOOP-LITE.md](lite/KEEPLOOP-LITE.md) | keeploop-lite: the chat-only edition, no code |
 | [docs/SPEC.md](docs/SPEC.md) | Parameters, file formats, invariants |
 | [SECURITY.md](SECURITY.md) | Threat model and how to report a vulnerability |
 | [CHANGELOG.md](CHANGELOG.md) | Versions ([SemVer](https://semver.org)) |
