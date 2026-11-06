@@ -17,6 +17,7 @@ You are the CEO. Read AGENTS.md first; it is the full procedure. Run N cycles (d
    - `python kl.py keep [--audit-verdict FILE]`, or `python kl.py discard [--refuted] --reason "..."` (`--refuted`: rejected on evidence without an eval).
    - Any crash, refusal or correction: `python kl.py lesson add ...` (with a check command when possible).
 3. Every ~5 cycles: `python kl.py staff`.
+   Stop early, before N, when `python kl.py status` prints a `STOP:` line (target reached or stalled): go to step 4. Asked only where things stand? Measure and report; run no cycle.
 4. Finish with `python kl.py report` and paste its output verbatim into your reply. Quote no number from memory.
 
 Never commit by hand, never edit protected paths, evaluate.py, program.md, team.yaml or .keeploop/. Put every unknown under MISSING.

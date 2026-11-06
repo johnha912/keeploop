@@ -21,6 +21,20 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+### Added
+
+- Brakes against doing more than was asked, set by the human in
+  `team.yaml`: `loop.target` (good enough; at or above it the job is done)
+  and `loop.stall_cycles` (that many cycles in a row without a keep). When
+  either trips, `kl status` prints a `STOP:` line, `kl card` refuses a new
+  card (no ledger row) and `run.py` stops before the next cycle. Both are off
+  unless set. Before, nothing but `max_iterations`, crashes and the token
+  budget stopped a loop that kept finding cards to try.
+- AGENTS.md (and BOOTSTRAP.md, the /keeploop skill): "measuring is not
+  improving". Asked where things stand, the AI measures and reports and
+  starts no cycle; it stops at a `STOP:` line even before 3 cycles; the
+  first-time interview asks what score is good enough.
+
 ### Changed
 
 - The version badge in the three READMEs reads PyPI and links to

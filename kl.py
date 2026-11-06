@@ -284,6 +284,8 @@ def status_text(c) -> str:
            f"workspace: {c.workspace}"]
     if warn := R.ceiling_warning(best["metric"], _bar(c, best), c.loop_cfg["metric_max"]):
         out.append(warn)
+    if why := R.brake(best["metric"], c.loop_cfg, ledger.read_rows(c.state)):
+        out.append(f"STOP: {why}")
     cy = _cycle(c)
     out.append(f"pending card: {cy['n']}  {cy['parsed']['hypothesis'][:80]}" if "card" in cy
                else "pending card: none")
@@ -337,6 +339,8 @@ def cmd_card(c, a) -> int:
         raise Refuse(f"card {_cycle(c)['n']} is still open: `kl keep` or `kl discard` it first")
     if _dirty(c):
         raise Refuse(f"workspace has uncommitted changes: run `{kl()} discard` first")
+    if why := R.brake(best["metric"], c.loop_cfg, ledger.read_rows(c.state)):
+        raise Refuse(f"{why}. Report with `{kl()} report`")
     n = _next_cycle(c)
     parsed = R.parse_card(text)
     if not parsed:
