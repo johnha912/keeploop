@@ -68,6 +68,8 @@ loop:
   max_iterations: 20
   keep_threshold: 0.0
   # metric_max: 1.0      # top of evaluate.py's scale: warns when the keep bar is above it
+  # target: 0.9          # good enough: once best reaches it, no new card and run.py stops
+  # stall_cycles: 5      # this many cycles in a row without a keep: the same brake (0 = off)
 
 # Optional: flag cycles slower than this many seconds in `kl report`, and use it as
 # the target `kl slow` proposes for a lesson check. Default: none.
