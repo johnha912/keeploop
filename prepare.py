@@ -38,6 +38,8 @@ CONFIG = {
     "noise_runs": 3,                # baseline evaluations; their pstdev is sigma
     "noise_z": 2.0,                 # a keep must beat best by noise_z * sigma
     "metric_max": None,             # top of evaluate.py's scale, if it has one (warns at the ceiling)
+    "target": None,                 # good enough: at or above it, no new card and run.py stops
+    "stall_cycles": 0,              # this many cycles in a row without a keep: same brake; 0 = off
     "max_run_tokens": 2_000_000,    # estimated tokens per run; reached = stop
     "duplicate_jaccard": 0.8,       # card vs a rejected one: skip the Engineer
     "heavy_diff_lines": 100,        # a bigger diff is heavy: forced confirm, heavy_model
