@@ -185,6 +185,27 @@ is scored once before and once after the run; the agents never see it, and
 a holdout gain far below the eval gain prints a warning that the keeps may
 be fitting the evaluation rather than the problem.
 
+### When to stop: measuring is not improving
+
+A loop that can always propose one more card will, so the stop has to be set
+before it starts, by the human, in numbers:
+
+```yaml
+loop:
+  target: 0.9        # good enough: once best reaches it, the job is done
+  stall_cycles: 5    # this many cycles in a row without a keep: stop too
+```
+
+When either brake trips, `kl status` prints a `STOP:` line, `kl card` refuses
+a new card, and `run.py` stops before the next cycle. Both are off unless set,
+and only the human changes them (`team.yaml` is fenced). Raising the target is
+a new decision, not something the loop drifts into.
+
+The other half is a rule in AGENTS.md: when the user asks where things stand
+(a number for a handover or a report), the AI measures and reports, and starts
+no cycle. A report that says "75%" is a finished job; turning it into "100%"
+is a separate request with its own acceptance test.
+
 ## Hypotheses, not prompts
 
 A better prompt makes an answer read better. It does not give the model

@@ -410,6 +410,28 @@ def ceiling_warning(best: float, bar: float, metric_max) -> str | None:
     return None
 
 
+def brake(best: float, loop_cfg: dict, rows: list[dict]) -> str | None:
+    """Why the loop must stop asking for work (None = carry on). Two human-set
+    brakes against doing more than was asked: loop.target (the score that is good
+    enough) and loop.stall_cycles (that many cycles in a row without a keep). Both
+    are off by default; only a human changes them (team.yaml is fenced)."""
+    target = loop_cfg.get("target")
+    if target is not None and best >= float(target):
+        return (f"target reached: best {best:.6f} >= target {float(target):.6f} (loop.target). "
+                f"The job is done: report, do not start another cycle. Only a human raises the target")
+    limit = int(loop_cfg.get("stall_cycles") or 0)
+    if limit > 0:
+        streak = 0
+        for row in reversed([r for r in rows if int(r["cycle"]) >= 1]):
+            if row["status"] == "keep":
+                break
+            streak += 1
+        if streak >= limit:
+            return (f"stalled: {streak} cycles in a row without a keep (loop.stall_cycles {limit}). "
+                    f"Stop and report; a human decides what changes next")
+    return None
+
+
 LAST_STDERR = [""]  # evaluate.py's stderr from its last run in this process; never holdout.py's
 
 
@@ -990,6 +1012,9 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
     totals = {"keep": 0, "discard": 0, "crash": 0, "tokens": 0, "lessons": 0}
     stop = 0
     for n in range(1, iterations + 1):
+        if why := brake(best["metric"], loop_cfg, ledger.read_rows(state)):
+            print(f"run: stopping — {why}")
+            break
         notes.clear()
         parsed.clear()
         forced.clear()

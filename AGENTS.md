@@ -15,9 +15,19 @@ measure ("make the tests faster", "raise the score"), run the cycle below
 yourself, without waiting for `/keeploop`. Default to 3 cycles, then
 report with `kl report`. First time in a project, if `evaluate.py` is
 still the demo, do not start the loop: ask the user, in plain words, what
-"better" means and how to measure it, then propose an `evaluate.py` for
-them to approve. Ask everything you need in one message; never make the
-user learn commands or flags.
+"better" means, how to measure it and what score is good enough (it
+becomes `loop.target`), then propose an `evaluate.py` for them to approve.
+Ask everything you need in one message; never make the user learn
+commands or flags.
+
+**Measuring is not improving.** When the user asks where things stand (a
+number for a report or a handover, "how good is it now?"), measure and
+report only: `kl begin` the first time, then `kl status`, `kl eval` or
+`kl report`. Change nothing and start no cycle; improving is a separate
+request. **Stop when it is enough.** When `kl status` prints a `STOP:`
+line (the target is reached, or the loop stalled), report and stop, even
+before 3 cycles. Never invent another card to keep going; `kl card`
+refuses it anyway.
 
 ## Pointing keeploop at the user's own repo (first time)
 
