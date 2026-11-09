@@ -108,27 +108,32 @@ class TestProofRun(Tmp):
         self.assertTrue(any("inside the noise band" in ln for ln in cyc[a]))
         self.assertTrue(any(ln.strip().startswith("KEEP") for ln in cyc[b]))
         for name in ("keeploop-demo.gif", "keeploop-demo.mp4", "keeploop-demo-poster.png",
-                     "keeploop-figure.gif", "keeploop-figure.mp4", "keeploop-figure.png"):
+                     "keeploop-gate.gif", "keeploop-gate.png", "keeploop-talk.mp4", "keeploop-talk.png"):
             size = (ROOT / "docs" / "assets" / name).stat().st_size
             self.assertTrue(0 < size < 15_000_000, name)
 
 
 class TestFigure(unittest.TestCase):
-    def test_figure_data_comes_from_the_committed_runs(self):
+    def test_animation_data_comes_from_the_committed_runs(self):
         import render_figure
         d = render_figure.data()
         proof = json.loads((ROOT / "docs" / "proof" / "proof.json").read_text(encoding="utf-8"))
         self.assertEqual(d["p"]["k"], proof["summary"]["keeploop"])
-        self.assertEqual((d["run"]["a"], d["run"]["b"]), (7, 8))
-        a = next(r for r in d["run"]["rows"] if r["cycle"] == 7)
-        self.assertLess(a["best"], a["metric"])  # beat the best...
-        self.assertLessEqual(a["metric"], a["best"] + 2 * d["run"]["sigma"])  # ...inside the band
-        html = (ROOT / "tools" / "figure" / "figure.html").read_text(encoding="utf-8")
-        typed = [f"{proof['summary'][m][k]:.2f}" for m in ("naive", "keeploop")
-                 for k in ("kept_no_true_gain_mean", "discarded_true_gain_mean")]
-        typed += [f"{a['metric']:.3f}", f"{a['best']:.3f}", f"{a['best'] + 2 * d['run']['sigma']:.3f}"]
-        for value in typed:  # every result on the page comes from DATA, none is typed in
-            self.assertNotIn(value, html)
+        beats, sig = d["readme"]["beats"], d["run"]["sigma"]
+        self.assertEqual([b["verdict"] for b in beats], ["discard", "keep", "discard"])
+        a, keep, c = beats
+        self.assertTrue(a["best"] < a["score"] <= a["best"] + 2 * sig)  # beat the best, inside the band
+        self.assertTrue(min(keep["score"], keep["rerun"]) > keep["best"] + 2 * sig)  # cleared it twice
+        self.assertTrue(c["score"] > keep["score"] and c["score"] <= c["best"] + 2 * sig)
+        sample = json.loads((ROOT / "docs" / "assets" / "demo-run" / "noise-sample.json").read_text(encoding="utf-8"))
+        self.assertEqual(d["talk"]["noise"], sample["scores"])  # the committed sample replays
+        for page in ("readme.html", "talk.html"):
+            html = (ROOT / "tools" / "figure" / page).read_text(encoding="utf-8")
+            typed = [f"{proof['summary'][m][k]:.2f}" for m in ("naive", "keeploop")
+                     for k in ("kept_no_true_gain_mean", "discarded_true_gain_mean")]
+            typed += [f"{b['score']:.3f}" for b in beats] + [f"{x:.3f}" for x in sample["scores"]]
+            for value in typed:  # every result on a page comes from DATA, none is typed in
+                self.assertNotIn(value, html, page)
 
 
 class TestNarrateAndReport(Tmp):

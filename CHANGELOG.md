@@ -76,17 +76,17 @@ release. The one-time PyPI setup and the steps are in
   starts no cycle; it stops at a `STOP:` line even before 3 cycles; the
   first-time interview asks what score is good enough.
 
-- The README hero: `docs/assets/keeploop-figure.gif` / `.mp4` / `.png`, a one-page
-  technical note, "A Commit Law for Noisy Evaluations", in a dark paper style (abstract,
-  naive vs keeploop loop, Algorithm 1, a real run drawn cycle by cycle, the 25-seed table
-  with its price, the keep bar on a number line) with a highlight that walks through it,
-  3:4 for X. Rendered by
-  `tools/render_figure.py` from `docs/proof/proof.json` and `docs/assets/demo-run/`
-  (build-time only: Playwright's Chromium, ffmpeg, Pillow); no number is typed into
-  the template.
-
-### Changed
-
+- Two animations in keeploop's own look (cream, black type, a yellow noise band), made
+  by `tools/render_figure.py` from `docs/proof/proof.json`, the seed-2 runs and a
+  measured noise sample (`docs/assets/demo-run/noise-sample.json`); no number is typed
+  into a template (build-time only: Playwright's Chromium, ffmpeg, Pillow):
+  - `docs/assets/keeploop-gate.gif`, the README hero: "the keep gate", one number line on
+    which three real changes land: one reset inside the noise band, one committed after
+    clearing the bar twice, and one that scores higher still but is reset inside the new
+    band. Loops seamlessly (the renderer refuses otherwise).
+  - `docs/assets/keeploop-talk.mp4`, a 48-second 16:9 talk for X: same code / different
+    score, keep-if-better keeps luck (with each kept change's true effect), the commit
+    law, the 25-seed numbers, the price, the fast path.
 - README (en, vi, zh-CN): the hero figure, the proof-run numbers and their trade-off at
   the top; the terminal demo is linked from the caption.
 - The version badge in the three READMEs reads PyPI and links to

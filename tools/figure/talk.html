@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>keeploop: the talk</title>
+<!-- The X video: a 16:9 talk, eight slides. tools/render_figure.py fills DATA and
+     screenshots render(t). Build-time only. No result is typed here: every number on a
+     slide is set from DATA (docs/proof/proof.json, the seed-2 runs, a measured noise
+     sample of examples/noisy-eval). -->
+<style>
+:root { --cream: #f4efe4; --ink: #151515; --ink2: #5b574f; --muted: #9a958a; --sun: #ffd23f;
+  --sun-edge: #e0b000; --go: #12804c; --stop: #e0502c; --card: #fffdf7; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--cream); }
+body { width: 1920px; height: 1080px; overflow: hidden; color: var(--ink); position: relative;
+  font-family: "Inter Display", Inter, "Liberation Sans", sans-serif; }
+.chrome { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: center; gap: 12px; font: 800 30px "Inter Display", Inter, sans-serif; letter-spacing: -0.6px; }
+.kicker { font: 600 18px "JetBrains Mono", monospace; color: var(--ink2); }
+.prog { position: absolute; left: 72px; right: 72px; bottom: 44px; display: flex; gap: 10px; align-items: center; }
+.prog i { flex: 1; height: 8px; background: #e3dccb; border-radius: 4px; }
+.prog i.on { background: var(--ink); }
+.prog b { font: 600 18px "JetBrains Mono", monospace; color: var(--ink2); margin-left: 14px; min-width: 90px; text-align: right; }
+section { position: absolute; left: 72px; right: 72px; top: 130px; bottom: 100px; opacity: 0; }
+h2 { font-weight: 900; font-size: 92px; letter-spacing: -3px; margin: 0; line-height: 1; }
+h2 .hl { background: linear-gradient(transparent 58%, var(--sun) 58%); }
+.lead { font-size: 34px; color: var(--ink2); margin-top: 22px; font-weight: 500; max-width: 1500px; line-height: 1.3; }
+.mono { font-family: "JetBrains Mono", monospace; }
+.big { font-weight: 900; letter-spacing: -4px; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.lab { font-size: 26px; color: var(--ink2); font-weight: 600; }
+.stat { position: absolute; }
+.chip { display: inline-block; font: 600 30px "JetBrains Mono", monospace; background: var(--ink); color: var(--cream);
+  padding: 10px 20px; border-radius: 10px; margin-right: 14px; }
+.row { position: absolute; left: 0; right: 0; font-size: 36px; font-weight: 700; }
+.row .sub { display: block; font-size: 27px; color: var(--ink2); font-weight: 500; margin-top: 10px; }
+svg { position: absolute; left: 0; top: 0; overflow: visible; }
+svg text { font-family: "JetBrains Mono", monospace; }
+</style></head>
+<body>
+<div class="chrome"><div class="brand"><svg width="38" height="38" viewBox="0 0 34 34" style="position:static"><path d="M24.5 8.5 A11 11 0 1 0 28 17" fill="none" stroke="#151515" stroke-width="4.2" stroke-linecap="round"/><path d="M19 4.5 L25 8.5 L20 13.5" fill="none" stroke="#151515" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29.5" cy="11" r="3.6" fill="#12804c"/></svg>keeploop</div>
+  <div class="kicker">a commit law for noisy evaluations</div></div>
+
+<section id="s1">
+  <h2 style="font-size:150px;letter-spacing:-6px;margin-top:120px" id="t1"></h2>
+  <div class="lead" style="font-size:38px;margin-top:40px">keeploop lets your AI change your project one idea at a time, and commits a change only when it clears the evaluation's own noise.</div>
+</section>
+
+<section id="s2">
+  <h2>Same code. <span class="hl">Different score.</span></h2>
+  <div class="lead" id="s2lead"></div>
+  <svg id="v2" width="1776" height="560" style="top:250px"></svg>
+</section>
+
+<section id="s3">
+  <h2>Keep-if-better <span class="hl">keeps luck.</span></h2>
+  <div class="lead" id="s3lead"></div>
+  <svg id="v3" width="1776" height="560" style="top:250px"></svg>
+</section>
+
+<section id="s4">
+  <h2>The commit law.</h2>
+  <div class="lead">Every change runs the same line. Most stop at the yellow gate.</div>
+  <svg id="v4" width="1776" height="560" style="top:230px"></svg>
+</section>
+
+<section id="s5">
+  <h2>Same 20 proposals. Same noise. <span class="hl" id="s5seeds"></span></h2>
+  <div class="lead">A naive keep-if-better loop and keeploop, mean per run. The simulation knows each change's true effect; the loops never see it.</div>
+  <div class="stat" style="left:0;top:300px;right:0"><div class="lab">changes kept with no true gain, per run</div>
+    <div style="display:flex;gap:70px;align-items:baseline;margin-top:6px">
+      <div class="big" style="font-size:180px;color:#12804c" id="k1"></div><div class="lab" style="font-size:30px">keeploop</div>
+      <div class="big" style="font-size:120px;color:#9a958a" id="n1"></div><div class="lab" style="font-size:30px">naive</div></div></div>
+  <div class="stat" style="left:0;top:580px;right:0"><div class="lab">how far the loop's own score overstates the holdout</div>
+    <div style="display:flex;gap:70px;align-items:baseline;margin-top:6px">
+      <div class="big" style="font-size:180px;color:#12804c" id="k2"></div><div class="lab" style="font-size:30px">keeploop</div>
+      <div class="big" style="font-size:120px;color:#9a958a" id="n2"></div><div class="lab" style="font-size:30px">naive</div></div></div>
+</section>
+
+<section id="s6">
+  <h2>The price, <span class="hl">measured.</span></h2>
+  <div class="lead">A bar that refuses luck also refuses some real gains that land inside the noise.</div>
+  <div class="stat" style="left:0;top:300px;right:0"><div class="lab">real gains thrown away, per run</div>
+    <div style="display:flex;gap:70px;align-items:baseline;margin-top:6px">
+      <div class="big" style="font-size:180px;color:#e0502c" id="k3"></div><div class="lab" style="font-size:30px">keeploop</div>
+      <div class="big" style="font-size:120px;color:#9a958a" id="n3"></div><div class="lab" style="font-size:30px">naive</div></div></div>
+  <div class="stat" style="left:0;top:580px;right:0"><div class="lab">seeds where keeploop's holdout ended lower than naive's</div>
+    <div style="display:flex;gap:70px;align-items:baseline;margin-top:6px">
+      <div class="big" style="font-size:180px;color:#e0502c" id="lower"></div>
+      <div class="lab" style="font-size:30px;max-width:760px">so measure the noise first: <span class="mono" style="color:#151515">kl doctor</span> says what gain your evaluation can see</div></div></div>
+</section>
+
+<section id="s7">
+  <h2>Fast where it <span class="hl">counts.</span></h2>
+  <div class="lead">Your own AI does the thinking. keeploop does the measuring, in as few steps as possible.</div>
+  <div class="row" style="top:300px"><span class="chip">kl next</span><span class="chip">kl try card.md</span>two commands a cycle
+    <span class="sub">one brief in, one decision out: gates, evaluation, keep or reset</span></div>
+  <div class="row" style="top:480px"><span class="chip">kl handoff</span><span class="chip">kl apply</span>ChatGPT, Gemini, Perplexity
+    <span class="sub">no repo access needed: one paste out, one reply in, per cycle</span></div>
+  <div class="row" style="top:660px"><span class="chip">keeploop-lite</span>any chat, no code
+    <span class="sub">paste one file; say "run 3 cycles" for up to five tries in one reply</span></div>
+</section>
+
+<section id="s8">
+  <h2 style="font-size:150px;letter-spacing:-6px;margin-top:110px">A gain inside the noise<br>is not a gain.</h2>
+  <div style="margin-top:70px"><span class="chip" style="font-size:40px">pipx install keeploop</span>
+    <span class="mono" style="font-size:34px;font-weight:600">github.com/johnha912/keeploop</span></div>
+  <div class="lead mono" style="font-size:26px;margin-top:34px">every number in this video: python tools/proof_run.py --check · stdlib only · MIT</div>
+</section>
+
+<div class="prog" id="prog"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const NS = "http://www.w3.org/2000/svg";
+const C = { ink: "#151515", ink2: "#5b574f", muted: "#9a958a", sun: "#ffd23f", sunEdge: "#e0b000",
+  go: "#12804c", stop: "#e0502c", card: "#fffdf7", cream: "#f4efe4", track: "#e3dccb" };
+function el(p, tag, a, txt) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]);
+  if (txt !== undefined) e.textContent = txt; p.appendChild(e); return e; }
+const ease = k => 1 - Math.pow(1 - Math.max(0, Math.min(1, k)), 3);
+const f3 = x => x.toFixed(3), P = D.p, TK = D.talk;
+const SCENES = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"];
+const DUR = [4.2, 6.2, 8.0, 7.0, 6.0, 6.0, 5.6, 4.8];
+const START = DUR.reduce((a, d, i) => (a.push(i ? a[i - 1] + DUR[i - 1] : 0), a), []);
+const prog = document.getElementById("prog");
+SCENES.forEach(() => prog.appendChild(document.createElement("i")));
+const num = document.createElement("b"); prog.appendChild(num);
+
+/* s1: the title, word by word */
+const W1 = ["Keep", "only", "what", "beats", "the", "noise."];
+const t1 = document.getElementById("t1");
+t1.innerHTML = W1.map((w, i) => `<span data-i="${i}" ${w === "noise." ? 'class="hl"' : ""}>${w}</span>`).join(" ");
+
+/* s2: one config, scored again and again */
+const nz = TK.noise, nzMean = nz.reduce((a, b) => a + b) / nz.length;
+const nzSd = Math.sqrt(nz.reduce((a, b) => a + (b - nzMean) ** 2, 0) / (nz.length - 1));
+document.getElementById("s2lead").textContent =
+  `examples/noisy-eval scores a random 1,000 of 10,000 cases per call. The same config, scored ${nz.length} times:`;
+const V2 = document.getElementById("v2");
+const lo2 = Math.floor((Math.min(...nz) - 0.01) * 100) / 100, hi2 = Math.ceil((Math.max(...nz) + 0.01) * 100) / 100;
+const X2 = v => 60 + (v - lo2) / (hi2 - lo2) * 1660, AX2 = 400;
+el(V2, "line", { x1: 30, x2: 1750, y1: AX2, y2: AX2, stroke: C.ink, "stroke-width": 4 });
+for (let v = lo2; v <= hi2 + 1e-9; v += 0.01) {
+  el(V2, "line", { x1: X2(v), x2: X2(v), y1: AX2, y2: AX2 + 12, stroke: C.ink, "stroke-width": 3 });
+  el(V2, "text", { x: X2(v), y: AX2 + 46, "font-size": 24, fill: C.ink2, "text-anchor": "middle" }, v.toFixed(2));
+}
+const spread = el(V2, "rect", { x: X2(nzMean - nzSd), width: X2(nzMean + nzSd) - X2(nzMean - nzSd), y: 150, height: AX2 - 150,
+  fill: C.sun, stroke: C.sunEdge, "stroke-width": 2, opacity: 0 });
+const spreadT = el(V2, "text", { x: X2(nzMean), y: 135, "font-size": 30, "font-weight": 700, fill: C.ink, "text-anchor": "middle", opacity: 0 },
+  `no change at all: ${f3(Math.min(...nz))} to ${f3(Math.max(...nz))}, spread σ = ${nzSd.toFixed(3)} in this sample (shaded ±1σ)`);
+const nzDots = nz.map((v, i) => {
+  const g = el(V2, "g", { opacity: 0 });
+  el(g, "circle", { cx: X2(v), cy: 0, r: 15, fill: C.ink });
+  el(g, "text", { x: X2(v), y: -28, "font-size": 21, fill: C.ink2, "text-anchor": "middle" }, f3(v));
+  g.v = v; g.i = i; return g;
+});
+// stack dots that land close together
+const lane = []; nzDots.forEach(g => { let k = 0; while (lane.some(o => o.k === k && Math.abs(X2(o.v) - X2(g.v)) < 70)) k++; lane.push({ k, v: g.v }); g.k = k; });
+
+/* s3: the same 20 proposals, naive vs keeploop, then the x-ray */
+const V3 = document.getElementById("v3");
+const rowsS3 = [["naive keep-if-better", TK.naive], ["keeploop", TK.keep]];
+const cw = 66, cx0 = 430;
+const s3 = rowsS3.map(([name, cyc], r) => {
+  const y = 60 + r * 220;
+  el(V3, "text", { x: 0, y: y + 50, "font-size": 30, "font-weight": 700, fill: C.ink, "font-family": "Inter Display, Inter, sans-serif" }, name);
+  const kept = cyc.filter(c => c.status === "keep"), luck = kept.filter(c => c.true_effect <= 0);
+  const cnt = el(V3, "text", { x: 0, y: y + 90, "font-size": 24, fill: C.ink2 }, "");
+  const cells = cyc.map((c, i) => {
+    const g = el(V3, "g", { opacity: 0 });
+    const x = cx0 + i * cw, keep = c.status === "keep";
+    el(g, "rect", { x, y, width: cw - 12, height: cw - 12, rx: 10, fill: keep ? C.go : C.card, stroke: keep ? C.go : C.ink, "stroke-width": 3 });
+    el(g, "text", { x: x + (cw - 12) / 2, y: y + 40, "font-size": 20, "font-weight": 700, fill: keep ? "#fff" : C.ink, "text-anchor": "middle" }, c.cycle);
+    g.xr = el(g, "g", { opacity: 0 });
+    if (keep) {
+      const bad = c.true_effect <= 0;
+      el(g.xr, "text", { x: x + (cw - 12) / 2, y: y + cw + 20, "font-size": 14, fill: bad ? C.stop : C.go, "text-anchor": "middle", "font-weight": 700 },
+        (c.true_effect > 0 ? "+" : "") + c.true_effect.toFixed(3));
+      if (bad) el(g.xr, "rect", { x: x - 5, y: y - 5, width: cw - 2, height: cw - 2, rx: 13, fill: "none", stroke: C.stop, "stroke-width": 5 });
+    }
+    return g;
+  });
+  return { cells, cnt, kept: kept.length, luck: luck.length, name };
+});
+const xrayT = el(V3, "text", { x: cx0, y: 520, "font-size": 26, fill: C.ink2, opacity: 0 },
+  "x-ray: under each kept change, its true effect on quality; red = kept with no true gain");
+document.getElementById("s3lead").textContent =
+  `The same 20 proposals and the same noise (seed ${D.run.seed}). Green = kept. Then the x-ray: what each kept change really did.`;
+
+/* s4: the line every change runs (a transit map) */
+const V4 = document.getElementById("v4");
+const LY = 250;
+const ST = [[120, "card", "reject rule written first"], [430, "one change", "in a git workspace"],
+  [760, "score > best + 2σ", "the noise gate"], [1100, "re-run", "still above the bar"],
+  [1410, "fresh Auditor", "reads the real diff"], [1690, "commit", "the new best"]];
+el(V4, "line", { x1: 60, x2: 1730, y1: LY, y2: LY, stroke: C.ink, "stroke-width": 14, "stroke-linecap": "round" });
+const branchX = 760;
+el(V4, "path", { d: `M${branchX},${LY} L${branchX},${LY + 200} L${branchX - 240},${LY + 200}`, fill: "none", stroke: C.stop, "stroke-width": 10, "stroke-linejoin": "round" });
+el(V4, "circle", { cx: branchX - 240, cy: LY + 200, r: 26, fill: C.card, stroke: C.stop, "stroke-width": 8 });
+el(V4, "text", { x: branchX - 290, y: LY + 212, "font-size": 30, "font-weight": 800, fill: C.stop, "text-anchor": "end", "font-family": "Inter Display, Inter, sans-serif" }, "reset + lesson");
+el(V4, "text", { x: branchX - 290, y: LY + 248, "font-size": 22, fill: C.ink2, "text-anchor": "end" }, "the reason is written down");
+const stations = ST.map(([x, name, sub], i) => {
+  const gate = i === 2, end = i === ST.length - 1;
+  const g = el(V4, "g", {});
+  if (gate) el(g, "rect", { x: x - 120, y: LY - 60, width: 240, height: 120, rx: 18, fill: C.sun, stroke: C.sunEdge, "stroke-width": 3 });
+  g.c = el(g, "circle", { cx: x, cy: LY, r: gate ? 30 : 26, fill: end ? C.go : C.card, stroke: end ? C.go : C.ink, "stroke-width": 8 });
+  el(g, "text", { x, y: LY - (i % 2 ? -110 : 92), "font-size": 31, "font-weight": 800, fill: C.ink, "text-anchor": "middle", "font-family": "Inter Display, Inter, sans-serif" }, name);
+  el(g, "text", { x, y: LY - (i % 2 ? -146 : 56) - (gate ? 20 : 0), "font-size": 22, fill: C.ink2, "text-anchor": "middle" }, gate ? "" : sub);
+  return g;
+});
+const rider = el(V4, "circle", { r: 22, fill: C.sun, stroke: C.ink, "stroke-width": 5 });
+const rider2 = el(V4, "circle", { r: 22, fill: C.sun, stroke: C.ink, "stroke-width": 5 });
+
+/* s5, s6: counters */
+const setN = (id, v, dp, plus) => document.getElementById(id).textContent = (plus && v >= 0 ? "+" : "") + v.toFixed(dp);
+document.getElementById("s5seeds").textContent = `${P.seeds} seeds.`;
+
+function show(id, t0, t, dur) {
+  const e = document.getElementById(id), k = Math.min(1, Math.max(0, (t - t0) / 0.45)), out = Math.min(1, Math.max(0, (t0 + dur - t) / 0.3));
+  const on = t >= t0 && t < t0 + dur;
+  e.style.opacity = on ? Math.min(ease(k), out) : 0;
+  e.style.transform = `translateY(${on ? (1 - ease(k)) * 40 : 0}px)`;
+  return on ? t - t0 : -1;
+}
+function render(t) {
+  const total = START[START.length - 1] + DUR[DUR.length - 1];
+  t = Math.min(t, total - 1e-6);
+  const cur = START.findIndex((s, i) => t >= s && t < s + DUR[i]);
+  [...prog.children].forEach((e, i) => { if (e.tagName === "I") e.classList.toggle("on", i <= cur); });
+  num.textContent = `${String(cur + 1).padStart(2, "0")} / ${String(SCENES.length).padStart(2, "0")}`;
+  const L = SCENES.map((id, i) => show(id, START[i], t, DUR[i]));
+  // s1
+  t1.querySelectorAll("span").forEach(s => { s.style.opacity = L[0] >= 0 ? (L[0] > 0.25 + s.dataset.i * 0.22 ? 1 : 0) : 1; });
+  // s2
+  nzDots.forEach(g => {
+    const a = 0.8 + g.i * 0.32, k = ease((L[1] - a) / 0.35);
+    g.setAttribute("opacity", L[1] >= a ? 1 : 0);
+    g.setAttribute("transform", `translate(0 ${AX2 - 40 - g.k * 0 - (1 - k) * 160 + 0}) translate(0 ${g.k * -46})`);
+  });
+  const sp = L[1] >= 0.8 + nz.length * 0.32 + 0.3 ? 1 : 0;
+  spread.setAttribute("opacity", sp * 0.75); spreadT.setAttribute("opacity", sp);
+  // s3
+  s3.forEach((r, ri) => {
+    r.cells.forEach((g, i) => { g.setAttribute("opacity", L[2] >= 0.6 + ri * 0.4 + i * 0.09 ? 1 : 0); });
+    const xr = L[2] >= 4.2;
+    r.cells.forEach(g => g.xr.setAttribute("opacity", xr ? 1 : 0));
+    r.cnt.textContent = L[2] >= 3.0 ? `kept ${r.kept}` + (xr ? `, ${r.luck} with no true gain` : "") : "";
+  });
+  xrayT.setAttribute("opacity", L[2] >= 4.2 ? 1 : 0);
+  // s4: one rider takes the reset branch, the next one the whole line
+  const s4t = L[3];
+  stations.forEach(g => g.c.setAttribute("stroke-width", 8));
+  if (s4t >= 0) {
+    const p1 = Math.min(1, s4t / 2.4);            // rider 1: to the gate, then down
+    let x, y;
+    if (p1 < 0.7) { x = 120 + (branchX - 120) * ease(p1 / 0.7); y = LY; }
+    else { const q = ease((p1 - 0.7) / 0.3); x = branchX - 240 * Math.max(0, q * 2 - 1); y = LY + 200 * Math.min(1, q * 2); }
+    rider.setAttribute("cx", x); rider.setAttribute("cy", y); rider.setAttribute("opacity", s4t < 2.9 ? 1 : 0);
+    rider.setAttribute("fill", p1 >= 0.7 ? C.stop : C.sun);
+    const p2 = Math.max(0, Math.min(1, (s4t - 2.9) / 3.2));
+    rider2.setAttribute("cx", 120 + (1690 - 120) * ease(p2)); rider2.setAttribute("cy", LY);
+    rider2.setAttribute("opacity", s4t >= 2.9 ? 1 : 0); rider2.setAttribute("fill", p2 >= 1 ? C.go : C.sun);
+  } else { rider.setAttribute("opacity", 0); rider2.setAttribute("opacity", 0); }
+  // s5, s6: count up
+  const cu = (L, d) => L >= 0 ? ease((L - d) / 1.2) : 1;
+  setN("n1", P.n.kept_no_true_gain_mean * cu(L[4], 0.6), 2); setN("k1", P.k.kept_no_true_gain_mean * cu(L[4], 1.0), 2);
+  setN("n2", P.n.dev_overstates_holdout_mean * cu(L[4], 1.4), 3, true); setN("k2", P.k.dev_overstates_holdout_mean * cu(L[4], 1.8), 3, true);
+  setN("n3", P.n.discarded_true_gain_mean * cu(L[5], 0.6), 2); setN("k3", P.k.discarded_true_gain_mean * cu(L[5], 1.0), 2);
+  document.getElementById("lower").textContent = `${Math.round(P.lower * cu(L[5], 1.4))} of ${P.seeds}`;
+}
+window.render = render;
+window.TOTAL = START[START.length - 1] + DUR[DUR.length - 1];
+render(0);
+</script>
+</body></html>

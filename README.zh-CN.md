@@ -45,9 +45,9 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   <a href="docs/GUIDE.md">完整指南（英文）</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-figure.gif" alt="keeploop 的一页技术笔记 A Commit Law for Noisy Evaluations：摘要；图 1，朴素循环（分数更高就保留）与 keeploop 循环的对比，后者有保留门槛 best + 2σ、复跑和 Auditor；算法 1，一个周期；图 2，examples/noisy-eval 上的真实运行逐周期绘出：第 7 周期得分 0.755，最佳为 0.754，落在噪声带内，被重置；第 8 周期得分 0.793，复跑 0.786，都高于门槛 0.777，被 commit；表 1，25 个种子上朴素 vs keeploop：保留无真实收益的改动 2.76 vs 0.44，丢弃真实改进 1.28 vs 2.64；代价；图 3，数轴上的保留门槛；结论：噪声内的提升不算提升。" width="720"></p>
+<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="保留门的动画：一条数轴，上面有历史最佳分数、一直延伸到门槛 best + 2σ 的黄色噪声带，以及 noisy-eval 运行中的三个真实改动。第 7 周期得分 0.755，最佳为 0.754，落在噪声带内，被重置。第 8 周期得分 0.793，复跑 0.786，都高于门槛 0.777，被 commit；最佳升到 0.786，门槛升到 0.809。第 14 周期得分 0.795，比第 8 周期还高，但落在新的噪声带内，被重置。" width="860"></p>
 
-<p align="center"><sub>所有数字都由 <code>python tools/render_figure.py</code> 从 <a href="docs/proof/proof.json">docs/proof/proof.json</a> 和 <a href="docs/assets/demo-run">docs/assets/demo-run</a> 读取。同一次运行的终端版：<a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>。</sub></p>
+<p align="center"><sub>来自 <a href="examples/noisy-eval">examples/noisy-eval</a>（种子 2）的真实改动；所有数字都由 <code>python tools/render_figure.py</code> 从 <a href="docs/proof/proof.json">docs/proof</a> 读取。48 秒讲解视频：<a href="docs/assets/keeploop-talk.mp4">keeploop-talk.mp4</a>。终端版：<a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>。</sub></p>
 
 AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 
