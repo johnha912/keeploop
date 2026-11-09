@@ -55,6 +55,8 @@ import codemap
 import ledger
 import lessons
 import packs
+import report
+import quickstart
 import rubric as rubric_mod
 import run as R
 import scaffold
@@ -627,6 +629,17 @@ def report_text(c) -> str:
 
 def cmd_report(c, a) -> int:
     print(report_text(c))
+    if a.html or a.svg:  # the shareable chart: ledger only, no model call
+        run = report.read_run(c.state)
+        title = f"keeploop run: {c.root.name}"
+        z = float(c.loop_cfg["noise_z"])
+        print("summary: " + report.summary(run))
+        if a.html:
+            Path(a.html).write_text(report.html_page(run, z, title), encoding="utf-8")
+            print(f"wrote {a.html}")
+        if a.svg:
+            Path(a.svg).write_text(report.chart_svg(run, z, title, auto_dark=True), encoding="utf-8")
+            print(f"wrote {a.svg}")
     if a.assert_cycle_under is not None:  # the attachable lesson check
         rows_t = _timings(c)
         if rows_t and _total(rows_t[-1]) > a.assert_cycle_under:
@@ -820,6 +833,9 @@ def _recall_lines(c, q, top) -> list[str]:
 
 def cmd_recall(c, a) -> int:
     hits = _recall_lines(c, a.query, a.top)
+    g = lessons.global_cfg(c.team)
+    hits += [f"  global lesson {r['id']} ({r['project']}): {r['guardrail'][:160]}"
+             for r in lessons.global_recall(a.query, g)]
     print("\n".join(hits) if hits else "nothing in memory matches; it is new")
     return 0
 
@@ -969,6 +985,8 @@ def parser() -> argparse.ArgumentParser:
     g.add_argument("--critic", metavar="FILE")
     g.add_argument("--reply", metavar="FILE")
     s = sub.add_parser("report", help="run facts from the ledger (paste verbatim)")
+    s.add_argument("--html", metavar="FILE", help="also write a self-contained HTML page: summary + chart")
+    s.add_argument("--svg", metavar="FILE", help="also write the chart alone as an SVG (README-ready)")
     s.add_argument("--assert-cycle-under", type=float, metavar="SECONDS",
                    help="exit 1 if the last cycle took longer (a lesson check)")
     sub.add_parser("cite", help="opt-in, network: dead links and quotes missing from pages").add_argument("file")
@@ -985,6 +1003,12 @@ def parser() -> argparse.ArgumentParser:
     s = sub.add_parser("recall", help="BM25 over lessons, hypotheses, debates, questions, ledger")
     s.add_argument("query")
     s.add_argument("--top", type=int, default=5)
+    s = sub.add_parser("doctor", help="init-time: run evaluate.py N times, report sigma and what it means")
+    s.add_argument("--runs", type=int, default=5)
+    s.add_argument("--want", type=float, metavar="GAIN", help="the smallest real gain you care about")
+    sub.add_parser("quickstart", help="tests | command | prompt | buildtime: a control folder "
+                   "with that evaluate.py for your repo")
+    sub.add_parser("import-lite", help="continue a keeploop-lite session: LEDGER.md [DIR]")
     s = sub.add_parser("pack", help="pack new NAME")
     s.add_argument("action", choices=["new"])
     s.add_argument("name")
@@ -1032,10 +1056,89 @@ def cmd_init(argv: list[str]) -> int:
     return 0
 
 
+def doctor_text(runs: list[float], loop_cfg: dict, want: float | None, secs: float) -> list[str]:
+    """What the measured noise means for this loop (kl doctor)."""
+    mean, sd = statistics.fmean(runs), statistics.stdev(runs)
+    z, th, n0 = float(loop_cfg["noise_z"]), float(loop_cfg["keep_threshold"]), int(loop_cfg["noise_runs"])
+    smallest = max(abs(mean) * th, z * sd)
+    out = [f"evaluate.py, {len(runs)} runs on the current workspace: " + ", ".join(f"{x:.6f}" for x in runs),
+           f"mean {mean:.6f}  sigma {sd:.6f} (sample stdev)  range {max(runs) - min(runs):.6f}"
+           f"  {secs:.1f}s per run"]
+    if sd == 0:
+        out.append("deterministic: no noise. A change is kept when it beats the best by more than "
+                   f"keep_threshold ({th:g} x best = {abs(mean) * th:.6f}); light changes skip the "
+                   "confirm re-run.")
+        return out
+    out.append(f"a change must gain more than {smallest:.6f} to be kept "
+               f"({'noise_z ' + format(z, 'g') + ' x sigma' if z * sd >= abs(mean) * th else 'keep_threshold'}"
+               + (f", {smallest / abs(mean):.1%} of the mean" if mean else "") + ")")
+    if n0 < 5:
+        out.append(f"warning: loop.noise_runs is {n0}: the baseline estimates sigma from {n0} runs, "
+                   "and that estimate swings widely (docs/proof/sweep.tsv: 3-run sigmas from "
+                   "0.0017 to 0.026 for an evaluation whose sigma is about 0.014). Set noise_runs: 5 or more in team.yaml.")
+    if want is not None and want > 0:
+        k = math.ceil((z * sd / want) ** 2) if z * sd > want else 1
+        out.append(f"to keep a real gain of {want:g}: " + (
+            "already detectable." if k == 1 else
+            f"the noise is too large. Average {k} repeats inside evaluate.py (sigma falls as "
+            f"1/sqrt(repeats); use the median for timings with outliers), fix seeds, or score "
+            f"more cases."))
+    elif mean and smallest / abs(mean) > 0.01:
+        out.append("warning: gains under that are invisible to the loop: real but small "
+                   "improvements will be discarded. Reduce the noise in evaluate.py (repeats + "
+                   "mean or median, fixed seeds, more cases), or say which gain matters with "
+                   "`--want GAIN`.")
+    return out
+
+
+def cmd_doctor(c, a) -> int:
+    if problem := R.workspace_error(c.root, c.workspace):
+        raise Refuse(problem)
+    runs, start = [], time.monotonic()
+    for i in range(max(3, a.runs)):
+        metric, error = _evaluate(c)
+        if metric is None:
+            raise Refuse(f"evaluate.py failed on run {i + 1}: {error}")
+        runs.append(metric)
+    print("\n".join(doctor_text(runs, c.loop_cfg, a.want, (time.monotonic() - start) / len(runs))))
+    print("nothing was logged: kl doctor only measures (the baseline is `" + kl() + " begin`)")
+    return 0
+
+
+def cmd_quickstart(argv: list[str]) -> int:
+    p = argparse.ArgumentParser(prog=f"{kl()} quickstart", description=(
+        "Write a keeploop control folder for your git repo, with an evaluate.py from a "
+        "template. Existing files are never overwritten."))
+    p.add_argument("template", choices=list(quickstart.TEMPLATES))
+    p.add_argument("dir", nargs="?", type=Path, help="default: <repo>-keeploop beside the repo")
+    p.add_argument("--workspace", type=Path, help="the repo the loop may change (default: cwd)")
+    a = p.parse_args(argv[1:])
+    try:
+        print("\n".join(quickstart.quickstart(a.template, a.workspace, a.dir, rewrite=kl() == "kl",
+                                              src=scaffold.source())))
+    except SystemExit as exc:
+        raise Refuse(str(exc).removeprefix("refused: "))
+    return 0
+
+
+def cmd_import_lite(argv: list[str]) -> int:
+    p = argparse.ArgumentParser(prog=f"{kl()} import-lite", description=(
+        "Continue a keeploop-lite chat session in the CLI: LEDGER.md is the saved ledger block."))
+    p.add_argument("ledger", type=Path)
+    p.add_argument("dir", nargs="?", type=Path, help="a new folder (default: keeploop-from-lite)")
+    a = p.parse_args(argv)
+    try:
+        print("\n".join(quickstart.import_lite(a.ledger, a.dir or Path("keeploop-from-lite"),
+                                               rewrite=kl() == "kl", src=scaffold.source())))
+    except (SystemExit, OSError) as exc:
+        raise Refuse(str(exc).removeprefix("refused: "))
+    return 0
+
+
 COMMANDS = {"begin": cmd_begin, "status": cmd_status, "card": cmd_card, "check": cmd_check,
             "eval": cmd_eval, "audit": cmd_audit, "keep": cmd_keep, "discard": cmd_discard,
             "staff": cmd_staff, "pack": cmd_pack, "report": cmd_report, "slow": cmd_slow, "debate": cmd_debate, "cite": cmd_cite,
-            "map": cmd_map, "recall": cmd_recall}
+            "map": cmd_map, "recall": cmd_recall, "doctor": cmd_doctor}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1049,9 +1152,25 @@ def main(argv: list[str] | None = None) -> int:
         except Refuse as exc:
             print(f"kl: REFUSED: {exc}")
             return 1
+    if argv[:1] in (["quickstart"], ["import-lite"]):
+        try:
+            return cmd_quickstart(argv) if argv[0] == "quickstart" else cmd_import_lite(argv[1:])
+        except Refuse as exc:
+            print(f"kl: REFUSED: {exc}")
+            return 1
     if argv[:1] == ["run"]:  # passthrough: run.py's own parser, the project kl resolved
         return R.main(argv[1:], root=root)
     try:
+        if argv[:2] == ["lesson", "share"]:  # a human copies one lesson to the global store
+            if len(argv) != 3:
+                raise Refuse(f"usage: {kl()} lesson share L-ID")
+            c = load(root)
+            g = lessons.global_cfg(c.team)
+            row = lessons.share(c.state, argv[2], g, c.root.name)
+            print(f"shared {argv[2]} as {row['id']} in {lessons.global_store(g)}"
+                  + ("" if g["enabled"] else "  (reading it is off: set global_lessons: enabled: "
+                                             "true in team.yaml to use shared lessons here)"))
+            return 0
         if argv[:1] in (["lesson"], ["scout"]):  # passthrough: their own parsers, '--' intact
             c = load(root)
             return (lessons.main(argv[1:], c.state, c.loop_cfg) if argv[0] == "lesson"

@@ -1,0 +1,37 @@
+# team.yaml - noisy-eval example: the proof run (naive keep vs the keeploop keep law).
+# Set up (seconds): kl init --example noisy-eval DEST   (or python tools/make_sandbox.py)
+# then: cd DEST/kl && kl begin && kl run --mock --iterations 20
+# The full A/B is one command from a clone: python tools/proof_run.py
+# sandbox root: evaluate.py, holdout.py, team.yaml, program.md, mock_script.json
+# sandbox workspace: config.json
+# evaluate.py scores a random 1,000 of 10,000 dev cases per call: sigma is about 0.014.
+# holdout.py scores 5,000 other cases, all of them; the loop never sees it.
+
+pack: software
+
+workspace: ../noisy-workspace
+
+# The offline demo runs every role on the mock vendor, whose engineer applies the
+# next entry of mock_script.json: the same 20 proposals in every run and every mode,
+# so only the keep law differs between two runs.
+roles:
+  analyst:
+    vendor: mock
+  engineer:
+    vendor: mock
+  auditor:
+    vendor: mock
+
+# The keep law under test, as shipped (prepare.py defaults, written out):
+# a change is kept only if it beats best + max(abs(best) * keep_threshold,
+# noise_z * sigma), sigma measured from noise_runs baseline evaluations, and
+# survives one confirm re-run (the lower of the two scores must still clear the bar).
+# tools/proof_run.py's naive mode sets keep_threshold 0, noise_z 0, confirm_keep false:
+# keep anything that beats best.
+loop:
+  max_iterations: 20
+  keep_threshold: 0.0
+  noise_runs: 3
+  noise_z: 2.0
+  confirm_keep: true
+  metric_max: 1.0

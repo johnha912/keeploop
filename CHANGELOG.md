@@ -21,7 +21,48 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-09
+
 ### Added
+
+- The proof run (`docs/proof/`, `python tools/proof_run.py`): a naive keep-if-better
+  loop and keeploop on the same 20 proposals and the same deliberately noisy
+  evaluation (`examples/noisy-eval`: a random 1,000 of 10,000 dev cases per call,
+  plus a 5,000-case holdout the loop never sees), on 25 seeds fixed before running.
+  The means: 2.76 vs 0.44 changes kept with no true gain, and a loop score that
+  overstated the holdout by +0.017 vs +0.005. The price: 2.64 vs 1.28 true gains
+  discarded, and a lower holdout than naive on 9 of 25 seeds (seed 1 included).
+  `--check` re-runs it and must match `proof.json` exactly; CI and the release
+  workflow run it (the golden gate; never part of a cycle). A post-hoc sensitivity
+  run with `noise_runs: 10` is in `docs/proof/posthoc-noise_runs-10/`.
+- `run.py --narrate` (`kl run --narrate`): each step of a cycle on screen: the card,
+  the diff, the score against best and the keep bar, the decision. Off by default.
+- `kl report --html FILE` / `--svg FILE`: the ledger as one shareable page with a
+  summary line and a chart (kept filled, discarded hollow, running best, noise band;
+  `report.py`, stdlib, no model call).
+- `kl doctor`: runs `evaluate.py` N times before a project starts and says how noisy it
+  is, the smallest gain the keep bar lets through, and how many repeats a wanted gain
+  needs. Warns when `noise_runs` is below 5.
+- `kl quickstart tests|command|prompt|buildtime`: a control folder beside your repo
+  with an `evaluate.py` from a template and `workspace:` already set.
+- `kl import-lite LEDGER.md`: continue a keeploop-lite chat session in the CLI (best
+  version -> workspace, scorecard and gates -> a model-judge `evaluate.py`, lessons ->
+  `program.md`).
+- Opt-in lessons shared across projects: `kl lesson share L-ID` and `global_lessons:`
+  in `team.yaml` (off by default; at most 5 lessons within a token budget).
+- `loop.eval_cache` (off by default): reuse a score for identical workspace files and
+  `evaluate.py`, only when sigma is 0.
+- Cost-routing guidance in `team.yaml` (cheap models where a mistake is cheap, the
+  strongest for the Auditor). Text only.
+- The launch demo: `docs/assets/keeploop-demo.gif` / `.mp4` / `-poster.png`, rendered
+  by `tools/render_demo.py` (build-time only: Pillow + ffmpeg) from a re-run of seed 2
+  of the proof sweep, chosen by a rule fixed in the script.
+- `tools/bench_cycle.py`: per-cycle wall time and tokens of the mock loop; before and
+  after this release in `docs/proof/bench-*.json`.
+- The mock vendor can follow a `mock_script.json` (used by `examples/noisy-eval`); a
+  scripted engineer applies the patch named on the card, so a dropped duplicate card
+  never puts the analyst and engineer out of step.
+- AGENTS.md: run `kl doctor` before `kl begin` on a new project.
 
 - Brakes against doing more than was asked, set by the human in
   `team.yaml`: `loop.target` (good enough; at or above it the job is done)
@@ -37,6 +78,8 @@ release. The one-time PyPI setup and the steps are in
 
 ### Changed
 
+- README (en, vi, zh-CN): the new demo, the proof-run numbers and their trade-off at
+  the top.
 - The version badge in the three READMEs reads PyPI and links to
   <https://pypi.org/project/keeploop/>, so it no longer needs a hand edit per
   release; the test now checks the PyPI badge instead of a version string.

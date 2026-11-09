@@ -48,17 +48,44 @@ in the current conversation:
   <a href="docs/GUIDE.md">Full guide</a>
 </p>
 
-<p align="center"><img src="docs/demo.gif" alt="Terminal recording of keeploop's mock run: baseline, two keeps, a discard, a crash that becomes a lesson, then a final keep." width="853"></p>
+<p align="center"><img src="docs/assets/keeploop-demo.gif" alt="Terminal: keeploop on a noisy evaluation. Cycle 7 scores 0.755 against a best of 0.754, inside the noise band, and is discarded and reset. Cycle 8 scores 0.793, its confirm re-run 0.786 still clears the bar of 0.777, and it is kept and committed." width="853"></p>
 
-<p align="center"><sub>Recorded from the real output of the offline mock demo (colours added). The full transcript is in <a href="docs/DEMO-OUTPUT.txt">docs/DEMO-OUTPUT.txt</a>.</sub></p>
+<p align="center"><sub>Real output of <code>kl run --mock --narrate</code> on <a href="examples/noisy-eval">examples/noisy-eval</a>, paced for reading. Two cycles are shown in full and the others folded into ⋯ lines. Run files: <a href="docs/assets/demo-run">docs/assets/demo-run</a>. Re-render: <code>python tools/render_demo.py</code>.</sub></p>
 
 AI agents are good at sounding sure. keeploop makes them prove it.
 
 - **You say what "better" means**: faster tests, a higher benchmark, a
   cleaner report. One number.
 - **Your AI tries one change at a time**, and a second, fresh AI checks it.
-- **Only a change that beats the number is kept.** Everything else is
-  undone, and the reason is written down so it is not tried again.
+- **A change is kept only if it beats the best score by more than the
+  evaluation's own noise.** Everything else is undone, and the reason is
+  written down so it is not tried again.
+
+keeploop is the first installable tool found in our scan of autoresearch-style
+loops (November 2026) that turns evaluation noise into a commit law: a change is
+kept only if it beats the best score by more than the evaluation's own measured
+noise (best + 2σ), with the falsification rule fixed in advance and a
+fresh-context Auditor reading the real diff. Evaluation noise is not our
+discovery; research has discussed it before. What is new is a tool that turns it
+into the rule that decides every commit.
+
+**What that buys, measured.** We ran a naive keep-if-better loop and keeploop on
+the same 20 proposals and the same noisy evaluation, a random 1,000 of 10,000 dev
+cases per call. A 5,000-case holdout scored the result, and the loop never saw
+it. Each was run on 25 seeds fixed before the run
+([docs/proof/PROOF.md](docs/proof/PROOF.md), `python tools/proof_run.py`):
+
+| mean over 25 seeds | naive | keeploop |
+|---|---|---|
+| changes kept with no true gain | 2.76 | **0.44** |
+| how far the loop's own score overstated the holdout | +0.017 | **+0.005** |
+| changes discarded despite a true gain | **1.28** | 2.64 |
+| holdout gain, median / mean | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+The price is real. keeploop throws away some true gains that land inside the
+noise. On 9 of the 25 seeds its holdout ended lower than the naive loop's,
+including seed 1, the run fixed before the sweep as the headline. `kl doctor`
+measures your evaluation's noise before you start, and tells you when to reduce it.
 
 Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI and other AIs
 you already use. keeploop itself is not an AI: it is a small Python tool
@@ -153,10 +180,30 @@ one. Then open the folder in your AI as in (a), and follow
 [AGENTS.md](AGENTS.md) to point it at your repo. `kl run` is the headless
 mode. Keep the clone if you want to read or change keeploop itself.
 
+One command from your own repo instead, with an `evaluate.py` written for you:
+
+```bash
+cd my-repo
+kl quickstart tests        # or: command | prompt | buildtime (writes ../my-repo-keeploop)
+cd ../my-repo-keeploop
+kl doctor                  # runs evaluate.py 5 times: how noisy is it, what gain can it see?
+kl begin
+```
+
+Started in a chat with keeploop-lite? `kl import-lite ledger.md` continues the
+session in the CLI. Its best version becomes the workspace, and its scorecard becomes an
+`evaluate.py`.
+
+**(d) Share a run.** `kl report --html run.html` turns the ledger into one page,
+with no model call. The page has a summary line and a chart: kept changes filled,
+discarded hollow, the running best and its noise band. Example:
+[the proof run's chart](docs/proof/keeploop/report.svg).
+
 ## Examples
 
 | Example | Field | What happened | Link |
 |---|---|---|---|
+| Proof run | Noisy eval, naive vs keeploop | Same 20 proposals, 25 seeds: 2.76 vs 0.44 kept changes with no true gain; the price is 2.64 vs 1.28 true gains discarded | [Read](docs/proof/PROOF.md) |
 | Offline demo | Toy config | 3 keeps, 1 discard, 1 crash that became lesson L-001; no AI | [Transcript](docs/DEMO-OUTPUT.txt) |
 | Marketing research | Consumer insight report | 1 real cycle: 0.970000 to 1.000000, audit APPROVED, kept | [Read](examples/marketing-research/) |
 | Prompt optimization | AI/LLM prompt | 8 headless cycles, 2 kept, 6 discarded (a 0.915 refused on re-run). Dev 0.873333 to 0.900000; holdout 0.835 to 0.855 | [Read](examples/prompt-optimization/) |

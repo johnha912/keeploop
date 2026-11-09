@@ -27,7 +27,11 @@ keeps overfit evaluate.py.
 Usage:
     python run.py [--mock] [--iterations N] [--root PATH]
 
---mock routes every role to the deterministic MockVendor (offline demo).
+--mock routes every role to the deterministic MockVendor (offline demo). A
+mock_script.json next to team.yaml (a list of JSON patches for config.json)
+replaces the mock engineer's built-in script: the noisy-eval example uses it so
+every run sees the same proposals. --narrate prints each step of a cycle (card,
+diff, score against the keep bar, decision); off by default.
 """
 
 import argparse
@@ -699,11 +703,45 @@ def verdict_of(status: str, metric: float | None, bar_before: float,
             else "inconclusive" if metric > bar_before else "rejected")
 
 
-def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
+def mock_script(root: Path) -> list[dict] | None:
+    """mock_script.json: [{"hypothesis": str, "set": {...}}, ...], else None (built-in)."""
+    path = root / "mock_script.json"
+    if not path.is_file():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not (isinstance(data, list) and data and all(
+            isinstance(x, dict) and isinstance(x.get("hypothesis"), str) and x["hypothesis"].strip()
+            and "\n" not in x["hypothesis"] and isinstance(x.get("set"), dict) and x["set"]
+            for x in data)):
+        raise ValueError(f'{path.name}: must be a non-empty list of '
+                         f'{{"hypothesis": "one line", "set": {{...}}}} objects')
+    return data
+
+
+def eval_cache_key(root: Path, workspace: Path, eval_cmd: str | None) -> str:
+    """Exactly what the evaluation sees: the workspace's files (git tree of everything,
+    staged) plus evaluate.py and eval_cmd. Same key = same inputs."""
+    git(workspace, "add", "-A")
+    tree = git(workspace, "write-tree").strip()
+    scorer = hashlib.sha256((root / "evaluate.py").read_bytes()).hexdigest() \
+        if (root / "evaluate.py").exists() else ""
+    return hashlib.sha256(f"{tree}\0{scorer}\0{eval_cmd or ''}".encode()).hexdigest()
+
+
+def diff_lines(diff: str, limit: int = 4) -> list[str]:
+    """The changed lines of a diff (no headers), for --narrate."""
+    out = [ln for ln in diff.splitlines()
+           if ln[:1] in "+-" and not ln.startswith(("+++", "---"))]
+    return out[:limit] + ([f"... {len(out) - limit} more"] if len(out) > limit else [])
+
+
+def run(root: Path, *, mock: bool, iterations: int | None = None,
+        narrate: bool = False) -> int:
     root = root.resolve()
     state = setup(root)
     try:
         cfg = project_config(root)
+        script = mock_script(root) if mock else None
     except ValueError as exc:
         print(f"run: {exc}")
         return 1
@@ -730,6 +768,9 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         except vendors.VendorUnavailable as exc:
             print(f"run: {role}: {exc}")
             return None
+        for m in members:
+            if script and getattr(m, "is_mock", False):
+                m.script = script
         if not members:
             print(f"run: {role}: none of {names} is available (CLI not installed?)")
         return vendors.FallbackVendor(members) if members else None
@@ -757,6 +798,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         """Role -> vendor that actually answered (first member before any call)."""
         return {r: v.served or v.members[0].name for r, v in vendor_objs.items()}
 
+    gl = lessons.global_cfg(team)
     pack = packs.load_pack(root, team.get("pack", "software"))
     charter = ""
     if (root / "program.md").exists():
@@ -795,10 +837,21 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
                 sub[part] += time.monotonic() - start
 
     def evaluate(script="evaluate.py", part=None):
-        return timed("v", lambda: guard(
+        key = None
+        if (loop_cfg["eval_cache"] and script == "evaluate.py" and best.get("metric") is not None
+                and not best.get("sigma")):  # never for a noisy evaluation
+            key = eval_cache_key(root, workspace, team.get("eval_cmd"))
+            if (hit := cache.get(key)) is not None:
+                notes.append("eval: cached (same files, same evaluate.py)")
+                return hit, ""
+        metric, error = timed("v", lambda: guard(
             "evaluate", lambda: evaluate_workspace(
                 root, workspace, script, loop_cfg["eval_timeout_s"],
                 eval_cmd=team.get("eval_cmd"))), part)
+        if key and metric is not None:
+            cache[key] = metric
+            _write_json(state / "eval_cache.json", cache)
+        return metric, error
 
     def call(role, prompt, heavy=False, part=None):
         v = heavy_auditor if heavy and role == "auditor" and heavy_auditor else vendor_objs[role]
@@ -820,6 +873,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         sealed is None or (sealed.get("files") == start_files
                            and sealed.get("best_sha") == _sha(state / "best.json")))
     best = _read_json(state / "best.json")
+    cache = (_read_json(state / "eval_cache.json")
+             if loop_cfg["eval_cache"] and (state / "eval_cache.json").exists() else {})
     hold_path = state / "holdout.json"  # never read into a prompt or the ledger
     has_holdout = (root / "holdout.py").exists()
     try:
@@ -837,6 +892,18 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
 
     def bar(b):
         return keep_bar(b, loop_cfg["keep_threshold"], loop_cfg["noise_z"], sigma)
+
+    def say(step: str, text: str) -> None:  # --narrate only
+        if narrate:
+            print(f"  {step:<9} {text}", flush=True)
+
+    def bar_text(b: float) -> str:
+        z, th = loop_cfg["noise_z"], loop_cfg["keep_threshold"]
+        if bar(b) == b:
+            return f"bar {b:.6f} = best (no noise margin)"
+        rule = (f"best + {z:g}σ, σ {sigma:.6f}" if z * sigma >= abs(b) * th
+                else f"best + {th:g} x best")
+        return f"bar {bar(b):.6f} = {rule}"
 
     if warn := ceiling_warning(best["metric"], bar(best["metric"]), loop_cfg["metric_max"]):
         print(f"run: {warn}")
@@ -894,13 +961,17 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             return "crash", None, learn(*L_VAGUE)
         ask_human(state, n, parsed["missing"])
         guardrails = lessons.guardrails_text(state, card, loop_cfg["recall_top_k"], loop_cfg)  # card-relevant
+        if gl["enabled"]:  # opt-in: capped lessons from other projects
+            guardrails += lessons.global_text(card, gl)
         standards = f"{guardrails}\n\nCraft standards:\n{taste}"
         card1 = " ".join(parsed["hypothesis"].split())
         notes.append("card: " + card1[:90])
+        say("analyst", "HYPOTHESIS: " + card1[:90])
 
         # 1b. DUPLICATE PRECHECK: no Engineer call for a repeat of a tested hypothesis
         if (twin := duplicate_of(parsed, rows, loop_cfg["duplicate_jaccard"])) is not None:
             notes.append(f"duplicate of cycle {twin}")
+            say("DISCARD", f"repeats the rejected card of cycle {twin}: no engineer call")
             forced["verdict"] = "duplicate"
             return "discard", None, ""
 
@@ -962,13 +1033,19 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             lesson_id = learn(*first)
 
         notes.append("tier: " + ("heavy" if heavy else "light"))
+        for ln in diff_lines(diff):
+            say("engineer", ln)
 
         # 4. DECIDE on the metric alone first: a candidate that cannot be kept
         #    costs no Auditor call
         def beats(m):
             return m > bar(best["metric"])
 
+        b = best["metric"]
+        say("evaluate", f"{metric:.6f}   best {b:.6f}   {bar_text(b)}")
         if not beats(metric):
+            say("DISCARD", (f"+{metric - b:.6f} over best, inside the noise band -> git reset"
+                            if metric > b else "not above best -> git reset"))
             return "discard", metric, lesson_id
 
         # 5. AUDIT: one call gives the verdict and, when a pack has a rubric, the scores
@@ -978,6 +1055,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             heavy=heavy)
         forced["audited"] = True
         audit_ok = approved(res.text)
+        say("audit", " ".join(res.text.split())[:70])
         notes.append("audit: " + " ".join(res.text.split())[:60])
         rubric_score = rubric_mod.reply_score(
             vendor_objs["auditor"], active_rubric, res.text)
@@ -995,8 +1073,12 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             forced["confirm_metric"] = metric2
             if metric2 is None or not beats(min(metric, metric2)):
                 notes.insert(1, unconfirmed_note(metric2, error))  # early: the ledger cuts at 240
+                say("confirm", (f"re-run {metric2:.6f}: below the bar" if metric2 is not None
+                                else f"re-run failed: {error[:60]}"))
+                say("DISCARD", "the gain did not survive a second measurement -> git reset")
                 return "discard", metric, lesson_id
             metric = min(metric, metric2)
+            say("confirm", f"re-run {metric2:.6f}: the lower score {metric:.6f} still clears the bar")
         failures = (guard("replay", lambda: lessons.replay(state, workspace, loop_cfg))
                     if loop_cfg["replay_on_keep"] else [])
         if failures:
@@ -1006,6 +1088,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             return "discard", metric, failures[0][0]
 
         commit_keep(workspace, state, best, n, card1, metric, rubric_score)
+        say("KEEP", f"{metric:.6f} clears the bar -> git commit {best['commit'][:7]}")
         return "keep", metric, lesson_id
 
     consecutive_crashes = 0
@@ -1015,6 +1098,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         if why := brake(best["metric"], loop_cfg, ledger.read_rows(state)):
             print(f"run: stopping — {why}")
             break
+        if narrate:
+            print(f"\ncycle {n}", flush=True)
         notes.clear()
         parsed.clear()
         forced.clear()
@@ -1141,8 +1226,10 @@ def main(argv: list[str] | None = None, root: Path | None = None) -> int:
     parser.add_argument("--iterations", type=int, default=None,
                         help="default: loop.max_iterations from team.yaml")
     parser.add_argument("--root", type=Path, default=root or Path(__file__).resolve().parent)
+    parser.add_argument("--narrate", action="store_true",
+                        help="print each step of a cycle: card, diff, score vs the keep bar, decision")
     args = parser.parse_args(argv)
-    return run(args.root, mock=args.mock, iterations=args.iterations)
+    return run(args.root, mock=args.mock, iterations=args.iterations, narrate=args.narrate)
 
 
 if __name__ == "__main__":

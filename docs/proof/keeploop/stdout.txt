@@ -1,0 +1,172 @@
+prepare: created results.tsv, lessons.jsonl, guardrails.md, workspace, best.json, scout_seen.json in <sandbox>/kl/.keeploop
+run: baseline metric = 0.628667  sigma = 0.020155 (3 runs)  holdout baseline recorded
+
+cycle 1
+  analyst   HYPOTHESIS: A lower temperature (0.5) gives more consistent answers.
+  engineer  -  "temperature": 0.7,
+  engineer  +  "temperature": 0.5,
+  evaluate  0.676000   best 0.628667   bar 0.668977 = best + 2σ, σ 0.020155
+  audit     APPROVED: diff matches the card; nothing else touched.
+  confirm   re-run 0.678000: the lower score 0.676000 still clears the bar
+  KEEP      0.676000 clears the bar -> git commit 589caa3
+cycle 1: keep  metric=0.676  best=0.676000  tokens=2582  time a=0s e=0s v=0s q=0s
+
+cycle 2
+  analyst   HYPOTHESIS: Three few-shot examples teach the answer format.
+  engineer  -  "few_shot": 0,
+  engineer  +  "few_shot": 3,
+  evaluate  0.701000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   +0.025000 over best, inside the noise band -> git reset
+cycle 2: discard  metric=0.701  best=0.676000  tokens=1809  time a=0s e=0s v=0s q=0s
+
+cycle 3
+  analyst   HYPOTHESIS: Smaller chunks (384 tokens) retrieve more precise passages.
+  engineer  -  "chunk_size": 512,
+  engineer  +  "chunk_size": 384,
+  evaluate  0.655000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 3: discard  metric=0.655  best=0.676000  tokens=1900  time a=0s e=0s v=0s q=0s
+
+cycle 4
+  analyst   HYPOTHESIS: Retrieving 8 passages instead of 5 finds more of the evidence.
+  engineer  -  "top_k": 5,
+  engineer  +  "top_k": 8,
+  evaluate  0.658000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 4: discard  metric=0.658  best=0.676000  tokens=1968  time a=0s e=0s v=0s q=0s
+
+cycle 5
+  analyst   HYPOTHESIS: Reranking the retrieved passages puts the evidence first.
+  engineer  -  "rerank": false,
+  engineer  +  "rerank": true,
+  evaluate  0.696000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   +0.020000 over best, inside the noise band -> git reset
+cycle 5: discard  metric=0.696  best=0.676000  tokens=2039  time a=0s e=0s v=0s q=0s
+
+cycle 6
+  analyst   HYPOTHESIS: A second retry recovers from malformed answers.
+  engineer  -  "retries": 1,
+  engineer  +  "retries": 2,
+  evaluate  0.650000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 6: discard  metric=0.65  best=0.676000  tokens=2103  time a=0s e=0s v=0s q=0s
+
+cycle 7
+  analyst   HYPOTHESIS: A longer answer budget (768 tokens) stops truncated answers.
+  engineer  -  "max_tokens": 512
+  engineer  +  "max_tokens": 768
+  evaluate  0.661000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 7: discard  metric=0.661  best=0.676000  tokens=2176  time a=0s e=0s v=0s q=0s
+
+cycle 8
+  analyst   HYPOTHESIS: A checklist-style prompt makes the model verify each answer.
+  engineer  -  "prompt_style": "plain",
+  engineer  +  "prompt_style": "checklist",
+  evaluate  0.706000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   +0.030000 over best, inside the noise band -> git reset
+cycle 8: discard  metric=0.706  best=0.676000  tokens=2252  time a=0s e=0s v=0s q=0s
+
+cycle 9
+  analyst   HYPOTHESIS: An even lower temperature (0.3) removes guessing.
+  engineer  -  "temperature": 0.5,
+  engineer  +  "temperature": 0.3,
+  evaluate  0.665000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 9: discard  metric=0.665  best=0.676000  tokens=2313  time a=0s e=0s v=0s q=0s
+
+cycle 10
+  analyst   HYPOTHESIS: Larger chunks (768 tokens) keep context together.
+  engineer  -  "chunk_size": 512,
+  engineer  +  "chunk_size": 768,
+  evaluate  0.646000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 10: discard  metric=0.646  best=0.676000  tokens=2379  time a=0s e=0s v=0s q=0s
+
+cycle 11
+  analyst   HYPOTHESIS: Five few-shot examples cover more question types than three.
+  engineer  -  "few_shot": 0,
+  engineer  +  "few_shot": 5,
+  evaluate  0.710000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   +0.034000 over best, inside the noise band -> git reset
+cycle 11: discard  metric=0.71  best=0.676000  tokens=2417  time a=0s e=0s v=0s q=0s
+
+cycle 12
+  analyst   HYPOTHESIS: Fewer passages (3) cut distracting context.
+  engineer  -  "top_k": 5,
+  engineer  +  "top_k": 3,
+  evaluate  0.628000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 12: discard  metric=0.628  best=0.676000  tokens=2401  time a=0s e=0s v=0s q=0s
+
+cycle 13
+  analyst   HYPOTHESIS: A third retry catches the remaining format failures.
+  engineer  -  "retries": 1,
+  engineer  +  "retries": 3,
+  evaluate  0.662000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 13: discard  metric=0.662  best=0.676000  tokens=2423  time a=0s e=0s v=0s q=0s
+
+cycle 14
+  analyst   HYPOTHESIS: A 1024-token answer budget leaves room for reasoning.
+  engineer  -  "max_tokens": 512
+  engineer  +  "max_tokens": 1024
+  evaluate  0.646000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 14: discard  metric=0.646  best=0.676000  tokens=2443  time a=0s e=0s v=0s q=0s
+
+cycle 15
+  analyst   HYPOTHESIS: An expert persona prompt raises answer confidence.
+  engineer  -  "prompt_style": "plain",
+  engineer  +  "prompt_style": "persona",
+  evaluate  0.645000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 15: discard  metric=0.645  best=0.676000  tokens=2463  time a=0s e=0s v=0s q=0s
+
+cycle 16
+  analyst   HYPOTHESIS: Greedy decoding (temperature 0) is the most accurate.
+  engineer  -  "temperature": 0.5,
+  engineer  +  "temperature": 0.0,
+  evaluate  0.662000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 16: discard  metric=0.662  best=0.676000  tokens=2478  time a=0s e=0s v=0s q=0s
+
+cycle 17
+  analyst   HYPOTHESIS: Eight few-shot examples beat five.
+  engineer  -  "few_shot": 0,
+  engineer  +  "few_shot": 8,
+  evaluate  0.727000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  audit     APPROVED: diff matches the card; nothing else touched.
+  confirm   re-run 0.706000: below the bar
+  DISCARD   the gain did not survive a second measurement -> git reset
+cycle 17: discard  metric=0.727  best=0.676000  tokens=3310  time a=0s e=0s v=0s q=0s
+
+cycle 18
+  analyst   HYPOTHESIS: Whole-section chunks (1024 tokens) preserve tables.
+  engineer  -  "chunk_size": 512,
+  engineer  +  "chunk_size": 1024,
+  evaluate  0.668000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 18: discard  metric=0.668  best=0.676000  tokens=2548  time a=0s e=0s v=0s q=0s
+
+cycle 19
+  analyst   HYPOTHESIS: Ten passages give the reranker more to choose from.
+  engineer  -  "top_k": 5,
+  engineer  +  "top_k": 10,
+  evaluate  0.639000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   not above best -> git reset
+cycle 19: discard  metric=0.639  best=0.676000  tokens=2561  time a=0s e=0s v=0s q=0s
+
+cycle 20
+  analyst   HYPOTHESIS: Two few-shot examples are enough and leave room for context.
+  engineer  -  "few_shot": 0,
+  engineer  +  "few_shot": 2,
+  evaluate  0.700000   best 0.676000   bar 0.716310 = best + 2σ, σ 0.020155
+  DISCARD   +0.024000 over best, inside the noise band -> git reset
+cycle 20: discard  metric=0.7  best=0.676000  tokens=2586  time a=0s e=0s v=0s q=0s
+holdout: 0.657400 -> 0.659400 (+0.002000); evaluation: 0.628667 -> 0.676000 (+0.047333)
+WARNING: the holdout gain is below the evaluation gain: the keeps may be overfitting the evaluation. Review them before trusting the metric.
+
+run complete: 1 keeps, 19 discards, 0 crashes, 0 lessons, 47151 tokens. Best metric: 0.676000
+time: analyst 0s, engineer 0s, eval 1s, audit 0s
+ledger: <sandbox>/kl/.keeploop/results.tsv

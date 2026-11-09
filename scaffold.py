@@ -31,7 +31,7 @@ BUNDLE = HERE / "_assets"  # present only in a pip install (setup.py)
 
 # The engine: the modules the wheel installs, inside its `keeploop/` folder (never
 # top-level, where names like `run` or `prepare` would clash with other packages).
-ENGINE = ["bm25", "codemap", "kl", "ledger", "lessons", "packs", "prepare", "rubric",
+ENGINE = ["bm25", "codemap", "kl", "ledger", "lessons", "packs", "prepare", "quickstart", "report", "rubric",
           "run", "scaffold", "scout", "vendors"]
 REPO_URL = "https://github.com/johnha912/keeploop"
 

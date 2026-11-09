@@ -1,0 +1,10 @@
+{
+  "few_shot": 3,
+  "rerank": true,
+  "prompt_style": "checklist",
+  "temperature": 0.7,
+  "chunk_size": 512,
+  "top_k": 5,
+  "retries": 2,
+  "max_tokens": 512
+}

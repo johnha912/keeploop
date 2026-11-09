@@ -19,7 +19,7 @@ import json
 import subprocess
 from pathlib import Path
 
-__version__ = "0.2.0"  # the single source; pyproject reads it, see CHANGELOG.md
+__version__ = "0.3.0"  # the single source; pyproject reads it, see CHANGELOG.md
 
 ROOT = Path(__file__).resolve().parent
 STATE_DIR = ROOT / ".keeploop"
@@ -29,6 +29,7 @@ CONFIG = {
     "max_iterations": 20,
     "keep_threshold": 0.0,          # minimum relative metric gain to keep
     "confirm_keep": True,           # re-run the evaluation once before a keep
+    "eval_cache": False,            # reuse a score for identical files + evaluate.py (sigma 0 only)
     "engineer_repairs": 1,          # extra engineer calls for a repairable failure
     "repo_map_max_chars": 3000,     # size of the Analyst's repo map
     "eval_stderr_max_chars": 1500,  # evaluate.py's stderr for the best, shown to the Analyst; 0 = off

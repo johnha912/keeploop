@@ -91,6 +91,11 @@ class MockVendor(Vendor):
       teaches nothing. Asked to repair, it changes nothing (and the script
       does not advance), so the demo stays deterministic.
     - auditor:  always approves.
+
+    A scripted project (run.py loads mock_script.json into `script`): entries are
+    {"hypothesis": "...", "set": {...}}. The analyst writes the patch as JSON on its
+    CHANGE line and the engineer applies the patch it reads from the card, so a card
+    the loop drops (a duplicate) never puts the two roles out of step.
     """
 
     name = "mock"
@@ -106,6 +111,7 @@ class MockVendor(Vendor):
 
     def __init__(self):
         self._calls: dict[str, int] = {}
+        self.script: list[dict] | None = None  # mock_script.json, see the class docstring
 
     def _next(self, role: str) -> int:
         n = self._calls.get(role, 0)
@@ -116,7 +122,9 @@ class MockVendor(Vendor):
                  cwd=None) -> VendorResult:
         start = time.time()
         text = ""
-        if role == "analyst":
+        if self.script:
+            text = self._scripted(prompt, role, cwd)
+        elif role == "analyst":
             # names the parameter and value the engineer will change next, so every
             # card differs from the others (the duplicate precheck compares them)
             param, value = next(iter(self.PATCH_SCRIPT[self._next(role) % len(self.PATCH_SCRIPT)].items()))
@@ -143,6 +151,27 @@ class MockVendor(Vendor):
                             tokens_out=_estimate_tokens(text),
                             model="mock-1",
                             latency_s=time.time() - start)
+
+
+    def _scripted(self, prompt: str, role: str, cwd) -> str:
+        if role == "analyst":
+            entry = self.script[self._next(role) % len(self.script)]
+            return (f"HYPOTHESIS: {entry['hypothesis']}\n"
+                    f"ALTERNATIVES: the gain is noise; the keep bar and the confirm re-run "
+                    f"tell them apart.\n"
+                    f"CHANGE: set in config.json {json.dumps(entry['set'])}\n"
+                    f"EXPECT: the metric rises.\n"
+                    f"REJECT IF: the metric does not beat the keep bar.\n"
+                    f"MISSING: none")
+        if role == "engineer":
+            m = re.search(r"^CHANGE: set in config\.json (\{.*\})$", prompt, re.M)
+            path = Path(cwd) / "config.json" if cwd else None
+            if m and path and path.exists() and "Your last attempt failed" not in prompt:
+                cfg = json.loads(path.read_text(encoding="utf-8"))
+                path.write_text(json.dumps({**cfg, **json.loads(m.group(1))}, indent=2) + "\n",
+                                encoding="utf-8")
+            return "done"
+        return "APPROVED: diff matches the card; nothing else touched."
 
 
 class CliVendor(Vendor):

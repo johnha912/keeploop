@@ -48,8 +48,10 @@ ready to paste; you never write them yourself (see Hard rules):
    while it fails.
 4. The mission in `program.md`.
 
-Then run `python kl.py begin`. Every keep is a commit on the `keeploop`
-branch of that worktree; the human merges the ones they want.
+Then run `python kl.py doctor`: it runs `evaluate.py` a few times and says how
+noisy it is and the smallest gain the keep bar lets through. Show its warnings to
+the human before going on. Then run `python kl.py begin`. Every keep is a commit
+on the `keeploop` branch of that worktree; the human merges the ones they want.
 
 To run a worked example instead: `python tools/make_sandbox.py examples/<name> <new short folder>`
 builds its sandbox in seconds and prints the next command (docs/GUIDE.md).

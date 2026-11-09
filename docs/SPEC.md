@@ -189,6 +189,7 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `max_iterations` | 20 | yes | Cycles per run; `--iterations` overrides |
 | `keep_threshold` | 0.0 | yes | Minimum gain relative to `abs(best)` |
 | `confirm_keep` | true | yes | Re-run before a keep when sigma > 0 (heavy always re-runs) |
+| `eval_cache` | false | yes (`run.py`) | Reuse a score when the workspace files (git tree), `evaluate.py` and `eval_cmd` are identical to an earlier evaluation; only when sigma is 0, never for the baseline or `holdout.py`. Stored in `.keeploop/eval_cache.json` |
 | `engineer_repairs` | 1 | yes | Extra Engineer calls for a repairable failure |
 | `repo_map_max_chars` | 3000 | yes (`run.py`); `kl map` uses the default | Analyst repo map size |
 | `eval_stderr_max_chars` | 1500 | yes (`run.py`) | `evaluate.py` stderr of the current best shown to the Analyst (control characters stripped, secrets redacted); 0 = off. Never `holdout.py` |
@@ -213,6 +214,21 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `recall_top_k` | 8 | yes | More open lessons than this: inject only the k most relevant |
 | `scout_max_proposals` | 3 | no (`--max`) | Per scout run |
 | `scout_min_relevance` | 0.35 | no (`--min-score`) | Applies to the relevance factor |
+
+Top-level `global_lessons:` (off by default): `enabled` (false), `path` (default
+`~/.keeploop/lessons`, or `$KEEPLOOP_HOME/lessons`), `max_lessons` (5, also the hard
+cap), `max_tokens` (400, characters / 4). Only `kl lesson share L-ID` writes the store.
+When enabled, `kl recall` and each headless cycle's card-relevant guardrails add the
+most relevant shared lessons within both caps; nothing is injected when it is off.
+
+`run.py --narrate` prints each step of a cycle (card, diff lines, score against the keep
+bar, decision); off by default. With `--mock`, a `mock_script.json` beside `team.yaml`
+(`[{"hypothesis": "...", "set": {...}}, ...]`) replaces the mock's built-in proposals.
+
+Init-time commands, never part of a cycle: `kl doctor [--runs N] [--want GAIN]` runs
+`evaluate.py` N times (default 5, at least 3) and reports sigma and the smallest gain the
+keep bar lets through; `kl quickstart TEMPLATE` and `kl import-lite LEDGER` write a
+control folder. `kl report --html FILE | --svg FILE` draws the ledger (no model call).
 
 No key of the earlier spec was removed. `keep_threshold` now feeds the bar
 `max(abs(best) * keep_threshold, noise_z * sigma)`.
