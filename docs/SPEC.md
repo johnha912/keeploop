@@ -170,6 +170,8 @@ the fence snapshot; every later command refuses (exit 2) if it changed.
 | 8 Record | `report`, `slow` | Facts from the ledger; bottleneck phase and levers. |
 | Staffing | `staff [--goal speed\|quality\|cost] [--apply]` | Section 4. |
 | Packs, memory | `pack new NAME`, `lesson ...`, `scout ...`, `cite FILE` | |
+| Fast path | `next`, `try [CARD] [--audit-verdict FILE] [--tokens N]` | `next` is one brief (best, bar, sigma, STOP, pending card, next hypothesis, top 3 memory hits, a card skeleton). `try` runs `card` + `check` + `eval` + `keep`/`discard` through the same functions. Exit 0 kept, 4 discarded, 3 waiting for a verdict (the cycle stays open, the next command is printed), 1 refused, 2 fence broken. A gain is decisive when it clears the bar by the bar's own margin again and by 1% of best; a heavy change or a light gain that is not decisive needs an Auditor verdict, and a heavy card stops for the Critic first. A refused keep ends in a discard, as in `run.py`. Lines over 300 characters are cut; the full text is `.keeploop/last-try.txt`. |
+| Chat AIs | `handoff [--files GLOB ...] [--max-chars N] [--audit\|--critic]`, `apply REPLY` | `handoff` prints one packet for a chat AI without repo access (mission, metric, best/bar, recent ledger, rejected hypotheses, open lessons, chosen files, the reply format) and records what it showed in `.keeploop/handoff.json`. `apply` registers the reply's card, writes its `file:` blocks and runs the `try` flow. It refuses absolute paths, `..`, `\\`, drive letters, `:`, `~`, `.git*`, protected paths, symlinked paths and an existing file the last handoff did not show whole; nothing in the reply is executed. |
 
 Differences from headless: the Auditor is optional for a light change that
 beats the bar (the CEO decides; `keep` demands a verdict only for heavy);
@@ -347,6 +349,9 @@ appended; every entry says "needs an experiment card before adoption".
   or the ledger.
 - `scout_seen.json`: URLs already fetched. `nohooks/`: empty hooks dir.
 - `cycle.json`, `fence.json`: interactive-mode state.
+- `next.json` (cycle start for `kl slow`), `handoff.json` (what the last handoff showed),
+  `last-try.txt` (the full `kl try` output), `eval-stderr.txt` (an evaluation crash's
+  full stderr, secrets redacted): fast-path state.
 
 ### `team.yaml`
 Restricted YAML: up to three levels of `key: value`, scalars, `#` comments,
@@ -524,9 +529,11 @@ filler slop patterns).
 - `python run.py --mock --iterations 5` exits 0 offline with keeps at cycles
   1, 2, 5, a discard at 3, a crash with lesson L-001 at 4, best metric 1.0
   (verdicts supported, supported, rejected, untested, supported).
-- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 138 tests).
+- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 232 tests).
 - `python scout.py --dry-run` exits 0 online and offline (manual check, no
   test).
 - `CHANGELOG.md` has a section for `prepare.__version__` (checked by
   `TestVersion`).
 - `docs/DEMO-OUTPUT.txt` is regenerated from a fresh copy.
+- `python tools/proof_run.py --check` passes (the golden gate: every keep, discard and
+  score of the 25-seed proof run matches `docs/proof/proof.json`).
