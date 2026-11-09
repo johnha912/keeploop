@@ -1112,7 +1112,7 @@ def cmd_quickstart(argv: list[str]) -> int:
     p.add_argument("template", choices=list(quickstart.TEMPLATES))
     p.add_argument("dir", nargs="?", type=Path, help="default: <repo>-keeploop beside the repo")
     p.add_argument("--workspace", type=Path, help="the repo the loop may change (default: cwd)")
-    a = p.parse_args(argv[1:])
+    a = p.parse_intermixed_args(argv[1:])  # DIR may follow --workspace (Python < 3.12 too)
     try:
         print("\n".join(quickstart.quickstart(a.template, a.workspace, a.dir, rewrite=kl() == "kl",
                                               src=scaffold.source())))
