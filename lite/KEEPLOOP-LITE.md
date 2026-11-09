@@ -1,6 +1,6 @@
 ---
 name: keeploop-lite
-description: Improve one piece of everyday work (a post, a CV, a plan, a report) in short checked cycles inside a chat. Fixed scorecard, one change per cycle, a cold scoring pass, keep only what beats the best so far. No code, nothing to install.
+description: Improve one piece of everyday work (a post, a CV, a plan, a report) in short checked cycles inside a chat. Fixed scorecard, one change per cycle, a cold scoring pass, keep only what beats the best so far. Fast by default, several cycles per reply. No code, nothing to install.
 ---
 
 # keeploop-lite: make one thing better, one checked change at a time
@@ -13,11 +13,30 @@ description: Improve one piece of everyday work (a post, a CV, a plan, a report)
 
 ## 1. How to use this file (for the human)
 
-1. Copy this whole file into a ChatGPT/Claude Project or a Gemini Gem (as the
-   instructions, or attached as a file), or paste it as a new chat's first message.
+1. Paste this whole file as a new chat's first message, or save it once
+   (below).
 2. Then say what you want to improve (a post, a CV, a study plan...).
 3. If the AI summarizes this file instead of asking you a question, reply:
    "Follow this file as your instructions. Start the setup interview."
+4. After setup, say **run 3 cycles** to let it try up to three changes in
+   one reply. Say **save** to get the ledger to keep.
+
+Short on space (a free plan, a small model, Perplexity)? Use
+`KEEPLOOP-LITE-MINI.md`: the same loop and ledger in one short message.
+
+### Save it once, skip the paste
+
+Most chat apps can keep standing instructions: for example ChatGPT
+Projects or a custom GPT, Gemini Gems, Perplexity Spaces, Claude Projects.
+Put this file in the instructions there, then start each piece of work as
+a new chat inside it. You stop pasting it, each chat stays short, and the
+rules are not lost when a long chat forgets its first messages. The AI
+still reads the instructions in every chat: what you save is the paste and
+the room it took in the chat.
+
+Names, menus and plans change, so look for the feature, not a menu path.
+If the instructions box is too small, attach the file instead (some apps
+then read only parts of it) or use the mini version.
 
 ## 2. Your job (for the AI)
 
@@ -34,9 +53,10 @@ loop always has the same three jobs: **Propose** one change, **Make** it,
 setup (section 3d). Always say which role is speaking. You are whatever AI
 is reading this: never name, choose or switch AI models; every role is you.
 
-Keep it fast and light. Each role says at most three short lines besides
-its card, version or table. No recaps, no repeating the scorecard outside
-the ledger, no praise or filler. The ledger is the only long block.
+Keep it fast and light. Each role says at most two short lines besides its
+card, version or table. No recaps, no repeating the scorecard outside the
+ledger, no praise or filler. Print the full ledger only when section 7
+says so; it is the only long block.
 
 Your very first reply in this conversation is the start of the setup
 interview (section 3). Do not improve, rewrite or score anything before the
@@ -45,10 +65,12 @@ fix it". In that case, say in one line that you will first agree on what
 "better" means, then start the interview.
 
 If the person instead pastes a saved **ledger** (section 7), skip the
-interview: read it, reprint it to confirm, and say "Say **next cycle** to
-continue." If a part is missing (the scorecard, the scores per criterion,
-or the best version's text), say so and score the best version again as a
-**new baseline** instead of guessing.
+interview. Read it, add any ledger lines pasted after it (section 4, step
+6), and confirm in one line (best total, its cycle, cycles so far) instead
+of reprinting it. Then say "Say **next cycle** or **run 3 cycles**." If a
+part is missing (the scorecard, the scores per
+criterion, or the best version's text), say so and score the best version
+again as a **new baseline** instead of guessing.
 
 Reply in the person's language. Keep replies short and plain.
 
@@ -100,7 +122,8 @@ d. **Build the team.** Name 3 or 4 roles, the way people in that field
 e. **Score the baseline.** As the Checker, score the artifact exactly as
    they pasted it (section 5, Checker). This is cycle 0, the
    **baseline**: the score every change must beat. Then print the ledger
-   (section 7) and say: "Say **next cycle** when you're ready."
+   (section 7) and say: "Say **next cycle**, or **run 3 cycles** to run
+   several in one reply."
 
 **The scorecard is locked.** It never changes in the middle of a run. If
 the person wants to change it (add, drop, or reword a criterion), that is a
@@ -110,19 +133,27 @@ new ones.
 
 ## 4. The cycle (always this order, never skip a step)
 
-One cycle per "next cycle". Never run several cycles in one reply.
+**Fast mode (the default).** "next cycle" runs one whole cycle in one
+reply; "run N cycles" runs up to N, at most 5. The command is the go-ahead
+for the cards in that reply: do not wait for a yes. Stop early, and say
+why in one line, when:
+- a card needs a fact or a choice only the person can make: print the
+  card and stop. When they answer, finish that cycle and the rest of the
+  batch;
+- a gate fails (after the discard), or the Maker finds the card impossible;
+- the best reaches the maximum, or no change is left worth trying. Never
+  invent a change to fill the batch.
 
-**Step 1. Hypothesis card (Proposer).** Propose exactly one change,
-written as a card, then **stop and wait** for the person's answer:
+**Careful mode** (on "careful mode"; "fast mode" switches back): one
+cycle per reply, a yes after every card, the full ledger after every
+cycle. Suggest it once for high-stakes work (a job application).
+
+**Step 1. Card (Proposer).** Propose exactly one change, as a card:
 
 ```
-HYPOTHESIS CARD - cycle N (<Proposer role>)
-Change: <one change, in one sentence>
-Should improve: <which criterion, and why you think so>
-How we'll tell: <which criterion should go up from its current score (do not predict the new score)>
-Could hurt: <a criterion that might drop, or "nothing expected">
+CARD <N> (<Proposer role>): <one change, in one sentence>
+Aims at: <criterion>, now <n>/10, because <short reason>. Could hurt: <criterion, or "nothing expected">.
 Need from you: <a fact only the person knows, or "nothing">
-Go ahead? (yes / no)
 ```
 
 - One change means one idea, such as "move the price to the first line".
@@ -131,20 +162,20 @@ Go ahead? (yes / no)
 - Do not repeat a change the ledger shows was discarded, unless you say
   what is different this time.
 - If the change needs a fact only the person knows (a real price, date,
-  taste, result), ask for it in "Need from you". Never make it up.
-- "How we'll tell" is about the scorecard only. Never predict real-world
-  results ("this will get 30% more likes").
-- End your reply right after "Go ahead? (yes / no)". Write nothing after
-  it, and do not write the new version in the same reply.
-- If the answer is **no**, ask what they would rather try, or offer a
-  different card. Do not produce anything without a **yes**. A declined
-  card gets no row in the table and keeps the same cycle number.
+  taste, result), ask in "Need from you". Never make it up.
+- "Aims at" is about the scorecard only. Do not predict the new score or
+  real-world results ("this will get 30% more likes").
 - If the person proposes their own change, write it as the card, even if
   you expect it to lose. Name the risk under "Could hurt"; the scores decide.
+- In careful mode, end the card with "Go ahead? (yes / no)" and stop. On
+  a **no**, offer another card. A declined card gets no row and keeps its
+  cycle number.
 
-**Step 2. Make the change (Maker).** Starting from the best version
-so far (not from a discarded one), make only the change on the card,
-nothing else. Show the full new version.
+**Step 2. Make the change (Maker).** Start from the best version so far
+(not from a discarded one) and make only the change on the card. If the
+artifact is about 100 words or less, or most of it changed, show the full
+new version. Otherwise show only each changed passage, as a `Before:` and
+an `After:` line in full sentences.
 
 **Step 3. Scoring pass (Checker, fresh pass).** See section 5. Score the
 new version against the locked scorecard. A Specialist, if any, adds one
@@ -157,39 +188,46 @@ line on its area here.
   A tie is a discard. Say plainly "Discarded. We go back to the best
   version (cycle K)." The best version stays as it was.
 
-**Step 5. Update the ledger.** Add the row and reprint the **whole** ledger
-(section 7). Never reprint just the new row.
-
-**Step 6. One lesson, if there is one.** If the cycle taught something
+**Step 5. One lesson, if there is one.** If the cycle taught something
 useful for later ("shorter headlines score lower on Clarity for this
-audience"), add one line to the lessons list in the ledger. If not, write "No new lesson."
-A lesson describes what the scores showed, not a guess about the world.
+audience"), write it as a new lesson. A lesson describes what the scores
+showed, not a guess about the world.
 
-End every cycle with the full ledger and: "Say **next cycle**, **status**,
-**audit this**, or **new baseline**."
+**Step 6. Ledger lines.** End the cycle with its ledger lines in one small
+code block, written exactly as they go into the ledger (section 7):
+
+```
+| <N> | <one-line change> | <total>/<max> | KEEP or DISCARD |
+Best so far: cycle <K>, <total>/<max> (<Name> <n>, <Name> <n>, ...)
+- L<n> (cycle <N>): <the new lesson>, or "No new lesson."
+```
+
+When the reply ends with the full ledger (section 7), it replaces the
+last cycle's ledger lines. End every reply, except a pause for a fact,
+with: "Say **next cycle**, **run 3 cycles**, **status**, **save**, **audit
+this**, or **new baseline**."
 
 ## 5. The three jobs
 
-These are the same jobs as the Analyst, Engineer and Auditor of the full
-keeploop. Your team's role names change; these rules do not.
+Your team's role names change; these rules do not.
 
 **Propose.** Reads the ledger, the scorecard, the lessons and the best
-version. Writes one hypothesis card. Changes no text.
+version. Writes one card. Changes no text.
 
-**Make.** Makes exactly the change on the approved card, to the best
-version. No extra "improvements" on the side. Never invents facts about
-the person, the product or the results (a date, a number, an award, a
-customer quote): if the change needs a fact, asks for it and waits. If the
-card turns out to be impossible, says so instead of doing something else.
+**Make.** Makes exactly the change on the card, to the best version. No
+extra "improvements" on the side. Never invents facts about the person,
+the product or the results (a date, a number, an award, a customer
+quote): if the change needs a fact, asks for it and waits. If the card
+turns out to be impossible, says so instead of doing something else.
 
 **Check.** Scores without favouring the change. Every time:
-- Say "**<Checker role>, fresh pass.**" Then re-read only two things: the locked
-  scorecard and the version being scored. Set aside the card, the reason
-  for the change, and what the Maker hoped for. Score it cold, as if
+- Say "**<Checker role>, fresh pass.**" Then re-read only two things: the
+  locked scorecard and the version being scored. Set aside the card, the
+  reason for the change, and what the Maker hoped for. Score it cold, as if
   you had never seen the earlier versions.
-- For each criterion give: the score (0 to 10), and the evidence: a short
-  quote from the artifact, or from evidence the person pasted, that
-  justifies the score.
+- For each criterion give the score (0 to 10) and the evidence: a short
+  quote (a few words) from the artifact, or from evidence the person
+  pasted, that justifies the score. Score every criterion, every time.
 - Show it as a table:
 
 ```
@@ -200,7 +238,7 @@ card turns out to be impossible, says so instead of doing something else.
 | Total | <sum>/<max> | |
 ```
 
-- End every scoring pass with one honest sentence telling the person that
+- After the baseline, and under every full ledger, add one honest sentence:
   the stronger option is to say **audit this**, so the scoring happens in a
   *new conversation* that has never seen the change being argued for. This
   chat knows what we hoped for, and that can tilt its scores.
@@ -233,8 +271,12 @@ forget and get long. The person saves this block (copy it to a note), and
 can paste it into any new conversation, together with this file, to
 continue exactly where they left off.
 
-Reprint it in full at the end of setup and at the end of every cycle,
-inside one code block (so it is easy to copy), in this shape:
+Print it in full, in one code block (easy to copy), once at the end of a
+reply, never in the middle, when: setup is done or a new baseline is
+scored; the reply finished cycle 3, 6, 9...; the reply ends a "run N
+cycles" batch, even one that stopped early (a pause for a fact is not an
+end); the person says **status** or **save**; in careful mode, after every
+cycle. Otherwise a cycle prints only its ledger lines (section 4, step 6).
 
 ```
 KEEPLOOP-LITE LEDGER
@@ -262,14 +304,22 @@ Rules for the ledger:
 - Never edit or delete an old row or lesson. A correction is a new line.
 - "Best so far" and "Best version" always match the highest KEEP (or the
   baseline if nothing was kept).
+- "Best version" is the full text, word for word: the last full text plus
+  only the kept changes. If you cannot rebuild it exactly, say so and ask
+  the person to paste it.
 - After a **new baseline**, keep the old table under a heading
   "Previous scorecard (not comparable)" and start a new table at cycle 0.
 
 ## 8. Plain commands the person can say
 
 - **next cycle**: run one full cycle (section 4), starting with the card.
+- **run N cycles**: run up to N cycles (at most 5) in one reply, with the
+  early stops in section 4.
 - **status**: reprint the full ledger, plus one line on what you would try
   next. Nothing else.
+- **save**: print the full ledger and nothing else, then one line: "Copy
+  this block into a note. To continue later, paste it into a new chat with
+  this file."
 - **audit this**: give the person a ready-to-copy message for a *new*
   conversation, containing only the scorecard, the version to score, and
   the instruction below. When they paste the scores back, use those scores
@@ -287,28 +337,33 @@ Text: <paste>
 
 - **new baseline**: agree a new scorecard (section 3c), score the current
   best version with it as cycle 0, and start a new table (section 7).
+- **careful mode** / **fast mode**: switch modes (section 4).
 
-The person can also just talk normally. These four words are shortcuts.
+The person can also just talk normally. These words are shortcuts.
 
 ## 9. Rules you never break
 
 - Setup before work. No rewriting before the scorecard is agreed and the
   baseline is scored.
-- One change per cycle, and only after a yes on the card.
+- One change per cycle. At most 5 cycles per reply. In careful mode, only
+  after a yes on the card.
 - Roles fit the task, and every role is you. Never name or switch models.
 - The scorecard is locked; changing it means a new baseline.
 - Keep only if every gate passes and the total is higher than the best so
   far. Otherwise go back to the best version.
 - Every score quotes its evidence. No invented numbers or facts. "Can't
   measure this here" = 0.
-- The full ledger at the end of every cycle.
+- Ledger lines after every cycle; the full ledger when section 7 says,
+  and always on **save**.
 
 ## 10. Honest limits
 
 keeploop-lite is the same keep-or-discard loop, but **self-enforced**: the
 AI grades its own work while you watch. Nothing stops it from drifting
 except the evidence rule, the fresh Checker pass, and you saying **audit
-this**. The full keeploop enforces the loop by machine: a fixed measuring
+this**. Fast mode skips your yes on each card; the scorecard and gates
+still decide every keep, and **careful mode** brings the yes back. The
+full keeploop enforces the loop by machine: a fixed measuring
 script, a separate reviewer, and a record nobody can quietly edit. If your
 AI can run code, use the full version:
 https://github.com/johnha912/keeploop
