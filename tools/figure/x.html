@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>keeploop: your AI as a team (X video)</title>
+<link rel="stylesheet" href="kl.css">
+<!-- The X video, 16:9: keeploop as a team with a CEO beside you. Eight scenes. Every
+     number and every quoted line is set from DATA (render_figure.py): the lite example
+     (lite/EXAMPLE.md, an illustrative transcript), the real fast-path run
+     (docs/assets/demo-run/fastpath.txt), docs/proof/proof.json and the measured benches. -->
+<style>
+body { width: 1920px; height: 1080px; }
+.top { position: absolute; left: 80px; right: 80px; top: 44px; display: flex; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: center; gap: 12px; font: 800 30px Inter, sans-serif; letter-spacing: -0.6px; }
+.prog { position: absolute; left: 80px; right: 80px; bottom: 46px; display: flex; gap: 10px; align-items: center; }
+.prog i { flex: 1; height: 6px; border-radius: 3px; background: var(--line); }
+.prog i.on { background: var(--ink); }
+.prog b { font: 600 17px "JetBrains Mono", monospace; color: var(--ink2); margin-left: 12px; }
+section { position: absolute; left: 80px; right: 80px; top: 130px; bottom: 100px; opacity: 0; }
+h2 { margin: 0; font: 900 92px/1.0 Inter, sans-serif; letter-spacing: -3.2px; }
+h2 span { display: block; color: var(--ink2); font-weight: 800; }
+.note { font: 500 30px/1.35 Inter, sans-serif; color: var(--ink2); margin-top: 22px; max-width: 1500px; }
+.cardx { position: absolute; background: var(--panel); border: 1.5px solid var(--ink); border-radius: 18px; }
+.role { position: absolute; width: 380px; padding: 18px 22px; border-radius: 16px; background: var(--panel); border: 2px solid; }
+.role .t { font: 800 30px Inter, sans-serif; }
+.role .s { font: 22px/1.35 Inter, sans-serif; color: var(--ink2); margin-top: 6px; }
+.role .m { font: 600 18px "JetBrains Mono", monospace; margin-top: 10px; }
+.msg { position: absolute; max-width: 980px; padding: 14px 20px; border-radius: 16px; font: 25px/1.38 Inter, sans-serif; }
+.msg.ai { background: var(--panel); border: 1.5px solid var(--ink); left: 24px; }
+.msg.me { background: var(--ink); color: #fff; right: 24px; }
+.term { font: 22px/1.65 "JetBrains Mono", monospace; color: var(--ink2); padding: 20px 26px; }
+.term b { color: var(--ink); }
+.term .k { color: var(--keep); font-weight: 700; } .term .r { color: var(--reset); font-weight: 700; }
+.big { font: 900 150px/0.95 Inter, sans-serif; letter-spacing: -6px; font-variant-numeric: tabular-nums; }
+.lab { font: 600 24px Inter, sans-serif; color: var(--ink2); }
+.pill { display: inline-block; font: 700 28px Inter, sans-serif; border: 2px solid var(--ink); border-radius: 999px; padding: 10px 22px; margin: 0 12px 16px 0; background: var(--panel); }
+.cap { font: 500 18px "JetBrains Mono", monospace; color: var(--muted); }
+</style></head>
+<body>
+<div class="top"><div class="brand"><svg width="36" height="36" viewBox="0 0 34 34"><path d="M24.5 8.5 A11 11 0 1 0 28 17" fill="none" stroke="#17181c" stroke-width="4.2" stroke-linecap="round"/><path d="M19 4.5 L25 8.5 L20 13.5" fill="none" stroke="#17181c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29.5" cy="11" r="3.6" fill="#1e9e5a"/></svg>keeploop</div>
+  <div class="legend" style="font-size:17px">
+    <span><i class="sw" style="background:var(--ceo)"></i>CEO</span><span><i class="sw" style="background:var(--analyst)"></i>analyst</span>
+    <span><i class="sw" style="background:var(--engineer)"></i>engineer</span><span><i class="sw" style="background:var(--auditor)"></i>auditor</span>
+    <span><i class="sw" style="background:var(--number)"></i>the number</span></div></div>
+
+<section id="s1">
+  <h2 style="font-size:132px;letter-spacing:-5px;margin-top:40px">Your AI is one person.<span style="color:var(--ink)">Give it a team.</span></h2>
+  <div class="note">keeploop turns the AI you already use into a small team with a CEO who works with you: it asks first, staffs the roles, and keeps only changes a number proves.</div>
+  <div id="s1roles"></div>
+</section>
+
+<section id="s2">
+  <div class="kick">01 · it asks you first</div>
+  <h2 style="margin-top:14px">Before any work,<span>the CEO asks a few questions.</span></h2>
+  <div class="cardx" style="left:0;right:0;top:300px;height:500px" id="chat"></div>
+  <div class="cap" style="position:absolute;right:0;bottom:-34px" id="s2cap"></div>
+</section>
+
+<section id="s3">
+  <div class="kick">02 · it staffs the team for the job</div>
+  <h2 style="margin-top:14px">Roles named for the work.<span>Each on the model that fits.</span></h2>
+  <div class="lab" style="position:absolute;left:0;top:300px">in a chat: a team for a bake-sale post (illustrative)</div>
+  <div class="lab" style="position:absolute;left:0;top:560px">in your code: a team for a repo</div>
+  <div id="s3roles"></div>
+</section>
+
+<section id="s4">
+  <div class="kick">03 · two commands a cycle</div>
+  <h2 style="margin-top:14px">One brief in.<span>One decision out.</span></h2>
+  <div class="cardx term" style="left:0;width:1150px;top:300px;height:470px" id="term"></div>
+  <div style="position:absolute;left:1210px;top:300px;width:550px">
+    <div class="lab">in Claude Code</div><div class="pill" style="margin-top:12px">/keeploop 3</div>
+    <div class="lab" style="margin-top:40px">in a chat</div><div class="pill" style="margin-top:12px">"run 3 cycles"</div>
+    <div class="lab" style="margin-top:40px">no repo access</div><div class="pill" style="margin-top:12px">kl handoff · kl apply</div>
+    <div class="cap" style="margin-top:6px">one paste out, one reply in</div></div>
+  <div class="cap" style="position:absolute;left:0;bottom:-34px">real output: docs/assets/demo-run/fastpath.txt (offline demo)</div>
+</section>
+
+<section id="s5">
+  <div class="kick">04 · it keeps only what clears the noise</div>
+  <h2 style="margin-top:14px">A gain inside the noise<span>is reset, not committed.</span></h2>
+  <div style="position:absolute;left:0;top:330px;display:flex;gap:80px;align-items:flex-end">
+    <div><div class="big" style="color:var(--muted)" id="n1"></div><div class="lab">naive keep-if-better</div></div>
+    <div><div class="big" style="color:var(--keep);font-size:200px" id="k1"></div><div class="lab">keeploop</div></div>
+    <div style="max-width:640px"><div class="lab" style="font-size:30px;color:var(--ink)">changes kept with no true gain, per run</div>
+      <div class="lab" style="margin-top:14px" id="s5price"></div></div></div>
+  <div class="cap" style="position:absolute;left:0;bottom:-34px" id="s5cap"></div>
+</section>
+
+<section id="s6">
+  <div class="kick">05 · fast and lean</div>
+  <h2 style="margin-top:14px">Fewer AI calls.<span>Fewer tokens. Same rules.</span></h2>
+  <div id="s6stats" style="position:absolute;left:0;top:330px;display:flex;gap:90px"></div>
+  <div class="note" style="position:absolute;left:0;top:640px;font-size:26px">With <span class="mono" style="color:var(--ink)">profile: fast</span> the Engineer writes its own card and your listed ideas need no Analyst call. The keep rule does not change.</div>
+  <div class="cap" style="position:absolute;left:0;bottom:-34px" id="s6cap"></div>
+</section>
+
+<section id="s7">
+  <div class="kick">06 · works where you already are</div>
+  <h2 style="margin-top:14px">Chat or code.<span>No new app to learn.</span></h2>
+  <div style="position:absolute;left:0;top:320px;width:820px"><div class="lab" style="margin-bottom:18px">chat apps · paste one file</div>
+    <span class="pill">ChatGPT</span><span class="pill">Gemini</span><span class="pill">Claude</span><span class="pill">Perplexity</span></div>
+  <div style="position:absolute;left:900px;top:320px;width:900px"><div class="lab" style="margin-bottom:18px">coding agents · one prompt</div>
+    <span class="pill">Claude Code</span><span class="pill">Codex</span><span class="pill">Cursor</span><span class="pill">Copilot</span><span class="pill">Gemini CLI</span></div>
+  <div class="note" style="position:absolute;left:0;top:600px;font-size:28px">keeploop itself is not an AI: a small Python tool with no dependencies, no telemetry and no API keys.</div>
+</section>
+
+<section id="s8">
+  <h2 style="font-size:128px;letter-spacing:-5px;margin-top:70px">A team for your AI.<span style="color:var(--ink)">A CEO beside you.</span></h2>
+  <div style="margin-top:60px"><span class="pill" style="background:var(--ink);color:#fff;font-family:'JetBrains Mono',monospace">pipx install keeploop</span>
+    <span class="pill" style="font-family:'JetBrains Mono',monospace">github.com/johnha912/keeploop</span></div>
+  <div class="cap" style="margin-top:20px;font-size:20px">every number in this video is in the repo: docs/proof · MIT</div>
+</section>
+
+<div class="prog" id="prog"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent), X = D.x, P = D.p;
+const ease = k => 1 - Math.pow(1 - Math.max(0, Math.min(1, k)), 3);
+const SC = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"], DUR = X.durations;
+const START = DUR.reduce((a, d, i) => (a.push(i ? a[i - 1] + DUR[i - 1] : 0), a), []);
+const prog = document.getElementById("prog");
+SC.forEach(() => prog.appendChild(document.createElement("i")));
+const num = document.createElement("b"); prog.appendChild(num);
+const mk = (parent, cls, html, style) => { const d = document.createElement("div"); d.className = cls; d.innerHTML = html;
+  if (style) d.setAttribute("style", style); parent.appendChild(d); return d; };
+const COL = { ceo: "var(--ceo)", analyst: "var(--analyst)", engineer: "var(--engineer)", auditor: "var(--auditor)" };
+const SOFT = { ceo: "#f1f1f3", analyst: "var(--analyst-soft)", engineer: "var(--engineer-soft)", auditor: "var(--auditor-soft)" };
+
+/* s1: the four role chips */
+const s1r = document.getElementById("s1roles");
+const R1 = [["ceo", "CEO", "works with you"], ["analyst", "Analyst", "proposes"], ["engineer", "Engineer", "builds"], ["auditor", "Auditor", "checks"]]
+  .map(([k, t, s], i) => mk(s1r, "role", `<div class="t" style="color:${COL[k]}">${t}</div><div class="s">${s}</div>`,
+    `left:${i * 420}px;top:520px;width:380px;border-color:${COL[k]};background:${SOFT[k]}`));
+
+/* s2: the interview (lite/EXAMPLE.md, illustrative) */
+const chat = document.getElementById("chat");
+const M2 = X.chat.map((m, i) => mk(chat, "msg " + (m.who === "AI" ? "ai" : "me"), m.text, `top:${24 + i * 96}px`));
+document.getElementById("s2cap").textContent = X.chat_source;
+
+/* s3: two teams */
+const s3r = document.getElementById("s3roles");
+const R3 = X.teams.flatMap((team, r) => team.map((m, i) => mk(s3r, "role",
+  `<div class="t" style="color:${COL[m.kind]}">${m.name}</div><div class="s">${m.job}</div>` + (m.model ? `<div class="m" style="color:${COL[m.kind]}">${m.model}</div>` : ""),
+  `left:${i * 450}px;top:${340 + r * 260}px;width:420px;border-color:${COL[m.kind]}`)));
+
+/* s4: the real fast-path terminal */
+const term = document.getElementById("term");
+const TL = X.term.map(s => mk(term, "", s));
+
+/* s5, s6 */
+const setTxt = (id, s) => document.getElementById(id).textContent = s;
+document.getElementById("s5price").textContent = X.price;
+setTxt("s5cap", X.proof_source);
+const s6 = document.getElementById("s6stats");
+const ST = X.stats.map(s => mk(s6, "", `<div class="big" style="font-size:150px">${s.big}</div><div class="lab" style="font-size:26px;margin-top:8px">${s.lab}</div>`));
+setTxt("s6cap", X.bench_source);
+
+function show(id, t0, t, dur) {
+  const e = document.getElementById(id), on = t >= t0 && t < t0 + dur;
+  const k = ease((t - t0) / 0.45), out = Math.min(1, Math.max(0, (t0 + dur - t) / 0.3));
+  e.style.opacity = on ? Math.min(k, out) : 0;
+  e.style.transform = `translateY(${on ? (1 - k) * 36 : 0}px)`;
+  return on ? t - t0 : -1;
+}
+function render(t) {
+  const total = START[START.length - 1] + DUR[DUR.length - 1];
+  t = Math.min(t, total - 1e-6);
+  const cur = START.findIndex((s, i) => t >= s && t < s + DUR[i]);
+  [...prog.children].forEach((e, i) => { if (e.tagName === "I") e.classList.toggle("on", i <= cur); });
+  num.textContent = `${String(cur + 1).padStart(2, "0")} / ${String(SC.length).padStart(2, "0")}`;
+  const L = SC.map((id, i) => show(id, START[i], t, DUR[i]));
+  R1.forEach((e, i) => { const a = 1.2 + i * 0.3; e.style.opacity = L[0] >= a ? 1 : 0;
+    e.style.transform = `translateY(${(1 - ease((L[0] - a) / 0.4)) * 30}px)`; });
+  M2.forEach((e, i) => { const a = 0.9 + i * 0.95; e.style.opacity = L[1] >= a ? 1 : 0;
+    e.style.transform = `translateY(${(1 - ease((L[1] - a) / 0.35)) * 20}px)`; });
+  R3.forEach((e, i) => { const a = 0.9 + i * 0.4; e.style.opacity = L[2] >= a ? 1 : 0;
+    e.style.transform = `translateX(${(1 - ease((L[2] - a) / 0.4)) * -40}px)`; });
+  TL.forEach((e, i) => { e.style.opacity = L[3] >= 0.8 + i * 0.45 ? 1 : 0; });
+  const cu = (Lx, d) => Lx >= 0 ? ease((Lx - d) / 1.2) : 1;
+  setTxt("n1", (P.n.kept_no_true_gain_mean * cu(L[4], 0.7)).toFixed(2));
+  setTxt("k1", (P.k.kept_no_true_gain_mean * cu(L[4], 1.1)).toFixed(2));
+  ST.forEach((e, i) => { const a = 0.8 + i * 0.5; e.style.opacity = L[5] >= a ? 1 : 0;
+    e.style.transform = `scale(${0.92 + 0.08 * ease((L[5] - a) / 0.35)})`; });
+}
+window.render = render;
+window.TOTAL = START[START.length - 1] + DUR[DUR.length - 1];
+render(0);
+</script>
+</body></html>

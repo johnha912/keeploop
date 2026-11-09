@@ -108,7 +108,8 @@ class TestProofRun(Tmp):
         self.assertTrue(any("inside the noise band" in ln for ln in cyc[a]))
         self.assertTrue(any(ln.strip().startswith("KEEP") for ln in cyc[b]))
         for name in ("keeploop-demo.gif", "keeploop-demo.mp4", "keeploop-demo-poster.png",
-                     "keeploop-gate.gif", "keeploop-gate.png", "keeploop-talk.mp4", "keeploop-talk.png"):
+                     "keeploop-gate.gif", "keeploop-gate.png", "keeploop-team.gif", "keeploop-team.png",
+                     "keeploop-x.mp4", "keeploop-x.png"):
             size = (ROOT / "docs" / "assets" / name).stat().st_size
             self.assertTrue(0 < size < 15_000_000, name)
 
@@ -127,7 +128,12 @@ class TestFigure(unittest.TestCase):
         self.assertTrue(c["score"] > keep["score"] and c["score"] <= c["best"] + 2 * sig)
         sample = json.loads((ROOT / "docs" / "assets" / "demo-run" / "noise-sample.json").read_text(encoding="utf-8"))
         self.assertEqual(d["talk"]["noise"], sample["scores"])  # the committed sample replays
-        for page in ("readme.html", "talk.html"):
+        fast = (ROOT / "docs" / "assets" / "demo-run" / "fastpath.txt").read_text(encoding="utf-8")
+        self.assertIn("KEPT cycle 1", fast)  # the hero's session lines are a real run
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for asked in ('what\n"better" means', "how to measure it", "what score is good enough"):
+            self.assertIn(asked, agents)  # the hero's three questions are AGENTS.md's
+        for page in ("readme.html", "hero.html", "x.html"):
             html = (ROOT / "tools" / "figure" / page).read_text(encoding="utf-8")
             typed = [f"{proof['summary'][m][k]:.2f}" for m in ("naive", "keeploop")
                      for k in ("kept_no_true_gain_mean", "discarded_true_gain_mean")]

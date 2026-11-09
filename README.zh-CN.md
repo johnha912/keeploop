@@ -47,43 +47,26 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   <a href="docs/GUIDE.md">完整指南（英文）</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="保留门的动画：一条数轴，上面有历史最佳分数、一直延伸到门槛 best + 2σ 的黄色噪声带，以及 noisy-eval 运行中的三个真实改动。第 7 周期得分 0.755，最佳为 0.754，落在噪声带内，被重置。第 8 周期得分 0.793，复跑 0.786，都高于门槛 0.777，被 commit；最佳升到 0.786，门槛升到 0.809。第 14 周期得分 0.795，比第 8 周期还高，但落在新的噪声带内，被重置。" width="860"></p>
+<p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop 的团队看板。你和 CEO，也就是你的 AI：它先问什么需要变得更好、用什么衡量、多少分算够好，再提出 evaluate.py 让你批准。它组建团队：Analyst 用便宜快速的模型写一张假设卡片；Engineer 用你的主力模型做一个小改动；Auditor 用最强的模型在全新上下文里读真实的 diff。改动经过 evaluate.py 和保留门 best + 2σ：一个被保留并 commit，下一个被重置并记下教训。每个周期两条命令：kl next 和 kl try。用 profile: fast，每个周期的 AI 调用和 token 更少。" width="860"></p>
 
-<p align="center"><sub>来自 <a href="examples/noisy-eval">examples/noisy-eval</a>（种子 2）的真实改动；所有数字都由 <code>python tools/render_figure.py</code> 从 <a href="docs/proof/proof.json">docs/proof</a> 读取。48 秒讲解视频：<a href="docs/assets/keeploop-talk.mp4">keeploop-talk.mp4</a>。终端版：<a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>。</sub></p>
+<p align="center"><sub>会话中的命令行是离线演示上 <code>kl next</code> / <code>kl try</code> 的真实输出（<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>）；速度数字是实测的（<a href="docs/proof">docs/proof/bench-latency-*.json</a>）。X 视频：<a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>。指南：<a href="docs/assets/keeploop-guide-chat.mp4">AI 聊天</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI 编程</a>。</sub></p>
 
-AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
+keeploop 把你已经在用的 AI 变成一个小团队，并有一位 CEO 和你一起工作。
 
-- **由你定义什么叫“更好”**：测试更快、benchmark 分数更高、报告更清晰。
-  只用一个数字。
-- **你的 AI 一次只尝试一个改动**，再由另一个全新的 AI 来检查。
-- **只有比历史最佳高出评测自身噪声以上的改动才会被保留。** 其余一律撤销，
-  并把原因记下来，免得以后再试一遍。
+- **好用。** 把一个文件粘贴进聊天应用，或把一段提示发给你的编程 agent。你用平常的话
+  交流，不用学任何命令。
+- **先问清楚，再组建团队。** CEO（你的 AI）会问“更好”是什么意思、用什么衡量、多少分
+  算够好。然后为这件事组建团队：便宜快速的模型提出方案，你的主力模型动手实现，最强的
+  模型在全新上下文里检查真实的 diff。
+- **快。** 在编程 agent 里每个周期两条命令（`kl next`、`kl try`）；看不到你仓库的聊天
+  AI 每个周期只需各粘贴一次。
+- **省 token。** 用 `profile: fast`，Engineer 自己写卡片，你列出的想法不再需要 Analyst
+  调用：在我们的离线基准测试中，每个周期 token −33%，时间 −26%。
+- **只保留真实的提升。** 只有当改动比历史最佳高出评测自身测得的噪声（best + 2σ）时才会
+  commit。其余一律重置，并把原因记下来（[实测](#为什么可以信任保留的改动)）。
 
-在我们对 autoresearch 类循环的调研中（2026 年 11 月），keeploop 是找到的第一个
-把评测噪声变成 commit 规则的可安装工具。只有当改动比历史最佳高出评测自身测得的
-噪声（best + 2σ）时才会被保留，证伪规则事先固定，并由一个全新上下文的 Auditor
-阅读真实 diff。评测噪声并不是我们的发现，研究界早已讨论过。新的是一个把它变成
-决定每次 commit 的规则的工具。
-
-**这能换来什么，实测数据。** 我们让一个朴素循环（分数更高就保留）和 keeploop
-跑同样的 20 个提议，用同一个有噪声的评测：每次从 10,000 个开发集样本中随机抽
-1,000 个打分。结果由一个 5,000 个样本的保留集评分，循环从未见过它。每种方式都在
-事先固定的 25 个种子上运行（[docs/proof/PROOF.md](docs/proof/PROOF.md)，
-`python tools/proof_run.py`）：
-
-| 25 个种子的平均 | 朴素 | keeploop |
-|---|---|---|
-| 被保留但并无真实收益的改动 | 2.76 | **0.44** |
-| 循环自己的分数比保留集高估了多少 | +0.017 | **+0.005** |
-| 有真实收益却被丢弃的改动 | **1.28** | 2.64 |
-| 保留集提升，中位数 / 平均值 | +0.130 / **+0.129** | **+0.135** / +0.107 |
-
-代价是真实存在的：keeploop 会丢掉一些落在噪声带内的真实改进。在 25 个种子中有
-9 个，它的保留集结果低于朴素循环，其中包括扫描前就定为重点展示的种子 1。
-`kl doctor` 会在你开始前测量评测的噪声，并告诉你何时需要降低它。
-
-它适用于你已经在用的 AI：Claude Code、Codex、Cursor、Copilot、Gemini CLI
-等。keeploop 本身不是 AI：它是一个小巧的 Python 工具，负责度量，也负责拒绝，
+适用于 ChatGPT、Gemini、Claude、Perplexity、Claude Code、Codex、Cursor、Copilot 和
+Gemini CLI。keeploop 本身不是 AI：它是一个小巧的 Python 工具，负责度量，也负责拒绝，
 没有依赖，不发送 telemetry，也不需要 API key。
 
 > **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
@@ -208,6 +191,33 @@ CLI 里继续。最佳版本成为 workspace，评分表成为一个 `evaluate.p
 任何示例都可以用 `kl init --example <name> <new short folder>`（已安装 `kl`）或
 `python tools/make_sandbox.py examples/<name> <new short folder>`（克隆）
 建成沙盒（[详情](docs/GUIDE.md#run-a-worked-example)）。
+
+## 为什么可以信任保留的改动
+
+<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="保留门的动画：一条数轴，上面有历史最佳分数、一直延伸到门槛 best + 2σ 的黄色噪声带，以及 noisy-eval 运行中的三个真实改动。第 7 周期得分 0.755，最佳为 0.754，落在噪声带内，被重置。第 8 周期得分 0.793，复跑 0.786，都高于门槛 0.777，被 commit；最佳升到 0.786，门槛升到 0.809。第 14 周期得分 0.795，比第 8 周期还高，但落在新的噪声带内，被重置。" width="760"></p>
+
+在我们对 autoresearch 类循环的调研中（2026 年 11 月），keeploop 是找到的第一个
+把评测噪声变成 commit 规则的可安装工具。只有当改动比历史最佳高出评测自身测得的
+噪声（best + 2σ）时才会被保留，证伪规则事先固定，并由一个全新上下文的 Auditor
+阅读真实 diff。评测噪声并不是我们的发现，研究界早已讨论过。新的是一个把它变成
+决定每次 commit 的规则的工具。
+
+**这能换来什么，实测数据。** 我们让一个朴素循环（分数更高就保留）和 keeploop
+跑同样的 20 个提议，用同一个有噪声的评测：每次从 10,000 个开发集样本中随机抽
+1,000 个打分。结果由一个 5,000 个样本的保留集评分，循环从未见过它。每种方式都在
+事先固定的 25 个种子上运行（[docs/proof/PROOF.md](docs/proof/PROOF.md)，
+`python tools/proof_run.py`）：
+
+| 25 个种子的平均 | 朴素 | keeploop |
+|---|---|---|
+| 被保留但并无真实收益的改动 | 2.76 | **0.44** |
+| 循环自己的分数比保留集高估了多少 | +0.017 | **+0.005** |
+| 有真实收益却被丢弃的改动 | **1.28** | 2.64 |
+| 保留集提升，中位数 / 平均值 | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+代价是真实存在的：keeploop 会丢掉一些落在噪声带内的真实改进。在 25 个种子中有
+9 个，它的保留集结果低于朴素循环，其中包括扫描前就定为重点展示的种子 1。
+`kl doctor` 会在你开始前测量评测的噪声，并告诉你何时需要降低它。
 
 ## 为什么选 keeploop
 

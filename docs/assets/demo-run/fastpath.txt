@@ -1,0 +1,13 @@
+# two real `kl try` cycles on the offline demo, written by tools/render_figure.py
+$ kl next
+$ kl try card.md
+card 1 registered
+PASS tier=light files=1 lines=4 diff=5bc4bf2761ed
+metric 0.942000  keep-bar 0.828178  best 0.828178  -> beats the bar
+KEPT cycle 1: metric 0.942000 (bar 0.828178); best is now 0.942000
+$ kl next
+$ kl try card.md
+card 2 registered
+PASS tier=light files=1 lines=2 diff=2bea342d9617
+metric 0.892000  keep-bar 0.942000  best 0.942000  -> does not beat the bar (noise or worse)
+discarded cycle 2 (discard); workspace back at best 0.942000
