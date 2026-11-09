@@ -304,7 +304,7 @@ class TestHandoffApply(Base):
         (self.tmp / "p").mkdir()
         p = Project(str(self.tmp / "p"))
         p.kl("status")  # creates the demo workspace; files committed before `kl begin` are its best
-        (p.ws / "notes.md").write_text("x" * 5000 + "\n")
+        (p.ws / "notes.md").write_bytes(b"x" * 5000 + b"\n")  # bytes: no CRLF on Windows
         (p.ws / ".npmrc").write_text("//registry/:_authToken=abc\n")
         run_mod.git(p.ws, "add", "-A")
         run_mod.git(p.ws, *run_mod.GIT_AUTHOR, "commit", "-qm", "more")
