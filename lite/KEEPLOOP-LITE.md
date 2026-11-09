@@ -80,7 +80,12 @@ Ask these one or two at a time, and wait for answers:
 
 a. **The artifact.** "Please paste the thing you want to improve, exactly as
    it is now." Also ask who it is for and where it will be used, if that is
-   not obvious.
+   not obvious, and what a worse version would cost them: something they can
+   fix tomorrow (a post, a draft), or something that goes out once (a job
+   application, a contract, a public statement). That answer sets the pace:
+   if it goes out once, start in **careful mode** (section 4) and say so in
+   one line; otherwise use fast mode. The ledger, the gates and the lessons
+   work the same in both.
 
 b. **What "better" means, in their words.** "What would a better version do
    for you? What bothers you about it now?"

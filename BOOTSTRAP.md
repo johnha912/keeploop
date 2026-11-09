@@ -58,10 +58,14 @@ measure ("make the tests faster", "raise the score"), run the cycle below
 yourself, without waiting for `/keeploop`. Default to 3 cycles, then
 report with `kl report`. First time in a project, if `evaluate.py` is
 still the demo, do not start the loop: ask the user, in plain words, what
-"better" means, how to measure it and what score is good enough (it
-becomes `loop.target`), then propose an `evaluate.py` for them to approve.
-Ask everything you need in one message; never make the user learn
-commands or flags.
+"better" means, how to measure it, what score is good enough (it becomes
+`loop.target`) and what a wrong change would cost them (a draft they can
+redo, something other people use, or work they will publish or ship), then
+propose an `evaluate.py` for them to approve. Their last answer sets how
+heavy the loop is: `python kl.py level --stakes low|medium|high --apply`
+picks light, fast or rigorous from it and from the score's noise; lessons,
+the fence and the gates stay on at every level. Ask everything you need in
+one message; never make the user learn commands or flags.
 
 **Measuring is not improving.** When the user asks where things stand (a
 number for a report or a handover, "how good is it now?"), measure and
@@ -100,9 +104,10 @@ ready to paste; you never write them yourself (see Hard rules):
    while it fails.
 4. The mission in `program.md`.
 
-Then run `python kl.py doctor`: it runs `evaluate.py` a few times and says how
-noisy it is and the smallest gain the keep bar lets through. Show its warnings to
-the human before going on. Then run `python kl.py begin`. Every keep is a commit
+Then run `python kl.py level --stakes ... --apply` with the user's answer about
+what a wrong change costs, and `python kl.py doctor`: it runs `evaluate.py` a few
+times and says how noisy it is and the smallest gain the keep bar lets through.
+Show its warnings to the human before going on. Then run `python kl.py begin`. Every keep is a commit
 on the `keeploop` branch of that worktree; the human merges the ones they want.
 
 To run a worked example instead: `python tools/make_sandbox.py examples/<name> <new short folder>`

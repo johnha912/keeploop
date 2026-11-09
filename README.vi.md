@@ -59,9 +59,12 @@ keeploop biến AI bạn đang dùng thành một đội nhỏ, có một CEO l�
 
 - **Dễ dùng.** Dán một file vào ứng dụng chat, hoặc một câu lệnh vào agent viết code.
   Bạn nói bằng lời thường; không phải học lệnh nào.
-- **Hỏi trước, rồi lập đội.** CEO (AI của bạn) hỏi "tốt hơn" nghĩa là gì, đo bằng gì
-  và điểm bao nhiêu là đủ. Sau đó nó lập một đội đúng việc: model rẻ, nhanh đề xuất,
-  model chính của bạn làm, model mạnh nhất kiểm tra diff thật trong ngữ cảnh mới.
+- **Hỏi trước, rồi chọn liều lượng và lập đội.** CEO (AI của bạn) hỏi "tốt hơn" nghĩa
+  là gì, đo bằng gì, điểm bao nhiêu là đủ và nếu một thay đổi sai lọt ra thì bạn tốn gì.
+  Một bản nháp được vòng lặp nhẹ vài chu kỳ; việc người khác dựa vào được vòng lặp
+  nghiêm ngặt (`kl level`). Sau đó nó lập một đội đúng việc: model rẻ, nhanh đề xuất,
+  model chính của bạn làm, model mạnh nhất kiểm tra diff thật trong ngữ cảnh mới. Ở mức
+  nào thì lỗi cũng thành bài học và không lặp lại.
 - **Nhanh.** Hai lệnh mỗi chu kỳ trong agent viết code (`kl next`, `kl try`); một lần
   dán đi, một lần dán về cho AI chat không thấy được repo của bạn.
 - **Tiết kiệm token.** Với `profile: fast`, Engineer tự viết thẻ và các ý bạn đã liệt kê

@@ -23,7 +23,10 @@
       "Bash(python kl.py try)",
       "Bash(python kl.py try *)",
       "Bash(python kl.py doctor)",
-      "Bash(python kl.py doctor *)"
+      "Bash(python kl.py doctor *)",
+      "Bash(python kl.py level --stakes low)",
+      "Bash(python kl.py level --stakes medium)",
+      "Bash(python kl.py level --stakes high)"
     ],
     "ask": [
       "Bash(python kl.py begin --accept-changes*)",
@@ -33,7 +36,8 @@
       "Bash(python kl.py audit *)",
       "Bash(python kl.py cite *)",
       "Bash(python kl.py handoff*)",
-      "Bash(python kl.py apply *)"
+      "Bash(python kl.py apply *)",
+      "Bash(python kl.py level * --apply*)"
     ]
   }
 }

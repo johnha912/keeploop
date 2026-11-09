@@ -77,7 +77,7 @@ const Q = D.hero.questions.map((q, i) => {
   d.innerHTML = `${q}<i>✓</i>`; qs.appendChild(d); return d;
 });
 const approve = document.createElement("div"); approve.className = "q";
-approve.style.borderStyle = "dashed"; approve.innerHTML = `→ proposes <b class="mono">evaluate.py</b>; you approve<i>✓</i>`;
+approve.style.borderStyle = "dashed"; approve.innerHTML = `→ picks the level (<b class="mono">kl level</b>) and <b class="mono">evaluate.py</b>; you approve<i>✓</i>`;
 qs.appendChild(approve); Q.push(approve);
 
 /* the line a change runs: evaluate.py -> the keep gate -> commit or reset */

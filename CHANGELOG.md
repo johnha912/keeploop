@@ -63,6 +63,14 @@ release. The one-time PyPI setup and the steps are in
   scripted engineer applies the patch named on the card, so a dropped duplicate card
   never puts the analyst and engineer out of step.
 - AGENTS.md: run `kl doctor` before `kl begin` on a new project.
+- The CEO sizes the loop to the job. Its first-time interview also asks what a wrong change
+  would cost (a draft to redo, something others use, work to publish or ship), and
+  `kl level --stakes low|medium|high [--apply]` turns the answer and the score's noise into
+  `loop.profile`: `light` (at most 3 cycles, stop after 2 without a keep, one baseline run, no
+  re-run, fewer AI calls), `fast`, or `rigorous` (5 noise runs, a re-run and an Auditor
+  verdict on every keep). Lessons, the fence, the gates and the brakes stay on at every level.
+  keeploop-lite asks the same question in setup and starts in careful mode for something that
+  goes out once (en, vi, zh-CN, full and mini).
 - The fast path for your own AI: `kl next` (one brief instead of `status` + `recall`) and
   `kl try card.md` (card, gates, evaluation, keep or discard in one command). A routine
   cycle takes 2 `kl` commands instead of 6, and AGENTS.md opens with a fast-path section

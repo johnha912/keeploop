@@ -887,7 +887,8 @@ def _try_open(c, a) -> int:
         return _try_discard(c, a, "metric did not beat the keep bar")
     heavy, tag = cy["gate"]["heavy"], cy["gate"]["diff"]
     why = "heavy change" if heavy else (
-        None if _decisive(best["metric"], bar, metric) else "the gain is not decisive")
+        "this project audits every keep (loop.audit_every_keep)" if c.loop_cfg.get("audit_every_keep")
+        else None if _decisive(best["metric"], bar, metric) else "the gain is not decisive")
     if why and not a.audit_verdict:
         print(f"WAIT audit required ({why}): give a fresh-context Auditor the card, `git -C "
               f"{_short(c, c.workspace)} diff`, metric {metric:.6f} and `DIFF: {tag}`; save its reply outside "
@@ -1470,6 +1471,10 @@ def parser() -> argparse.ArgumentParser:
     s = sub.add_parser("recall", help="BM25 over lessons, hypotheses, debates, questions, ledger")
     s.add_argument("query")
     s.add_argument("--top", type=int, default=5)
+    s = sub.add_parser("level", help="the CEO's choice of light / fast / rigorous from the stakes and the noise")
+    s.add_argument("--stakes", required=True, choices=list(STAKES),
+                   help="what a wrong change costs: " + "; ".join(f"{k} = {v}" for k, v in STAKES.items()))
+    s.add_argument("--apply", action="store_true", help="write loop.profile in team.yaml")
     s = sub.add_parser("doctor", help="init-time: run evaluate.py N times, report sigma and what it means")
     s.add_argument("--runs", type=int, default=5)
     s.add_argument("--want", type=float, metavar="GAIN", help="the smallest real gain you care about")
@@ -1558,6 +1563,72 @@ def doctor_text(runs: list[float], loop_cfg: dict, want: float | None, secs: flo
     return out
 
 
+STAKES = {
+    "low": "a draft or a personal file you can redo",
+    "medium": "something other people use, that you can still roll back",
+    "high": "work people rely on, or a result you will publish or ship",
+}
+
+
+def level_for(stakes: str, sigma: float) -> tuple[str, list[str]]:
+    """The CEO's choice of `loop.profile` -> (profile, reasons). Pure: the user's answer
+    about stakes, and the evaluation's measured noise."""
+    if stakes == "high":
+        return "rigorous", ["a wrong keep is costly: 5 noise runs, a re-run before every keep, "
+                            "an Auditor verdict on every keep, the full Analyst"]
+    if stakes == "low" and sigma == 0:
+        return "light", ["a wrong keep is cheap to undo and the score does not move between runs: "
+                         "at most 3 cycles, stop after 2 without a keep, one baseline run, "
+                         "no re-run, fewer AI calls"]
+    why = ["fewer AI calls and shorter prompts, the full keep law"]
+    if stakes == "low":
+        why.append(f"not light: the score moves between runs (sigma {sigma:.6f}), so the noise "
+                   "is still measured and a keep is re-run")
+    return "fast", why
+
+
+def _set_profile(team: Path, name: str) -> None:
+    text = team.read_text(encoding="utf-8")
+    if re.search(r"^  profile:.*$", text, re.M):
+        text = re.sub(r"^  profile:.*$", f"  profile: {name}", text, count=1, flags=re.M)
+    elif re.search(r"^loop:[ \t]*$", text, re.M):
+        text = re.sub(r"^loop:[ \t]*\n", f"loop:\n  profile: {name}\n", text, count=1, flags=re.M)
+    else:
+        text = text.rstrip("\n") + f"\n\nloop:\n  profile: {name}\n"
+    team.write_text(text, encoding="utf-8")
+
+
+def cmd_level(c, a) -> int:
+    best = R._read_json(c.state / "best.json")
+    if best.get("metric") is not None:
+        sigma, src = float(best.get("sigma") or 0.0), f"baseline ({c.loop_cfg['noise_runs']} runs)"
+    else:  # not begun: measure, like kl doctor, without logging anything
+        if problem := R.workspace_error(c.root, c.workspace):
+            raise Refuse(problem)
+        runs = []
+        for _ in range(3):
+            metric, error = _evaluate(c)
+            if metric is None:
+                raise Refuse(f"evaluate.py failed: {error}")
+            runs.append(metric)
+        sigma, src = statistics.pstdev(runs), "3 runs just now"
+    name, why = level_for(a.stakes, sigma)
+    print(f"stakes: {a.stakes} ({STAKES[a.stakes]}); score noise: sigma {sigma:.6f} from {src}")
+    print(f"level: {name}")
+    print("\n".join(f"  {w}" for w in why))
+    print("  always on: lessons (a mistake is never repeated), the fence, the gates, "
+          "loop.target and loop.stall_cycles")
+    cur = (c.team.get("loop") or {}).get("profile")
+    if a.apply:
+        _set_profile(c.root / "team.yaml", name)
+        print(f"team.yaml: loop.profile {cur or '(none)'} -> {name}"
+              + ("; run `" + kl() + " begin --accept-changes` if a fence is set" if (c.state / "fence.json").exists() else ""))
+    else:
+        print(f"to use it: `{kl()} level --stakes {a.stakes} --apply` (writes loop.profile in team.yaml)"
+              + (f"; now: {cur}" if cur else ""))
+    return 0
+
+
 def cmd_doctor(c, a) -> int:
     if problem := R.workspace_error(c.root, c.workspace):
         raise Refuse(problem)
@@ -1605,7 +1676,7 @@ def cmd_import_lite(argv: list[str]) -> int:
 COMMANDS = {"begin": cmd_begin, "status": cmd_status, "card": cmd_card, "check": cmd_check,
             "eval": cmd_eval, "audit": cmd_audit, "keep": cmd_keep, "discard": cmd_discard,
             "staff": cmd_staff, "pack": cmd_pack, "report": cmd_report, "slow": cmd_slow, "debate": cmd_debate, "cite": cmd_cite,
-            "map": cmd_map, "recall": cmd_recall, "doctor": cmd_doctor, "next": cmd_next,
+            "map": cmd_map, "recall": cmd_recall, "doctor": cmd_doctor, "level": cmd_level, "next": cmd_next,
             "try": cmd_try, "handoff": cmd_handoff, "apply": cmd_apply}
 
 

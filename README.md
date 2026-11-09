@@ -60,10 +60,12 @@ beside you.
 
 - **Easy.** Paste one file into a chat app, or one prompt into your coding agent.
   You talk in plain words; you never learn commands.
-- **It asks first, then staffs the team.** The CEO (your AI) asks what "better"
-  means, how to measure it and what score is good enough. Then it names a team for
-  the job: a cheap, fast model proposes, your main model builds, the strongest model
-  checks the real diff in a fresh context.
+- **It asks first, then sizes and staffs the team.** The CEO (your AI) asks what
+  "better" means, how to measure it, what score is good enough and what a wrong change
+  would cost you. A draft gets a light loop of a few cycles; work people rely on gets
+  the rigorous one (`kl level`). Then it names a team for the job: a cheap, fast model
+  proposes, your main model builds, the strongest model checks the real diff in a fresh
+  context. Mistakes become lessons it does not repeat, at every level.
 - **Fast.** Two commands a cycle in a coding agent (`kl next`, `kl try`); one paste
   each way for a chat AI that cannot see your repo.
 - **Saves tokens.** With `profile: fast` the Engineer writes its own card and the

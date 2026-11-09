@@ -191,7 +191,8 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `max_iterations` | 20 | yes | Cycles per run; `--iterations` overrides |
 | `keep_threshold` | 0.0 | yes | Minimum gain relative to `abs(best)` |
 | `confirm_keep` | true | yes | Re-run before a keep when sigma > 0 (heavy always re-runs) |
-| `profile` | none | yes | `fast` sets `fused: true`, `auto_cards: true`, `repo_map_max_chars: 1200`, `ledger_tail_for_prompt: 3`, `recall_top_k: 4`, `eval_stderr_max_chars: 400`, `eval_stderr_handle: true`. Precedence: defaults, then the profile, then explicit `loop:` keys. An unknown name is a startup error |
+| `audit_every_keep` | false | yes (`kl try`) | Every keep needs an Auditor verdict, decisive or not (the headless loop audits every keep anyway). Set by `profile: rigorous` |
+| `profile` | none | yes | `light` (small, reversible work with a deterministic score: the `fast` caps plus `max_iterations: 3`, `stall_cycles: 2`, `noise_runs: 1`, `confirm_keep: false`), `rigorous` (`noise_runs: 5`, `confirm_keep: true`, `audit_every_keep: true`, the full Analyst), or `fast`, which sets `fused: true`, `auto_cards: true`, `repo_map_max_chars: 1200`, `ledger_tail_for_prompt: 3`, `recall_top_k: 4`, `eval_stderr_max_chars: 400`, `eval_stderr_handle: true`. Precedence: defaults, then the profile, then explicit `loop:` keys. An unknown name is a startup error |
 | `fused` | false | yes (`run.py`) | One Engineer call writes the card (labelled lines in its reply) and implements it; no Analyst call. The card is parsed and checked before the evaluation; a missing or vague card is a crash and the edit is reset; a duplicate is dropped before the evaluation; a heavy card still goes to the critic |
 | `auto_cards` | false | yes (`run.py`) | The next untested `program.md` hypothesis becomes the card with no Analyst call (CHANGE "the smallest change that tests it", REJECT IF "the metric does not beat the keep bar"); a line naming a heavy file gets `TIER: heavy`; lines over 300 characters go to the Analyst |
 | `eval_stderr_handle` | false | yes (`run.py`) | A cut stderr excerpt ends with the path of `.keeploop/scorer_notes.json` (the full text) |
@@ -232,7 +233,11 @@ most relevant shared lessons within both caps; nothing is injected when it is of
 bar, decision); off by default. With `--mock`, a `mock_script.json` beside `team.yaml`
 (`[{"hypothesis": "...", "set": {...}}, ...]`) replaces the mock's built-in proposals.
 
-Init-time commands, never part of a cycle: `kl doctor [--runs N] [--want GAIN]` runs
+Init-time commands, never part of a cycle: `kl level --stakes low|medium|high [--apply]` is
+the CEO's choice of `loop.profile` from the user's answer about what a wrong change costs and
+the score's noise (sigma from the baseline, or 3 runs if not begun): high gives `rigorous`, low
+with sigma 0 gives `light`, anything else `fast`; `--apply` writes it into `team.yaml`. Lessons,
+the fence, the gates and the brakes are the same at every level. `kl doctor [--runs N] [--want GAIN]` runs
 `evaluate.py` N times (default 5, at least 3) and reports sigma and the smallest gain the
 keep bar lets through; `kl quickstart TEMPLATE` and `kl import-lite LEDGER` write a
 control folder. `kl report --html FILE | --svg FILE` draws the ledger (no model call).
@@ -534,7 +539,7 @@ filler slop patterns).
 - `python run.py --mock --iterations 5` exits 0 offline with keeps at cycles
   1, 2, 5, a discard at 3, a crash with lesson L-001 at 4, best metric 1.0
   (verdicts supported, supported, rejected, untested, supported).
-- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 259 tests).
+- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 263 tests).
 - `python scout.py --dry-run` exits 0 online and offline (manual check, no
   test).
 - `CHANGELOG.md` has a section for `prepare.__version__` (checked by
