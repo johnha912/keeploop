@@ -45,17 +45,40 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   <a href="docs/GUIDE.md">完整指南（英文）</a>
 </p>
 
-<p align="center"><img src="docs/demo.gif" alt="keeploop mock 运行的终端录屏：基线、两次保留、一次丢弃、一次 crash 变成经验教训，最后再保留一次。" width="853"></p>
+<p align="center"><img src="docs/assets/keeploop-demo.gif" alt="终端：keeploop 运行在一个有噪声的评测上。第 7 周期得分 0.755，最佳为 0.754，落在噪声带内，被丢弃并重置。第 8 周期得分 0.793，确认复跑得 0.786，仍高于门槛 0.777，被保留并 commit。" width="853"></p>
 
-<p align="center"><sub>录自离线 mock 演示的真实输出（已加上颜色）。完整记录见 <a href="docs/DEMO-OUTPUT.txt">docs/DEMO-OUTPUT.txt</a>。</sub></p>
+<p align="center"><sub><a href="examples/noisy-eval">examples/noisy-eval</a> 上 <code>kl run --mock --narrate</code> 的真实输出，已放慢以便阅读。完整展示两个周期，其余周期折叠为 ⋯ 行。这次运行的文件：<a href="docs/assets/demo-run">docs/assets/demo-run</a>。重新渲染：<code>python tools/render_demo.py</code>。</sub></p>
 
 AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 
 - **由你定义什么叫“更好”**：测试更快、benchmark 分数更高、报告更清晰。
   只用一个数字。
 - **你的 AI 一次只尝试一个改动**，再由另一个全新的 AI 来检查。
-- **只有胜过这个数字的改动才会被保留。** 其余一律撤销，并把原因记下来，
-  免得以后再试一遍。
+- **只有比历史最佳高出评测自身噪声以上的改动才会被保留。** 其余一律撤销，
+  并把原因记下来，免得以后再试一遍。
+
+在我们对 autoresearch 类循环的调研中（2026 年 11 月），keeploop 是找到的第一个
+把评测噪声变成 commit 规则的可安装工具。只有当改动比历史最佳高出评测自身测得的
+噪声（best + 2σ）时才会被保留，证伪规则事先固定，并由一个全新上下文的 Auditor
+阅读真实 diff。评测噪声并不是我们的发现，研究界早已讨论过。新的是一个把它变成
+决定每次 commit 的规则的工具。
+
+**这能换来什么，实测数据。** 我们让一个朴素循环（分数更高就保留）和 keeploop
+跑同样的 20 个提议，用同一个有噪声的评测：每次从 10,000 个开发集样本中随机抽
+1,000 个打分。结果由一个 5,000 个样本的保留集评分，循环从未见过它。每种方式都在
+事先固定的 25 个种子上运行（[docs/proof/PROOF.md](docs/proof/PROOF.md)，
+`python tools/proof_run.py`）：
+
+| 25 个种子的平均 | 朴素 | keeploop |
+|---|---|---|
+| 被保留但并无真实收益的改动 | 2.76 | **0.44** |
+| 循环自己的分数比保留集高估了多少 | +0.017 | **+0.005** |
+| 有真实收益却被丢弃的改动 | **1.28** | 2.64 |
+| 保留集提升，中位数 / 平均值 | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+代价是真实存在的：keeploop 会丢掉一些落在噪声带内的真实改进。在 25 个种子中有
+9 个，它的保留集结果低于朴素循环，其中包括扫描前就定为重点展示的种子 1。
+`kl doctor` 会在你开始前测量评测的噪声，并告诉你何时需要降低它。
 
 它适用于你已经在用的 AI：Claude Code、Codex、Cursor、Copilot、Gemini CLI
 等。keeploop 本身不是 AI：它是一个小巧的 Python 工具，负责度量，也负责拒绝，
@@ -148,10 +171,28 @@ kl begin                   # 演示的基线
 那样在你的 AI 中打开这个文件夹，并按 [AGENTS.md](AGENTS.md) 把它指向你的仓库。
 `kl run` 是无头模式。如果你想阅读或修改 keeploop 本身，请保留克隆。
 
+或者在你自己的仓库里一条命令搞定，并自动写好一个 `evaluate.py`：
+
+```bash
+cd my-repo
+kl quickstart tests        # 或：command | prompt | buildtime（生成 ../my-repo-keeploop）
+cd ../my-repo-keeploop
+kl doctor                  # 运行 evaluate.py 5 次：噪声多大，能看出多大的提升？
+kl begin
+```
+
+已经在聊天里用 keeploop-lite 开始了？`kl import-lite ledger.md` 会把那次会话接到
+CLI 里继续。最佳版本成为 workspace，评分表成为一个 `evaluate.py`。
+
+**(d) 分享一次运行。** `kl report --html run.html` 把 ledger 变成一个页面，不调用
+模型。页面有一行摘要和一张图：保留的改动为实心，丢弃的为空心，还有历史最佳线和它的
+噪声带。示例：[proof run 的图](docs/proof/keeploop/report.svg)。
+
 ## 实战示例
 
 | 示例 | 领域 | 发生了什么 | 链接 |
 |---|---|---|---|
+| Proof run | 有噪声的评测，朴素 vs keeploop | 同样 20 个提议、25 个种子：保留无真实收益的改动 2.76 vs 0.44；代价是丢弃真实改进 2.64 vs 1.28 | [阅读](docs/proof/PROOF.md) |
 | 离线演示 | 玩具配置 | 3 次保留、1 次丢弃、1 次变成经验教训 L-001 的 crash；不需要 AI | [记录](docs/DEMO-OUTPUT.txt) |
 | 营销研究 | 消费者洞察报告 | 1 个真实周期：0.970000 → 1.000000，审计 APPROVED，保留 | [阅读](examples/marketing-research/) |
 | 提示词优化 | AI/LLM 提示词 | 8 个无人值守周期，保留 2 次，丢弃 6 次（其中一次 0.915 在复跑时被拒绝）。开发集 0.873333 → 0.900000；保留集 0.835 → 0.855 | [阅读](examples/prompt-optimization/) |

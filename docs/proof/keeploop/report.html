@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>keeploop mode, seed 1 (proof run)</title>
+<style>
+:root { --page: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --line: #e6e5e1; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --line: #33332f; color-scheme: dark; } }
+:root[data-theme="dark"] { --page: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --line: #33332f; color-scheme: dark; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+.sum { color: var(--ink-2); margin: 0 0 16px; font-variant-numeric: tabular-nums; }
+svg { width: 100%; height: auto; display: block; }
+details { margin-top: 16px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+td, th { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.foot { color: var(--ink-2); font-size: 13px; margin-top: 16px; }
+</style></head>
+<body><main>
+<h1>keeploop mode, seed 1 (proof run)</h1>
+<p class="sum">20 experiments, 1 kept, best 0.628667 -&gt; 0.676000 (+0.047333), noise sigma 0.020155, holdout 0.657400 -&gt; 0.659400 (+0.002000)</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" class="kl-chart" role="img" aria-label="keeploop mode, seed 1 (proof run): 20 experiments, 1 kept, best 0.628667 -&gt; 0.676000 (+0.047333), noise sigma 0.020155, holdout 0.657400 -&gt; 0.659400 (+0.002000)">
+<style>
+.kl-chart { --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #8a8984;
+  --grid: #e6e5e1; --series: #2a78d6; --band: rgba(42, 120, 214, 0.13); --crash: #52514e; }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .kl-chart, .kl-chart.kl-auto {
+    --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8f8e88;
+    --grid: #33332f; --series: #3987e5; --band: rgba(57, 135, 229, 0.20); --crash: #c3c2b7; }
+}
+:root[data-theme="dark"] .kl-chart {
+  --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8f8e88;
+  --grid: #33332f; --series: #3987e5; --band: rgba(57, 135, 229, 0.20); --crash: #c3c2b7; }
+.kl-chart text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  fill: var(--ink-2); font-size: 13px; }
+.kl-chart .bg { fill: var(--surface); }
+.kl-chart .grid { stroke: var(--grid); stroke-width: 1; }
+.kl-chart .axis { stroke: var(--muted); stroke-width: 1; }
+.kl-chart .band { fill: var(--band); }
+.kl-chart .bar { stroke: var(--series); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.kl-chart .best { stroke: var(--ink); stroke-width: 2; fill: none; }
+.kl-chart .kept { fill: var(--series); stroke: var(--surface); stroke-width: 2; }
+.kl-chart .disc { fill: var(--surface); stroke: var(--series); stroke-width: 2; }
+.kl-chart .crash { stroke: var(--crash); stroke-width: 2; }
+.kl-chart .hit { fill: transparent; }
+.kl-chart .hit:hover + .dot, .kl-chart .dot:hover { stroke-width: 3.5; }
+.kl-chart .lbl { fill: var(--ink); font-weight: 600; }
+</style>
+<rect class="bg" width="960" height="440" rx="8"/>
+<line class="grid" x1="72" x2="932" y1="336.5" y2="336.5"/>
+<text x="62" y="340.5" text-anchor="end">0.600</text>
+<line class="grid" x1="72" x2="932" y1="223.4" y2="223.4"/>
+<text x="62" y="227.4" text-anchor="end">0.650</text>
+<line class="grid" x1="72" x2="932" y1="110.2" y2="110.2"/>
+<text x="62" y="114.2" text-anchor="end">0.700</text>
+<text x="72.0" y="408" text-anchor="middle">0</text>
+<text x="158.0" y="408" text-anchor="middle">2</text>
+<text x="244.0" y="408" text-anchor="middle">4</text>
+<text x="330.0" y="408" text-anchor="middle">6</text>
+<text x="416.0" y="408" text-anchor="middle">8</text>
+<text x="502.0" y="408" text-anchor="middle">10</text>
+<text x="588.0" y="408" text-anchor="middle">12</text>
+<text x="674.0" y="408" text-anchor="middle">14</text>
+<text x="760.0" y="408" text-anchor="middle">16</text>
+<text x="846.0" y="408" text-anchor="middle">18</text>
+<text x="932.0" y="408" text-anchor="middle">20</text>
+<line class="axis" x1="72" x2="932" y1="388" y2="388"/>
+<text x="502.0" y="430" text-anchor="middle">experiment (cycle; 0 = baseline)</text>
+<text transform="translate(18 206.0) rotate(-90)" text-anchor="middle">score</text>
+<polygon class="band" points="72.0,180.4 115.0,180.4 115.0,73.3 158.0,73.3 158.0,73.3 201.0,73.3 201.0,73.3 244.0,73.3 244.0,73.3 287.0,73.3 287.0,73.3 330.0,73.3 330.0,73.3 373.0,73.3 373.0,73.3 416.0,73.3 416.0,73.3 459.0,73.3 459.0,73.3 502.0,73.3 502.0,73.3 545.0,73.3 545.0,73.3 588.0,73.3 588.0,73.3 631.0,73.3 631.0,73.3 674.0,73.3 674.0,73.3 717.0,73.3 717.0,73.3 760.0,73.3 760.0,73.3 803.0,73.3 803.0,73.3 846.0,73.3 846.0,73.3 889.0,73.3 889.0,73.3 932.0,73.3 932.0,73.3 932.0,73.3 932.0,255.8 932.0,255.8 932.0,255.8 889.0,255.8 889.0,255.8 846.0,255.8 846.0,255.8 803.0,255.8 803.0,255.8 760.0,255.8 760.0,255.8 717.0,255.8 717.0,255.8 674.0,255.8 674.0,255.8 631.0,255.8 631.0,255.8 588.0,255.8 588.0,255.8 545.0,255.8 545.0,255.8 502.0,255.8 502.0,255.8 459.0,255.8 459.0,255.8 416.0,255.8 416.0,255.8 373.0,255.8 373.0,255.8 330.0,255.8 330.0,255.8 287.0,255.8 287.0,255.8 244.0,255.8 244.0,255.8 201.0,255.8 201.0,255.8 158.0,255.8 158.0,255.8 115.0,255.8 115.0,362.9 72.0,362.9"><title>noise band: best +- 2 sigma (sigma 0.020155)</title></polygon>
+<polyline class="bar" points="72.0,180.4 115.0,180.4 115.0,73.3 158.0,73.3 158.0,73.3 201.0,73.3 201.0,73.3 244.0,73.3 244.0,73.3 287.0,73.3 287.0,73.3 330.0,73.3 330.0,73.3 373.0,73.3 373.0,73.3 416.0,73.3 416.0,73.3 459.0,73.3 459.0,73.3 502.0,73.3 502.0,73.3 545.0,73.3 545.0,73.3 588.0,73.3 588.0,73.3 631.0,73.3 631.0,73.3 674.0,73.3 674.0,73.3 717.0,73.3 717.0,73.3 760.0,73.3 760.0,73.3 803.0,73.3 803.0,73.3 846.0,73.3 846.0,73.3 889.0,73.3 889.0,73.3 932.0,73.3 932.0,73.3 932.0,73.3"><title>keep bar: best + 2 sigma</title></polyline>
+<polyline class="best" points="72.0,271.7 115.0,271.7 115.0,164.5 158.0,164.5 158.0,164.5 201.0,164.5 201.0,164.5 244.0,164.5 244.0,164.5 287.0,164.5 287.0,164.5 330.0,164.5 330.0,164.5 373.0,164.5 373.0,164.5 416.0,164.5 416.0,164.5 459.0,164.5 459.0,164.5 502.0,164.5 502.0,164.5 545.0,164.5 545.0,164.5 588.0,164.5 588.0,164.5 631.0,164.5 631.0,164.5 674.0,164.5 674.0,164.5 717.0,164.5 717.0,164.5 760.0,164.5 760.0,164.5 803.0,164.5 803.0,164.5 846.0,164.5 846.0,164.5 889.0,164.5 889.0,164.5 932.0,164.5 932.0,164.5 932.0,164.5"/>
+<g><title>cycle 1: keep, score 0.676000, best 0.676000
+A lower temperature (0.5) gives more consistent answers.</title><circle class="hit" cx="115.0" cy="164.5" r="12"/><circle class="dot kept" cx="115.0" cy="164.5" r="6"/></g>
+<g><title>cycle 2: discard, score 0.701000, best 0.676000
+Three few-shot examples teach the answer format.</title><circle class="hit" cx="158.0" cy="107.9" r="12"/><circle class="dot disc" cx="158.0" cy="107.9" r="5"/></g>
+<g><title>cycle 3: discard, score 0.655000, best 0.676000
+Smaller chunks (384 tokens) retrieve more precise passages.</title><circle class="hit" cx="201.0" cy="212.1" r="12"/><circle class="dot disc" cx="201.0" cy="212.1" r="5"/></g>
+<g><title>cycle 4: discard, score 0.658000, best 0.676000
+Retrieving 8 passages instead of 5 finds more of the evidence.</title><circle class="hit" cx="244.0" cy="205.3" r="12"/><circle class="dot disc" cx="244.0" cy="205.3" r="5"/></g>
+<g><title>cycle 5: discard, score 0.696000, best 0.676000
+Reranking the retrieved passages puts the evidence first.</title><circle class="hit" cx="287.0" cy="119.3" r="12"/><circle class="dot disc" cx="287.0" cy="119.3" r="5"/></g>
+<g><title>cycle 6: discard, score 0.650000, best 0.676000
+A second retry recovers from malformed answers.</title><circle class="hit" cx="330.0" cy="223.4" r="12"/><circle class="dot disc" cx="330.0" cy="223.4" r="5"/></g>
+<g><title>cycle 7: discard, score 0.661000, best 0.676000
+A longer answer budget (768 tokens) stops truncated answers.</title><circle class="hit" cx="373.0" cy="198.5" r="12"/><circle class="dot disc" cx="373.0" cy="198.5" r="5"/></g>
+<g><title>cycle 8: discard, score 0.706000, best 0.676000
+A checklist-style prompt makes the model verify each answer.</title><circle class="hit" cx="416.0" cy="96.6" r="12"/><circle class="dot disc" cx="416.0" cy="96.6" r="5"/></g>
+<g><title>cycle 9: discard, score 0.665000, best 0.676000
+An even lower temperature (0.3) removes guessing.</title><circle class="hit" cx="459.0" cy="189.4" r="12"/><circle class="dot disc" cx="459.0" cy="189.4" r="5"/></g>
+<g><title>cycle 10: discard, score 0.646000, best 0.676000
+Larger chunks (768 tokens) keep context together.</title><circle class="hit" cx="502.0" cy="232.4" r="12"/><circle class="dot disc" cx="502.0" cy="232.4" r="5"/></g>
+<g><title>cycle 11: discard, score 0.710000, best 0.676000
+Five few-shot examples cover more question types than three.</title><circle class="hit" cx="545.0" cy="87.6" r="12"/><circle class="dot disc" cx="545.0" cy="87.6" r="5"/></g>
+<g><title>cycle 12: discard, score 0.628000, best 0.676000
+Fewer passages (3) cut distracting context.</title><circle class="hit" cx="588.0" cy="273.2" r="12"/><circle class="dot disc" cx="588.0" cy="273.2" r="5"/></g>
+<g><title>cycle 13: discard, score 0.662000, best 0.676000
+A third retry catches the remaining format failures.</title><circle class="hit" cx="631.0" cy="196.2" r="12"/><circle class="dot disc" cx="631.0" cy="196.2" r="5"/></g>
+<g><title>cycle 14: discard, score 0.646000, best 0.676000
+A 1024-token answer budget leaves room for reasoning.</title><circle class="hit" cx="674.0" cy="232.4" r="12"/><circle class="dot disc" cx="674.0" cy="232.4" r="5"/></g>
+<g><title>cycle 15: discard, score 0.645000, best 0.676000
+An expert persona prompt raises answer confidence.</title><circle class="hit" cx="717.0" cy="234.7" r="12"/><circle class="dot disc" cx="717.0" cy="234.7" r="5"/></g>
+<g><title>cycle 16: discard, score 0.662000, best 0.676000
+Greedy decoding (temperature 0) is the most accurate.</title><circle class="hit" cx="760.0" cy="196.2" r="12"/><circle class="dot disc" cx="760.0" cy="196.2" r="5"/></g>
+<g><title>cycle 17: discard, score 0.727000, best 0.676000
+Eight few-shot examples beat five.</title><circle class="hit" cx="803.0" cy="49.1" r="12"/><circle class="dot disc" cx="803.0" cy="49.1" r="5"/></g>
+<g><title>cycle 18: discard, score 0.668000, best 0.676000
+Whole-section chunks (1024 tokens) preserve tables.</title><circle class="hit" cx="846.0" cy="182.6" r="12"/><circle class="dot disc" cx="846.0" cy="182.6" r="5"/></g>
+<g><title>cycle 19: discard, score 0.639000, best 0.676000
+Ten passages give the reranker more to choose from.</title><circle class="hit" cx="889.0" cy="248.3" r="12"/><circle class="dot disc" cx="889.0" cy="248.3" r="5"/></g>
+<g><title>cycle 20: discard, score 0.700000, best 0.676000
+Two few-shot examples are enough and leave room for context.</title><circle class="hit" cx="932.0" cy="110.2" r="12"/><circle class="dot disc" cx="932.0" cy="110.2" r="5"/></g>
+<circle class="kept" cx="86" cy="40" r="5.5"/>
+<text x="98" y="44.5">kept</text>
+<circle class="disc" cx="140.8" cy="40" r="5.5"/>
+<text x="152.8" y="44.5">discarded</text>
+<line class="best" x1="223.60000000000002" x2="239.60000000000002" y1="40" y2="40"/>
+<text x="243.60000000000002" y="44.5">running best</text>
+<rect class="band" x="337.0" y="33" width="14" height="14" rx="2"/>
+<text x="356.0" y="44.5">noise band +-2 sigma (top = keep bar)</text>
+</svg>
+<details><summary>Every experiment (table)</summary>
+<table><thead><tr><th>cycle</th><th>status</th><th>score</th><th>best after</th><th>hypothesis</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>keep</td><td>0.628667</td><td>0.628667</td><td>baseline: untouched workspace</td></tr>
+<tr><td>1</td><td>keep</td><td>0.676000</td><td>0.676000</td><td>A lower temperature (0.5) gives more consistent answers.</td></tr>
+<tr><td>2</td><td>discard</td><td>0.701000</td><td>0.676000</td><td>Three few-shot examples teach the answer format.</td></tr>
+<tr><td>3</td><td>discard</td><td>0.655000</td><td>0.676000</td><td>Smaller chunks (384 tokens) retrieve more precise passages.</td></tr>
+<tr><td>4</td><td>discard</td><td>0.658000</td><td>0.676000</td><td>Retrieving 8 passages instead of 5 finds more of the evidence.</td></tr>
+<tr><td>5</td><td>discard</td><td>0.696000</td><td>0.676000</td><td>Reranking the retrieved passages puts the evidence first.</td></tr>
+<tr><td>6</td><td>discard</td><td>0.650000</td><td>0.676000</td><td>A second retry recovers from malformed answers.</td></tr>
+<tr><td>7</td><td>discard</td><td>0.661000</td><td>0.676000</td><td>A longer answer budget (768 tokens) stops truncated answers.</td></tr>
+<tr><td>8</td><td>discard</td><td>0.706000</td><td>0.676000</td><td>A checklist-style prompt makes the model verify each answer.</td></tr>
+<tr><td>9</td><td>discard</td><td>0.665000</td><td>0.676000</td><td>An even lower temperature (0.3) removes guessing.</td></tr>
+<tr><td>10</td><td>discard</td><td>0.646000</td><td>0.676000</td><td>Larger chunks (768 tokens) keep context together.</td></tr>
+<tr><td>11</td><td>discard</td><td>0.710000</td><td>0.676000</td><td>Five few-shot examples cover more question types than three.</td></tr>
+<tr><td>12</td><td>discard</td><td>0.628000</td><td>0.676000</td><td>Fewer passages (3) cut distracting context.</td></tr>
+<tr><td>13</td><td>discard</td><td>0.662000</td><td>0.676000</td><td>A third retry catches the remaining format failures.</td></tr>
+<tr><td>14</td><td>discard</td><td>0.646000</td><td>0.676000</td><td>A 1024-token answer budget leaves room for reasoning.</td></tr>
+<tr><td>15</td><td>discard</td><td>0.645000</td><td>0.676000</td><td>An expert persona prompt raises answer confidence.</td></tr>
+<tr><td>16</td><td>discard</td><td>0.662000</td><td>0.676000</td><td>Greedy decoding (temperature 0) is the most accurate.</td></tr>
+<tr><td>17</td><td>discard</td><td>0.727000</td><td>0.676000</td><td>Eight few-shot examples beat five.</td></tr>
+<tr><td>18</td><td>discard</td><td>0.668000</td><td>0.676000</td><td>Whole-section chunks (1024 tokens) preserve tables.</td></tr>
+<tr><td>19</td><td>discard</td><td>0.639000</td><td>0.676000</td><td>Ten passages give the reranker more to choose from.</td></tr>
+<tr><td>20</td><td>discard</td><td>0.700000</td><td>0.676000</td><td>Two few-shot examples are enough and leave room for context.</td></tr>
+</tbody></table></details>
+<p class="foot">Made by <code>kl report --html</code> from the run's ledger (.keeploop/results.tsv),
+no model call. keeploop keeps a change only when it beats the best by more than the
+evaluation's own measured noise.</p>
+</main></body></html>

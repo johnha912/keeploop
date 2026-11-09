@@ -48,17 +48,45 @@ gì trong cuộc trò chuyện hiện tại:
   <a href="docs/GUIDE.md">Hướng dẫn đầy đủ (tiếng Anh)</a>
 </p>
 
-<p align="center"><img src="docs/demo.gif" alt="Bản ghi terminal chạy mock của keeploop: đo mức gốc, hai lần giữ, một lần bỏ, một lần crash thành bài học, rồi giữ lần cuối." width="853"></p>
+<p align="center"><img src="docs/assets/keeploop-demo.gif" alt="Terminal: keeploop trên một bài đánh giá nhiễu. Chu kỳ 7 đạt 0.755 so với best 0.754, nằm trong dải nhiễu, nên bị bỏ và reset. Chu kỳ 8 đạt 0.793, lần chạy lại xác nhận được 0.786, vẫn vượt ngưỡng 0.777, nên được giữ và commit." width="853"></p>
 
-<p align="center"><sub>Ghi lại từ đầu ra thật của bản demo mock chạy offline (có thêm màu). Bản ghi đầy đủ nằm ở <a href="docs/DEMO-OUTPUT.txt">docs/DEMO-OUTPUT.txt</a>.</sub></p>
+<p align="center"><sub>Đầu ra thật của <code>kl run --mock --narrate</code> trên <a href="examples/noisy-eval">examples/noisy-eval</a>, chạy chậm lại cho dễ đọc. Hai chu kỳ được hiện đầy đủ, các chu kỳ khác gộp vào dòng ⋯. File của lần chạy: <a href="docs/assets/demo-run">docs/assets/demo-run</a>. Dựng lại: <code>python tools/render_demo.py</code>.</sub></p>
 
 AI agent rất giỏi nói như thể chắc chắn. keeploop bắt chúng phải chứng minh.
 
 - **Bạn nói "tốt hơn" nghĩa là gì**: test chạy nhanh hơn, benchmark cao hơn,
   báo cáo gọn hơn. Chỉ một con số.
 - **AI của bạn thử từng thay đổi một**, và một AI thứ hai, phiên mới, kiểm tra nó.
-- **Chỉ thay đổi nào vượt được con số mới được giữ lại.** Mọi thứ khác bị
-  hoàn tác, và lý do được ghi lại để không thử lại lần nữa.
+- **Một thay đổi chỉ được giữ khi nó vượt điểm tốt nhất nhiều hơn chính độ
+  nhiễu của bài đánh giá.** Mọi thứ khác bị hoàn tác, và lý do được ghi lại
+  để không thử lại lần nữa.
+
+Trong lần rà soát các vòng lặp kiểu autoresearch (tháng 11/2026), keeploop là
+công cụ cài đặt được đầu tiên mà chúng tôi tìm thấy biến nhiễu đánh giá thành
+luật commit. Một thay đổi chỉ được giữ khi nó vượt điểm tốt nhất nhiều hơn độ
+nhiễu đo được của chính bài đánh giá (best + 2σ). Quy tắc bác bỏ được cố định
+từ trước, và một Auditor ở phiên mới đọc diff thật. Nhiễu đánh giá không phải
+phát hiện của chúng tôi: giới nghiên cứu đã bàn về nó từ trước. Điều mới là
+một công cụ biến nó thành quy tắc quyết định mọi commit.
+
+**Đổi lại được gì, có đo.** Chúng tôi cho một vòng lặp ngây thơ (thấy điểm cao
+hơn là giữ) và keeploop chạy cùng 20 đề xuất, trên cùng một bài đánh giá nhiễu:
+mỗi lần chấm lấy ngẫu nhiên 1.000 trong 10.000 ca dev. Kết quả được chấm trên
+một tập holdout 5.000 ca mà vòng lặp không bao giờ thấy. Mỗi bên chạy 25 seed
+cố định từ trước ([docs/proof/PROOF.md](docs/proof/PROOF.md),
+`python tools/proof_run.py`):
+
+| trung bình trên 25 seed | ngây thơ | keeploop |
+|---|---|---|
+| số thay đổi được giữ mà thật ra không có lợi | 2.76 | **0.44** |
+| điểm của chính vòng lặp phóng đại holdout bao nhiêu | +0.017 | **+0.005** |
+| số thay đổi có lợi thật nhưng bị bỏ | **1.28** | 2.64 |
+| mức tăng holdout, trung vị / trung bình | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+Cái giá là có thật: keeploop bỏ đi một số cải thiện thật nằm lọt trong dải
+nhiễu. Ở 9 trên 25 seed, holdout của nó kết thúc thấp hơn vòng lặp ngây thơ,
+kể cả seed 1, lần chạy được chọn làm tiêu điểm trước khi quét. `kl doctor` đo
+độ nhiễu của bài đánh giá trước khi bạn bắt đầu, và cho biết khi nào cần giảm nó.
 
 Dùng được với Claude Code, Codex, Cursor, Copilot, Gemini CLI và các AI
 khác bạn đang dùng. Bản thân keeploop không phải AI: nó là một công cụ
@@ -156,10 +184,30 @@ ghi đè file có sẵn. Sau đó mở thư mục này trong AI của bạn như
 làm theo [AGENTS.md](AGENTS.md) để trỏ nó vào repo của bạn. `kl run` là chế
 độ headless. Giữ bản clone nếu bạn muốn đọc hoặc sửa chính keeploop.
 
+Hoặc chỉ một lệnh từ chính repo của bạn, kèm một `evaluate.py` viết sẵn:
+
+```bash
+cd my-repo
+kl quickstart tests        # hoặc: command | prompt | buildtime (tạo ../my-repo-keeploop)
+cd ../my-repo-keeploop
+kl doctor                  # chạy evaluate.py 5 lần: nhiễu cỡ nào, thấy được mức tăng nào?
+kl begin
+```
+
+Đã bắt đầu trong chat với keeploop-lite? `kl import-lite ledger.md` chuyển
+phiên đó sang CLI. Phiên bản tốt nhất thành workspace, bảng chấm điểm thành
+một `evaluate.py`.
+
+**(d) Chia sẻ một lần chạy.** `kl report --html run.html` biến ledger thành
+một trang, không gọi model. Trang có một dòng tóm tắt và một biểu đồ: thay đổi
+được giữ tô đặc, bị bỏ để rỗng, đường best và dải nhiễu của nó. Ví dụ:
+[biểu đồ của proof run](docs/proof/keeploop/report.svg).
+
 ## Ví dụ thực tế
 
 | Ví dụ | Lĩnh vực | Điều đã xảy ra | Liên kết |
 |---|---|---|---|
+| Proof run | Đánh giá nhiễu, ngây thơ vs keeploop | Cùng 20 đề xuất, 25 seed: giữ 2.76 vs 0.44 thay đổi không có lợi thật; cái giá là bỏ 2.64 vs 1.28 cải thiện thật | [Đọc](docs/proof/PROOF.md) |
 | Demo offline | Cấu hình đồ chơi | 3 lần keep, 1 lần discard, 1 lần crash thành bài học L-001; không cần AI | [Bản ghi](docs/DEMO-OUTPUT.txt) |
 | Nghiên cứu marketing | Báo cáo insight người tiêu dùng | 1 chu kỳ thật: 0.970000 → 1.000000, kiểm toán APPROVED, được giữ lại | [Đọc](examples/marketing-research/) |
 | Tối ưu prompt | Prompt AI/LLM | 8 chu kỳ headless, giữ 2, bỏ 6 (một lần đạt 0.915 bị từ chối khi chạy lại). Dev 0.873333 → 0.900000; holdout 0.835 → 0.855 | [Đọc](examples/prompt-optimization/) |

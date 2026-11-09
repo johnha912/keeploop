@@ -1,5 +1,5 @@
 # Release: push the tag vX.Y.Z (it must equal prepare.__version__) and this runs once:
-#   gate (build, twine check, tools/check_dist.py) -> upload to PyPI -> install it back
+#   gate (build, twine check, tools/check_dist.py, tools/proof_run.py --check) -> upload to PyPI -> install it back
 #   from PyPI with pip and pipx on Linux and Windows and smoke-test -> GitHub Release
 #   with the CHANGELOG section as notes.
 # Rehearsal: run it by hand (Actions -> publish -> Run workflow). It builds X.Y.Z.devN
@@ -57,6 +57,8 @@ jobs:
           git config --global user.name ci
           git config --global user.email ci@example.com
       - run: python tools/check_dist.py --dist dist
+      - name: Golden gate (the proof run must reproduce docs/proof/proof.json)
+        run: python tools/proof_run.py --check
       - uses: actions/upload-artifact@v4
         with:
           name: dist

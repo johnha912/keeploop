@@ -1,0 +1,10 @@
+{
+  "few_shot": 0,
+  "rerank": false,
+  "prompt_style": "plain",
+  "temperature": 0.5,
+  "chunk_size": 512,
+  "top_k": 5,
+  "retries": 1,
+  "max_tokens": 512
+}
