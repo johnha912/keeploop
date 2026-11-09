@@ -412,6 +412,7 @@ scenes.forEach(sc => {
     if (!e.dataset.at) { e.dataset.at = at; e.dataset.fx = e.dataset.fx || (q === ".card" ? "card" : "up"); }
   }));
   sc.anims = [...sc.querySelectorAll("[data-fx]")];
+  sc.anims.forEach(e => { if (e.dataset.fx === "type") e.innerHTML = `<span class="ghost">${esc(e.dataset.text)}</span>`; });
   sc.anims.forEach(e => { if (e.dataset.fx === "swap") { e.vals = e.dataset.vals.split("|"); e.ats = e.dataset.ats.split("|").map(Number); } });
 });
 
