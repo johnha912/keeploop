@@ -57,6 +57,28 @@ CONFIG = {
     # Scout
     "scout_max_proposals": 3,
     "scout_min_relevance": 0.35,
+    # Speed levers (run.py). All off by default; `profile: fast` turns on the safe ones.
+    "profile": None,                # a preset from PROFILES; explicit `loop:` keys win over it
+    "fused": False,                 # one Engineer call writes the card and implements it: no Analyst call
+    "auto_cards": False,            # an untested program.md hypothesis becomes the card: no Analyst call
+    "confirm_skip_z": 0.0,          # skip the confirm re-run of a light change > this many sigma over best; 0 = off
+    "eval_stderr_handle": False,    # a cut scorer-stderr excerpt names the file that holds all of it
+}
+
+# `loop.profile: NAME` presets (run.project_config: CONFIG < profile < explicit loop: keys).
+# "fast" = fewer AI calls and shorter prompts, same keep law. Not in it: confirm_skip_z
+# (it saves an evaluation, not an AI call, and its safety argument needs roughly normal
+# noise; see run.confirm_skippable).
+PROFILES = {
+    "fast": {
+        "fused": True,
+        "auto_cards": True,
+        "repo_map_max_chars": 1200,     # ~300 tokens: a pointer; the agent reads files itself
+        "ledger_tail_for_prompt": 3,    # recency only; "already tested" carries the rejected ideas
+        "recall_top_k": 4,              # the 4 most relevant open lessons (checked ones run anyway)
+        "eval_stderr_max_chars": 400,   # the excerpt; the full text is one file read away
+        "eval_stderr_handle": True,
+    },
 }
 
 # The demo workspace: parameters of a toy training run. For a real project,
