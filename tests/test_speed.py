@@ -139,10 +139,11 @@ class TestMockLatencyAndLog(unittest.TestCase):
             v.complete("x", role="auditor", max_tokens=10)
             self.assertLess(time.monotonic() - start, 0.1)
         with mock.patch.dict(os.environ, {"KEEPLOOP_MOCK_LATENCY": "auditor=0.2"}):
-            start = time.monotonic()
+            start = time.perf_counter()
             res = v.complete("x", role="auditor", max_tokens=10)
-            self.assertGreaterEqual(time.monotonic() - start, 0.2)
-            self.assertGreaterEqual(res.latency_s, 0.2)
+            # Windows clocks tick in ~16 ms steps: a 0.2 s sleep can read as 0.188 s
+            self.assertGreaterEqual(time.perf_counter() - start, 0.15)
+            self.assertGreaterEqual(res.latency_s, 0.15)
 
     def test_call_log(self):
         with tempfile.TemporaryDirectory() as d:
