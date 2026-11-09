@@ -1,0 +1,19 @@
+{
+  "reps": 2,
+  "cycles": 6,
+  "latency": "analyst=2,engineer=4,auditor=2",
+  "loop": {
+    "profile": "fast"
+  },
+  "wall_s_per_cycle_median": 5.8063,
+  "wall_s_per_cycle_all": [
+    5.8063,
+    5.8062
+  ],
+  "tokens_per_cycle_median": 2257.8,
+  "calls_per_cycle_median": {
+    "analyst": 0.0,
+    "engineer": 1.167,
+    "auditor": 0.5
+  }
+}

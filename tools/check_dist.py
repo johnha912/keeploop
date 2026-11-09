@@ -85,7 +85,7 @@ def check_contents(wheel: Path, sdist: Path) -> None:
     rel = [m for m in re.findall(r'(?:\]\(|src="|href="|srcset=")([^)"\s]+)', md)
            if not re.match(r"[a-z][a-z0-9+.-]*:|#", m, re.I)]
     expect(not rel, "PyPI description has no relative links" + (f" (found {rel[:5]})" if rel else ""))
-    expect(f"/v{v}/docs/assets/keeploop-gate.gif" in md, f"PyPI description pins its images to the tag v{v}")
+    expect(f"/v{v}/docs/assets/keeploop-team.gif" in md, f"PyPI description pins its images to the tag v{v}")
     with tarfile.open(sdist) as tf:
         snames = {n.split("/", 1)[1] for n in tf.getnames() if "/" in n}
     print(f"\n{sdist.name}: {len(snames)} entries")

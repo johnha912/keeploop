@@ -51,50 +51,29 @@ gì trong cuộc trò chuyện hiện tại:
   <a href="docs/GUIDE.md">Hướng dẫn đầy đủ (tiếng Anh)</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="Cổng giữ, dạng hoạt hình: một trục số với điểm tốt nhất, dải nhiễu màu vàng tới ngưỡng best + 2σ, và ba thay đổi thật từ lần chạy noisy-eval. Chu kỳ 7 đạt 0.755 so với best 0.754, nằm trong dải, bị reset. Chu kỳ 8 đạt 0.793 và 0.786 khi chạy lại, cả hai vượt ngưỡng 0.777, được commit; best lên 0.786 và ngưỡng lên 0.809. Chu kỳ 14 đạt 0.795, cao hơn chu kỳ 8, nhưng nằm trong dải mới, bị reset." width="860"></p>
+<p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop dưới dạng bảng đội ngũ. Bạn và CEO, tức AI của bạn: nó hỏi điều gì cần tốt hơn, đo bằng gì và điểm bao nhiêu là đủ, rồi đề xuất evaluate.py để bạn duyệt. Nó lập đội: Analyst trên model rẻ, nhanh viết một thẻ giả thuyết; Engineer trên model chính của bạn làm một thay đổi nhỏ; Auditor trên model mạnh nhất đọc diff thật trong ngữ cảnh mới. Thay đổi đi qua evaluate.py và cổng giữ best + 2σ: một cái được giữ và commit, cái sau bị reset kèm bài học. Hai lệnh mỗi chu kỳ, kl next và kl try. Với profile: fast, ít lượt gọi AI và ít token hơn mỗi chu kỳ." width="860"></p>
 
-<p align="center"><sub>Các thay đổi thật từ <a href="examples/noisy-eval">examples/noisy-eval</a> (seed 2); mọi con số được <code>python tools/render_figure.py</code> đọc từ <a href="docs/proof/proof.json">docs/proof</a>. Bản thuyết trình 48 giây: <a href="docs/assets/keeploop-talk.mp4">keeploop-talk.mp4</a>. Bản terminal: <a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>.</sub></p>
+<p align="center"><sub>Các dòng phiên làm việc là đầu ra thật của <code>kl next</code> / <code>kl try</code> trên bản demo offline (<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>); số đo tốc độ là đo thật (<a href="docs/proof">docs/proof/bench-latency-*.json</a>). Video cho X: <a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>. Hướng dẫn: <a href="docs/assets/keeploop-guide-chat.mp4">AI chat</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI code</a>.</sub></p>
 
-AI agent rất giỏi nói như thể chắc chắn. keeploop bắt chúng phải chứng minh.
+keeploop biến AI bạn đang dùng thành một đội nhỏ, có một CEO làm việc cùng bạn.
 
-- **Bạn nói "tốt hơn" nghĩa là gì**: test chạy nhanh hơn, benchmark cao hơn,
-  báo cáo gọn hơn. Chỉ một con số.
-- **AI của bạn thử từng thay đổi một**, và một AI thứ hai, phiên mới, kiểm tra nó.
-- **Một thay đổi chỉ được giữ khi nó vượt điểm tốt nhất nhiều hơn chính độ
-  nhiễu của bài đánh giá.** Mọi thứ khác bị hoàn tác, và lý do được ghi lại
-  để không thử lại lần nữa.
+- **Dễ dùng.** Dán một file vào ứng dụng chat, hoặc một câu lệnh vào agent viết code.
+  Bạn nói bằng lời thường; không phải học lệnh nào.
+- **Hỏi trước, rồi lập đội.** CEO (AI của bạn) hỏi "tốt hơn" nghĩa là gì, đo bằng gì
+  và điểm bao nhiêu là đủ. Sau đó nó lập một đội đúng việc: model rẻ, nhanh đề xuất,
+  model chính của bạn làm, model mạnh nhất kiểm tra diff thật trong ngữ cảnh mới.
+- **Nhanh.** Hai lệnh mỗi chu kỳ trong agent viết code (`kl next`, `kl try`); một lần
+  dán đi, một lần dán về cho AI chat không thấy được repo của bạn.
+- **Tiết kiệm token.** Với `profile: fast`, Engineer tự viết thẻ và các ý bạn đã liệt kê
+  không cần lượt gọi Analyst: −33% token và −26% thời gian mỗi chu kỳ trong
+  benchmark offline của chúng tôi.
+- **Chỉ giữ cải thiện thật.** Một thay đổi chỉ được commit khi vượt điểm tốt nhất nhiều
+  hơn độ nhiễu đo được của chính bài đánh giá (best + 2σ). Mọi thứ khác bị reset, và lý
+  do được ghi lại ([đã đo](#vì-sao-tin-được-các-lần-giữ)).
 
-Trong lần rà soát các vòng lặp kiểu autoresearch (tháng 11/2026), keeploop là
-công cụ cài đặt được đầu tiên mà chúng tôi tìm thấy biến nhiễu đánh giá thành
-luật commit. Một thay đổi chỉ được giữ khi nó vượt điểm tốt nhất nhiều hơn độ
-nhiễu đo được của chính bài đánh giá (best + 2σ). Quy tắc bác bỏ được cố định
-từ trước, và một Auditor ở phiên mới đọc diff thật. Nhiễu đánh giá không phải
-phát hiện của chúng tôi: giới nghiên cứu đã bàn về nó từ trước. Điều mới là
-một công cụ biến nó thành quy tắc quyết định mọi commit.
-
-**Đổi lại được gì, có đo.** Chúng tôi cho một vòng lặp ngây thơ (thấy điểm cao
-hơn là giữ) và keeploop chạy cùng 20 đề xuất, trên cùng một bài đánh giá nhiễu:
-mỗi lần chấm lấy ngẫu nhiên 1.000 trong 10.000 ca dev. Kết quả được chấm trên
-một tập holdout 5.000 ca mà vòng lặp không bao giờ thấy. Mỗi bên chạy 25 seed
-cố định từ trước ([docs/proof/PROOF.md](docs/proof/PROOF.md),
-`python tools/proof_run.py`):
-
-| trung bình trên 25 seed | ngây thơ | keeploop |
-|---|---|---|
-| số thay đổi được giữ mà thật ra không có lợi | 2.76 | **0.44** |
-| điểm của chính vòng lặp phóng đại holdout bao nhiêu | +0.017 | **+0.005** |
-| số thay đổi có lợi thật nhưng bị bỏ | **1.28** | 2.64 |
-| mức tăng holdout, trung vị / trung bình | +0.130 / **+0.129** | **+0.135** / +0.107 |
-
-Cái giá là có thật: keeploop bỏ đi một số cải thiện thật nằm lọt trong dải
-nhiễu. Ở 9 trên 25 seed, holdout của nó kết thúc thấp hơn vòng lặp ngây thơ,
-kể cả seed 1, lần chạy được chọn làm tiêu điểm trước khi quét. `kl doctor` đo
-độ nhiễu của bài đánh giá trước khi bạn bắt đầu, và cho biết khi nào cần giảm nó.
-
-Dùng được với Claude Code, Codex, Cursor, Copilot, Gemini CLI và các AI
-khác bạn đang dùng. Bản thân keeploop không phải AI: nó là một công cụ
-Python nhỏ biết đo và biết từ chối, không cần cài thêm gì, không gửi
-telemetry và không cần API key.
+Dùng được với ChatGPT, Gemini, Claude, Perplexity, Claude Code, Codex, Cursor, Copilot
+và Gemini CLI. Bản thân keeploop không phải AI: nó là một công cụ Python nhỏ biết đo và
+biết từ chối, không cần cài thêm gì, không gửi telemetry và không cần API key.
 
 > **Chỉ có ứng dụng chat** (ChatGPT, Claude, Gemini, không code)? Dùng
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
@@ -227,6 +206,37 @@ một trang, không gọi model. Trang có một dòng tóm tắt và một bi�
 Dựng bất kỳ ví dụ nào thành một sandbox bằng `kl init --example <name> <new short folder>`
 (khi đã cài `kl`) hoặc `python tools/make_sandbox.py examples/<name> <new short folder>`
 (khi dùng bản clone) ([chi tiết](docs/GUIDE.md#run-a-worked-example)).
+
+## Vì sao tin được các lần giữ
+
+<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="Cổng giữ, dạng hoạt hình: một trục số với điểm tốt nhất, dải nhiễu màu vàng tới ngưỡng best + 2σ, và ba thay đổi thật từ lần chạy noisy-eval. Chu kỳ 7 đạt 0.755 so với best 0.754, nằm trong dải, bị reset. Chu kỳ 8 đạt 0.793 và 0.786 khi chạy lại, cả hai vượt ngưỡng 0.777, được commit; best lên 0.786 và ngưỡng lên 0.809. Chu kỳ 14 đạt 0.795, cao hơn chu kỳ 8, nhưng nằm trong dải mới, bị reset." width="760"></p>
+
+Trong lần rà soát các vòng lặp kiểu autoresearch (tháng 11/2026), keeploop là
+công cụ cài đặt được đầu tiên mà chúng tôi tìm thấy biến nhiễu đánh giá thành
+luật commit. Một thay đổi chỉ được giữ khi nó vượt điểm tốt nhất nhiều hơn độ
+nhiễu đo được của chính bài đánh giá (best + 2σ). Quy tắc bác bỏ được cố định
+từ trước, và một Auditor ở phiên mới đọc diff thật. Nhiễu đánh giá không phải
+phát hiện của chúng tôi: giới nghiên cứu đã bàn về nó từ trước. Điều mới là
+một công cụ biến nó thành quy tắc quyết định mọi commit.
+
+**Đổi lại được gì, có đo.** Chúng tôi cho một vòng lặp ngây thơ (thấy điểm cao
+hơn là giữ) và keeploop chạy cùng 20 đề xuất, trên cùng một bài đánh giá nhiễu:
+mỗi lần chấm lấy ngẫu nhiên 1.000 trong 10.000 ca dev. Kết quả được chấm trên
+một tập holdout 5.000 ca mà vòng lặp không bao giờ thấy. Mỗi bên chạy 25 seed
+cố định từ trước ([docs/proof/PROOF.md](docs/proof/PROOF.md),
+`python tools/proof_run.py`):
+
+| trung bình trên 25 seed | ngây thơ | keeploop |
+|---|---|---|
+| số thay đổi được giữ mà thật ra không có lợi | 2.76 | **0.44** |
+| điểm của chính vòng lặp phóng đại holdout bao nhiêu | +0.017 | **+0.005** |
+| số thay đổi có lợi thật nhưng bị bỏ | **1.28** | 2.64 |
+| mức tăng holdout, trung vị / trung bình | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+Cái giá là có thật: keeploop bỏ đi một số cải thiện thật nằm lọt trong dải
+nhiễu. Ở 9 trên 25 seed, holdout của nó kết thúc thấp hơn vòng lặp ngây thơ,
+kể cả seed 1, lần chạy được chọn làm tiêu điểm trước khi quét. `kl doctor` đo
+độ nhiễu của bài đánh giá trước khi bạn bắt đầu, và cho biết khi nào cần giảm nó.
 
 ## Vì sao chọn keeploop
 

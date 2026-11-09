@@ -95,19 +95,27 @@ release. The one-time PyPI setup and the steps are in
   starts no cycle; it stops at a `STOP:` line even before 3 cycles; the
   first-time interview asks what score is good enough.
 
-- Two animations in keeploop's own look (cream, black type, a yellow noise band), made
-  by `tools/render_figure.py` from `docs/proof/proof.json`, the seed-2 runs and a
-  measured noise sample (`docs/assets/demo-run/noise-sample.json`); no number is typed
-  into a template (build-time only: Playwright's Chromium, ffmpeg, Pillow):
-  - `docs/assets/keeploop-gate.gif`, the README hero: "the keep gate", one number line on
-    which three real changes land: one reset inside the noise band, one committed after
-    clearing the bar twice, and one that scores higher still but is reset inside the new
-    band. Loops seamlessly (the renderer refuses otherwise).
-  - `docs/assets/keeploop-talk.mp4`, a 48-second 16:9 talk for X: same code / different
-    score, keep-if-better keeps luck (with each kept change's true effect), the commit
-    law, the 25-seed numbers, the price, the fast path.
-- README (en, vi, zh-CN): the hero figure, the proof-run numbers and their trade-off at
-  the top; the terminal demo is linked from the caption.
+- Animations in one light design system (`tools/figure/kl.css`: your AI as a team, each
+  role in its own colour), made by `tools/render_figure.py` from committed files only
+  (build-time only: Playwright's Chromium, ffmpeg, Pillow):
+  - `docs/assets/keeploop-team.gif`, the README hero: you and the CEO (your AI); the
+    first-time questions of AGENTS.md; the team it staffs (Analyst on a cheap model,
+    Engineer on your main model, Auditor on the strongest); a cycle in two commands with
+    real `kl next` / `kl try` output (`docs/assets/demo-run/fastpath.txt`); the measured
+    speed strip (`docs/proof/bench-latency-*.json`). Loops seamlessly.
+  - `docs/assets/keeploop-x.mp4`, a 54-second 16:9 video for X with the same story: give
+    your AI a team, it asks first (the illustrative lite example), it staffs the team, two
+    commands a cycle, it keeps only what clears the noise (with the price), fewer calls and
+    tokens, where it works.
+  - `docs/assets/keeploop-gate.gif`, "the keep gate", in the README's new "Why trust the
+    keeps" section: three real changes from the proof run on one number line.
+- Measured speed of `profile: fast` on the offline demo with simulated call latency
+  (`docs/proof/bench-latency-default.json`, `-fast.json`): tokens per cycle 3390.8 to
+  2257.8 (-33%), time per cycle 7.81 s to 5.81 s (-26%), AI calls per cycle 2.7 to 1.7.
+- README (en, vi, zh-CN): opens on what keeploop is for: your AI as a team with a CEO
+  beside you, in order of what matters (easy, asks first and staffs the team, fast, saves
+  tokens, keeps only real gains). The noise proof and its trade-off moved to "Why trust
+  the keeps".
 - The version badge in the three READMEs reads PyPI and links to
   <https://pypi.org/project/keeploop/>, so it no longer needs a hand edit per
   release; the test now checks the PyPI badge instead of a version string.

@@ -51,48 +51,31 @@ in the current conversation:
   <a href="docs/GUIDE.md">Full guide</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="The keep gate, animated: a number line with the best score, a yellow noise band up to the bar at best + 2σ, and three real changes from the noisy-eval run. Cycle 7 scores 0.755 against a best of 0.754, inside the band, and is reset. Cycle 8 scores 0.793 and 0.786 on a re-run, both past the bar of 0.777, and is committed; the best moves to 0.786 and the bar to 0.809. Cycle 14 scores 0.795, more than cycle 8 did, but inside the new band, and is reset." width="860"></p>
+<p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop as a team board. You and the CEO, your AI: it asks what should get better, how to measure it and what score is good enough, then proposes evaluate.py for you to approve. It staffs a team: an Analyst on a cheap fast model writes one hypothesis card, an Engineer on your main model makes one small change, an Auditor on the strongest model reads the real diff in a fresh context. A change runs through evaluate.py and the keep gate, best + 2σ: one is kept and committed, the next is reset with a lesson. Two commands a cycle, kl next and kl try. With profile: fast, fewer AI calls and tokens per cycle." width="860"></p>
 
-<p align="center"><sub>Real changes from <a href="examples/noisy-eval">examples/noisy-eval</a> (seed 2); every number is read from <a href="docs/proof/proof.json">docs/proof</a> by <code>python tools/render_figure.py</code>. The 48-second talk: <a href="docs/assets/keeploop-talk.mp4">keeploop-talk.mp4</a>. The terminal version: <a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>.</sub></p>
+<p align="center"><sub>The session lines are real output of <code>kl next</code> / <code>kl try</code> on the offline demo (<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>); the speed numbers are measured (<a href="docs/proof">docs/proof/bench-latency-*.json</a>). Video for X: <a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>. Guides: <a href="docs/assets/keeploop-guide-chat.mp4">AI chat</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI code</a>.</sub></p>
 
-AI agents are good at sounding sure. keeploop makes them prove it.
+keeploop turns the AI you already use into a small team, with a CEO that works
+beside you.
 
-- **You say what "better" means**: faster tests, a higher benchmark, a
-  cleaner report. One number.
-- **Your AI tries one change at a time**, and a second, fresh AI checks it.
-- **A change is kept only if it beats the best score by more than the
-  evaluation's own noise.** Everything else is undone, and the reason is
-  written down so it is not tried again.
+- **Easy.** Paste one file into a chat app, or one prompt into your coding agent.
+  You talk in plain words; you never learn commands.
+- **It asks first, then staffs the team.** The CEO (your AI) asks what "better"
+  means, how to measure it and what score is good enough. Then it names a team for
+  the job: a cheap, fast model proposes, your main model builds, the strongest model
+  checks the real diff in a fresh context.
+- **Fast.** Two commands a cycle in a coding agent (`kl next`, `kl try`); one paste
+  each way for a chat AI that cannot see your repo.
+- **Saves tokens.** With `profile: fast` the Engineer writes its own card and the
+  ideas you listed need no Analyst call: −33% tokens and −26% time per cycle in
+  our offline benchmark.
+- **Keeps only real gains.** A change is committed only if it beats the best score
+  by more than the evaluation's own measured noise (best + 2σ). Everything else is
+  reset, and the reason is written down ([measured](#why-trust-the-keeps)).
 
-keeploop is the first installable tool found in our scan of autoresearch-style
-loops (November 2026) that turns evaluation noise into a commit law: a change is
-kept only if it beats the best score by more than the evaluation's own measured
-noise (best + 2σ), with the falsification rule fixed in advance and a
-fresh-context Auditor reading the real diff. Evaluation noise is not our
-discovery; research has discussed it before. What is new is a tool that turns it
-into the rule that decides every commit.
-
-**What that buys, measured.** We ran a naive keep-if-better loop and keeploop on
-the same 20 proposals and the same noisy evaluation, a random 1,000 of 10,000 dev
-cases per call. A 5,000-case holdout scored the result, and the loop never saw
-it. Each was run on 25 seeds fixed before the run
-([docs/proof/PROOF.md](docs/proof/PROOF.md), `python tools/proof_run.py`):
-
-| mean over 25 seeds | naive | keeploop |
-|---|---|---|
-| changes kept with no true gain | 2.76 | **0.44** |
-| how far the loop's own score overstated the holdout | +0.017 | **+0.005** |
-| changes discarded despite a true gain | **1.28** | 2.64 |
-| holdout gain, median / mean | +0.130 / **+0.129** | **+0.135** / +0.107 |
-
-The price is real. keeploop throws away some true gains that land inside the
-noise. On 9 of the 25 seeds its holdout ended lower than the naive loop's,
-including seed 1, the run fixed before the sweep as the headline. `kl doctor`
-measures your evaluation's noise before you start, and tells you when to reduce it.
-
-Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI and other AIs
-you already use. keeploop itself is not an AI: it is a small Python tool
-that measures and refuses, with no dependencies, no telemetry and no API keys.
+Works with ChatGPT, Gemini, Claude, Perplexity, Claude Code, Codex, Cursor, Copilot
+and Gemini CLI. keeploop itself is not an AI: it is a small Python tool that
+measures and refuses, with no dependencies, no telemetry and no API keys.
 
 > **Only have a chat app** (ChatGPT, Claude, Gemini, no code)? Use
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.md): one file you paste into the chat,
@@ -223,6 +206,36 @@ discarded hollow, the running best and its noise band. Example:
 Set up any example as a sandbox with `kl init --example <name> <new short folder>`
 (installed `kl`) or `python tools/make_sandbox.py examples/<name> <new short folder>`
 (clone) ([details](docs/GUIDE.md#run-a-worked-example)).
+
+## Why trust the keeps
+
+<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="The keep gate, animated: a number line with the best score, a yellow noise band up to the bar at best + 2σ, and three real changes from the noisy-eval run. Cycle 7 scores 0.755 against a best of 0.754, inside the band, and is reset. Cycle 8 scores 0.793 and 0.786 on a re-run, both past the bar of 0.777, and is committed; the best moves to 0.786 and the bar to 0.809. Cycle 14 scores 0.795, more than cycle 8 did, but inside the new band, and is reset." width="760"></p>
+
+keeploop is the first installable tool found in our scan of autoresearch-style
+loops (November 2026) that turns evaluation noise into a commit law: a change is
+kept only if it beats the best score by more than the evaluation's own measured
+noise (best + 2σ), with the falsification rule fixed in advance and a
+fresh-context Auditor reading the real diff. Evaluation noise is not our
+discovery; research has discussed it before. What is new is a tool that turns it
+into the rule that decides every commit.
+
+**What that buys, measured.** We ran a naive keep-if-better loop and keeploop on
+the same 20 proposals and the same noisy evaluation, a random 1,000 of 10,000 dev
+cases per call. A 5,000-case holdout scored the result, and the loop never saw
+it. Each was run on 25 seeds fixed before the run
+([docs/proof/PROOF.md](docs/proof/PROOF.md), `python tools/proof_run.py`):
+
+| mean over 25 seeds | naive | keeploop |
+|---|---|---|
+| changes kept with no true gain | 2.76 | **0.44** |
+| how far the loop's own score overstated the holdout | +0.017 | **+0.005** |
+| changes discarded despite a true gain | **1.28** | 2.64 |
+| holdout gain, median / mean | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+The price is real. keeploop throws away some true gains that land inside the
+noise. On 9 of the 25 seeds its holdout ended lower than the naive loop's,
+including seed 1, the run fixed before the sweep as the headline. `kl doctor`
+measures your evaluation's noise before you start, and tells you when to reduce it.
 
 ## Why keeploop
 
