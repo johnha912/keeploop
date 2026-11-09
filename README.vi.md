@@ -29,6 +29,9 @@ gì trong cuộc trò chuyện hiện tại:
   không có gì để cài hay clone. Nếu người dùng muốn, bạn có thể đọc file đó
   và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
   lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
+  Nếu ngữ cảnh của bạn nhỏ, hoặc bạn là trợ lý tìm kiếm, hãy đọc
+  `lite/KEEPLOOP-LITE-MINI.vi.md` (cùng vòng lặp, khoảng 1.200 từ).
+  Danh mục các file này cho máy đọc nằm ở [`llms.txt`](llms.txt).
 
 </details>
 
@@ -97,6 +100,11 @@ telemetry và không cần API key.
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
 > cùng vòng giữ-hay-bỏ cho một bài đăng, một CV hay một kế hoạch
 > ([English](lite/KEEPLOOP-LITE.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [ví dụ](lite/EXAMPLE.vi.md)).
+> Mặc định chạy nhanh: nói **chạy 3 chu kỳ** để thử tối đa năm thay đổi trong
+> một câu trả lời, và **lưu** để lấy sổ ghi. Ít chỗ (gói miễn phí, Perplexity)? Dùng
+> [KEEPLOOP-LITE-MINI.vi.md](lite/KEEPLOOP-LITE-MINI.vi.md). Có thể lưu file một lần làm
+> chỉ dẫn cố định (Project hoặc custom GPT của ChatGPT, Gem của Gemini, Space của
+> Perplexity, Project của Claude) thay vì dán vào mỗi cuộc chat.
 > **AI của bạn chạy được code?** Dùng bản đầy đủ bên dưới.
 
 ## Bắt đầu nhanh
@@ -126,8 +134,9 @@ chạy ba chu kỳ.
 
 Để cải thiện một dự án code từ ứng dụng chat,
 hãy dán toàn bộ [`BOOTSTRAP.md`](BOOTSTRAP.md) vào một cuộc
-chat mới. Khi đó AI sẽ đưa bạn từng lệnh `python kl.py ...` để chạy trong
-một bản clone, và bạn dán đầu ra lại cho nó.
+chat mới. Mỗi chu kỳ chỉ một lượt qua lại: `python kl.py handoff` in ra một gói
+cho chat (mục tiêu, điểm số, các file), AI trả lời bằng một thẻ và các file đã sửa,
+và `python kl.py apply reply.md` kiểm tra, chấm điểm, rồi giữ hoặc bỏ.
 
 </details>
 
@@ -149,6 +158,9 @@ một bản clone, và bạn dán đầu ra lại cho nó.
    nhưng chỉ người dùng được sửa chúng.
 5. Không bao giờ commit bằng tay: chỉ `python kl.py keep` mới commit. Với
    mọi tuyên bố về tiến độ, hãy dán nguyên văn `python kl.py report`.
+6. Đường nhanh, hai lệnh mỗi chu kỳ: `python kl.py next` (một bản tóm tắt), viết
+   thẻ và sửa, rồi `python kl.py try card.md` (cổng kiểm tra, chấm điểm, giữ hoặc
+   bỏ; nó nói khi nào cần phán quyết của Auditor).
 
 </details>
 
