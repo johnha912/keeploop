@@ -75,6 +75,11 @@ h1 > span { display: block; }
 .setup li { display: flex; align-items: center; gap: 16px; font: 600 25px Inter, sans-serif; color: var(--muted); }
 .setup li .bx { width: 34px; height: 34px; border-radius: 10px; border: 1.5px solid var(--line); display: grid; place-items: center; flex: none; font: 700 17px var(--mono); }
 .setup li.on { color: var(--ink); }
+.pace { margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed var(--line); }
+.pq { font: 500 22px/1.35 Inter, sans-serif; color: var(--ink2); }
+.pp { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+.po { font: 600 19px var(--mono); padding: 6px 12px; border-radius: 10px; border: 1.5px solid var(--ink); background: var(--panel); color: var(--ink2); }
+.po b { color: var(--ink); }
 .setup li.on .bx { background: var(--keep); border-color: var(--keep); color: #fff; }
 .setup li.cur { color: var(--ink); }
 .setup li.cur .bx { border-color: var(--ink); border-width: 2.5px; }
@@ -222,28 +227,31 @@ h1 > span { display: block; }
 <section class="scene" id="s2">
   <div class="left">
     <h1><span class="l1">Paste the thing</span><span class="l2"><span class="hl">you want better.</span></span></h1>
-    <div class="body">Exactly as it is now, and who it is for. Nothing is rewritten yet: first you agree on what “better” means.</div>
+    <div class="body">Exactly as it is now, and who it is for. Nothing is rewritten yet: first you agree on what “better” means, and how careful to be.</div>
     <div class="tags"><span class="tag">EASY</span><span class="tag">ASKS FIRST</span></div>
   </div>
   <div class="src">Example: Mai's banana-bread post, from lite/EXAMPLE.md (illustrative).</div>
   <div class="stage">
-    <div class="win card" style="top:0;height:440px">
+    <div class="win card" style="top:0;height:400px">
       <div class="bar"><span class="d"><i></i><i></i><i></i></span>keeploop-lite · setup</div>
-      <div class="msgs">
-        <div class="msg you" data-fx="up" data-at="0.75"><div class="who">Mai</div>
+      <div class="msgs" style="padding-top:20px">
+        <div class="msg you" data-fx="up" data-at="0.7"><div class="who">Mai</div>
           <div class="bub" data-src="lite/EXAMPLE.md">My Facebook post for the neighbourhood group: "Banana bread for sale. DM me."</div></div>
-        <div class="msg ai" data-fx="ai" data-at="1.85"><div class="who">AI</div><div class="tdots"><i></i><i></i><i></i></div>
+        <div class="msg ai" data-fx="ai" data-at="1.7"><div class="who">AI</div><div class="tdots"><i></i><i></i><i></i></div>
           <div class="bub" data-src="lite/EXAMPLE.md">Thanks. What would a better version do for you? What bothers you about it now?</div></div>
       </div>
     </div>
-    <div class="panel2" style="top:472px" data-fx="up" data-at="0.9">
+    <div class="panel2" style="top:424px;padding:20px 30px" data-fx="up" data-at="0.9">
       <div class="ph2">Setup, before any work</div>
-      <ul class="setup">
+      <ul class="setup" style="gap:8px;margin-top:12px">
         <li data-fx="state" data-on="0.8" data-cur="-1"><span class="bx">✓</span>The thing to improve, and who it is for</li>
-        <li data-fx="state" data-on="99" data-cur="1.85"><span class="bx">2</span>What “better” means, in your words</li>
-        <li><span class="bx">3</span>A locked scorecard and a team: you say yes</li>
-        <li><span class="bx">4</span>The baseline score</li>
+        <li data-fx="state" data-on="99" data-cur="1.7"><span class="bx">2</span>What “better” means, in your words</li>
+        <li><span class="bx">3</span>A locked scorecard, a team, the baseline score</li>
       </ul>
+      <div class="pace" data-fx="up" data-at="2.3">
+        <div class="pq">It also asks: <span data-src="lite/KEEPLOOP-LITE-MINI.md">could you fix it tomorrow, or does it go out once (a job application, a contract)?</span></div>
+        <div class="pp"><span class="po">fix it tomorrow <b>→ fast mode</b></span><span class="po">goes out once <b>→ careful mode</b>, and it says so</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -397,7 +405,7 @@ h1 > span { display: block; }
         <span class="c" data-fx="up" data-at="0.7">status</span><span class="d" data-fx="up" data-at="0.7">the ledger, and what to try next</span>
         <span class="c" data-fx="up" data-at="0.85">save</span><span class="d" data-fx="up" data-at="0.85">the ledger to keep</span>
         <span class="c" data-fx="up" data-at="1.0">audit this</span><span class="d" data-fx="up" data-at="1.0">a new chat scores it, without knowing what we hoped for</span>
-        <span class="c" data-fx="up" data-at="1.15">careful mode</span><span class="d" data-fx="up" data-at="1.15">it waits for your yes on every card</span>
+        <span class="c" data-fx="up" data-at="1.15">careful mode</span><span class="d" data-fx="up" data-at="1.15">your yes on every card; the start for work that goes out once</span>
       </div>
     </div>
   </div>
@@ -409,7 +417,7 @@ h1 > span { display: block; }
 /* The deck engine: a pure function of t. Each scene lasts DUR[i] seconds; inside a scene,
    an element with data-at="s" animates in at s seconds after the scene starts (data-fx says
    how). Nothing reads the clock: render(t) sets every style from t alone. */
-const DUR = [2.0, 3.4, 3.6, 4.8, 4.2, 5.0, 3.8, 3.2];
+const DUR = [2.0, 3.4, 4.0, 4.8, 4.2, 5.0, 3.8, 2.8];
 const STEPS = ["Paste the file", "Paste your work", "Agree on better", "Meet the team", "Run cycles", "Save"];
 const NSTEP = STEPS.length;
 const START = DUR.reduce((a, d, i) => (a.push(i ? a[i - 1] + DUR[i - 1] : 0), a), []);
