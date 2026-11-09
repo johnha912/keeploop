@@ -168,7 +168,7 @@ h1 > span { display: block; }
 <!-- 0 · intro -->
 <section class="scene sm" id="s0">
   <div class="left">
-    <h1><span class="l1">Make one thing better,</span><span class="l2"><span class="hl">one checked change</span> at a time.</span></h1>
+    <h1><span class="l1">Make one thing better,</span><span class="l2"><span class="hl">one checked change</span></span><span class="l2">at a time.</span></h1>
     <div class="body">Your AI runs a small team that improves a post, a CV or a plan. A change stays only when the score says it is better.</div>
     <div class="tags"><span class="tag">NO CODE</span><span class="tag">NOTHING TO INSTALL</span></div>
   </div>
@@ -472,6 +472,11 @@ function fx(e, lt) {
     const since = lt - e.ats[i];
     s.display = "inline-block";
     s.transform = i > 0 && since < 0.4 ? `scale(${0.75 + 0.25 * back(since / 0.4)})` : "none";
+  } else if (f === "type") {
+    const txt = e.dataset.text, d = +(e.dataset.dur || Math.max(0.3, txt.length / 28));
+    const k = clamp((lt - at) / d), n = lt < at ? 0 : Math.round(k * txt.length);
+    const caret = lt >= at && (k < 1 || Math.floor(lt * 4) % 2 === 0);
+    e.innerHTML = esc(txt.slice(0, n)) + (caret ? '<span class="caret"></span>' : "") + `<span class="ghost">${esc(txt.slice(n))}</span>`;
   } else if (f === "compose") {
     const txt = e.dataset.text, a = +e.dataset.at, snd = +e.dataset.send;
     const typeEnd = snd - 0.22, k = clamp((lt - a) / Math.max(0.2, typeEnd - a));
