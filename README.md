@@ -48,9 +48,9 @@ in the current conversation:
   <a href="docs/GUIDE.md">Full guide</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-demo.gif" alt="Terminal: keeploop on a noisy evaluation. Cycle 7 scores 0.755 against a best of 0.754, inside the noise band, and is discarded and reset. Cycle 8 scores 0.793, its confirm re-run 0.786 still clears the bar of 0.777, and it is kept and committed." width="853"></p>
+<p align="center"><img src="docs/assets/keeploop-figure.gif" alt="keeploop as a one-page technical note, A Commit Law for Noisy Evaluations: an abstract; Fig. 1, a naive keep-if-better loop next to keeploop's loop with its keep bar best + 2σ, re-run and Auditor; Algorithm 1, one cycle; Fig. 2, a real run on examples/noisy-eval drawn cycle by cycle, where cycle 7 scores 0.755 against a best of 0.754 inside the noise band and is reset, and cycle 8 scores 0.793 with a re-run of 0.786, both above the bar of 0.777, and is committed; Table 1, naive vs keeploop over 25 seeds, 2.76 vs 0.44 changes kept with no true gain and 1.28 vs 2.64 real gains discarded; the price; Fig. 3, the keep bar on a number line; takeaway: a gain inside the noise is not a gain." width="720"></p>
 
-<p align="center"><sub>Real output of <code>kl run --mock --narrate</code> on <a href="examples/noisy-eval">examples/noisy-eval</a>, paced for reading. Two cycles are shown in full and the others folded into ⋯ lines. Run files: <a href="docs/assets/demo-run">docs/assets/demo-run</a>. Re-render: <code>python tools/render_demo.py</code>.</sub></p>
+<p align="center"><sub>Every number is read from <a href="docs/proof/proof.json">docs/proof/proof.json</a> and <a href="docs/assets/demo-run">docs/assets/demo-run</a> by <code>python tools/render_figure.py</code>. The terminal version of the same run: <a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>.</sub></p>
 
 AI agents are good at sounding sure. keeploop makes them prove it.
 

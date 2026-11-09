@@ -48,9 +48,9 @@ gì trong cuộc trò chuyện hiện tại:
   <a href="docs/GUIDE.md">Hướng dẫn đầy đủ (tiếng Anh)</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-demo.gif" alt="Terminal: keeploop trên một bài đánh giá nhiễu. Chu kỳ 7 đạt 0.755 so với best 0.754, nằm trong dải nhiễu, nên bị bỏ và reset. Chu kỳ 8 đạt 0.793, lần chạy lại xác nhận được 0.786, vẫn vượt ngưỡng 0.777, nên được giữ và commit." width="853"></p>
+<p align="center"><img src="docs/assets/keeploop-figure.gif" alt="keeploop dưới dạng một trang ghi chú kỹ thuật, A Commit Law for Noisy Evaluations: tóm tắt; Hình 1, vòng lặp ngây thơ (thấy cao hơn là giữ) cạnh vòng lặp của keeploop với ngưỡng giữ best + 2σ, chạy lại và Auditor; Thuật toán 1, một chu kỳ; Hình 2, một lần chạy thật trên examples/noisy-eval vẽ từng chu kỳ: chu kỳ 7 đạt 0.755 so với best 0.754, nằm trong dải nhiễu, bị reset; chu kỳ 8 đạt 0.793, chạy lại 0.786, cả hai vượt ngưỡng 0.777, được commit; Bảng 1, ngây thơ vs keeploop trên 25 seed: giữ 2.76 vs 0.44 thay đổi không có lợi thật, bỏ 1.28 vs 2.64 cải thiện thật; cái giá; Hình 3, ngưỡng giữ trên trục số; kết luận: mức tăng nằm trong nhiễu không phải mức tăng." width="720"></p>
 
-<p align="center"><sub>Đầu ra thật của <code>kl run --mock --narrate</code> trên <a href="examples/noisy-eval">examples/noisy-eval</a>, chạy chậm lại cho dễ đọc. Hai chu kỳ được hiện đầy đủ, các chu kỳ khác gộp vào dòng ⋯. File của lần chạy: <a href="docs/assets/demo-run">docs/assets/demo-run</a>. Dựng lại: <code>python tools/render_demo.py</code>.</sub></p>
+<p align="center"><sub>Mọi con số được <code>python tools/render_figure.py</code> đọc từ <a href="docs/proof/proof.json">docs/proof/proof.json</a> và <a href="docs/assets/demo-run">docs/assets/demo-run</a>. Bản terminal của cùng lần chạy: <a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>.</sub></p>
 
 AI agent rất giỏi nói như thể chắc chắn. keeploop bắt chúng phải chứng minh.
 
