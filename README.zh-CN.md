@@ -26,6 +26,8 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   （英文：`KEEPLOOP-LITE.md`，越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
   如果用户想用，你可以读这个文件，在聊天里和用户一起跑它的循环，从设置访谈开始。
   如果你打不开链接，用户可以把文件粘贴进来。
+  如果你的上下文较小，或者你是搜索助手，请改读 `lite/KEEPLOOP-LITE-MINI.zh-CN.md`
+  （同样的循环，篇幅更短）。这些文件的机器可读索引是 [`llms.txt`](llms.txt)。
 
 </details>
 
@@ -87,7 +89,11 @@ AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
 > **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.zh-CN.md)（另有 [English](lite/KEEPLOOP-LITE.md)、[Tiếng Việt](lite/KEEPLOOP-LITE.vi.md) 版）：
 > 把一个文件粘贴进聊天，就能对一篇帖子、一份简历或一个计划跑同样的保留/丢弃循环
-> （[示例](lite/EXAMPLE.zh-CN.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
+> （[示例](lite/EXAMPLE.zh-CN.md)）。默认快速模式：说**运行 3 轮**，一条回复最多尝试五处
+> 修改；说**保存**拿到记录本。空间不够（免费套餐、Perplexity）？用
+> [KEEPLOOP-LITE-MINI.zh-CN.md](lite/KEEPLOOP-LITE-MINI.zh-CN.md)。也可以把文件保存一次作为长期
+> 指令（ChatGPT 的 Project 或自定义 GPT、Gemini 的 Gem、Perplexity 的 Space、Claude 的
+> Project），不用每个对话都粘贴。**你的 AI 能运行代码？** 请用下面的完整版。
 
 ## 快速开始
 
@@ -115,8 +121,8 @@ AI 能读懂中文提示词；链接和命令保持原样。
 
 要在聊天应用里改进一个代码项目，
 请改为把 [`BOOTSTRAP.md`](BOOTSTRAP.md) 的全部内容粘贴到一个新的聊天中。之后
-AI 会每次给你一条 `python kl.py ...` 命令，让你在克隆目录里运行，再把输出贴
-回去。
+每个周期只需一次往返：`python kl.py handoff` 打印一个给聊天用的包（目标、分数、文件），
+AI 回复一张卡片和改好的文件，`python kl.py apply reply.md` 负责检查、评测，再保留或丢弃。
 
 </details>
 
@@ -136,6 +142,8 @@ AI 会每次给你一条 `python kl.py ...` 命令，让你在克隆目录里运
    `team.yaml`、`program.md` 和 `evaluate.py`，但只有用户本人才能编辑它们。
 5. 绝不要手动 commit：只有 `python kl.py keep` 才会 commit。任何关于进度的
    说法，都要原样粘贴 `python kl.py report`。
+6. 快速路径，每个周期两条命令：`python kl.py next`（一份简报），写卡片并改动，然后
+   `python kl.py try card.md`（门禁、评测、保留或丢弃；需要 Auditor 裁定时它会说明）。
 
 </details>
 

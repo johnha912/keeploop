@@ -29,6 +29,9 @@ in the current conversation:
   nothing to install or clone. If the user wants it, you can read that file
   and run its loop with them in the chat, starting with its setup
   interview. If you cannot open links, the user can paste the file.
+  With a small context window, or as a search assistant, read
+  `lite/KEEPLOOP-LITE-MINI.md` instead (the same loop in about 1,200 words).
+  A machine-readable index of these files is [`llms.txt`](llms.txt).
 
 </details>
 
@@ -95,6 +98,11 @@ that measures and refuses, with no dependencies, no telemetry and no API keys.
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.md): one file you paste into the chat,
 > the same keep-or-discard loop for a post, a CV or a plan
 > ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [example](lite/EXAMPLE.md)).
+> It is fast by default: say **run 3 cycles** to try up to five changes in one
+> reply, and **save** to get the ledger to keep. Short on space (a free plan,
+> Perplexity)? Use [KEEPLOOP-LITE-MINI.md](lite/KEEPLOOP-LITE-MINI.md). Save either file
+> once as standing instructions (a ChatGPT Project or custom GPT, a Gemini Gem, a
+> Perplexity Space, a Claude Project) instead of pasting it into every chat.
 > **Your AI can run code?** Use the full version below.
 
 ## Quick start
@@ -122,8 +130,9 @@ To improve everyday work (a post, a CV, a plan), use
 
 To improve a code project from a chat app,
 paste the whole of [`BOOTSTRAP.md`](BOOTSTRAP.md) into a new chat instead.
-The AI then gives you one `python kl.py ...` command at a time to run in a
-clone, and you paste the output back.
+One round trip per cycle: `python kl.py handoff` prints one packet for the chat
+(the goal, the scores, the files), the AI replies with a card and the changed files,
+and `python kl.py apply reply.md` checks, evaluates and keeps or discards it.
 
 </details>
 
@@ -145,6 +154,9 @@ clone, and you paste the output back.
    user edits them.
 5. Never commit by hand: only `python kl.py keep` commits. For any
    progress claim, paste `python kl.py report` verbatim.
+6. The fast path, two commands a cycle: `python kl.py next` (one brief), write
+   the card and make the change, then `python kl.py try card.md` (gates,
+   evaluation, keep or discard; it says when an Auditor verdict is needed).
 
 </details>
 
