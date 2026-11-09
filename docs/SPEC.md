@@ -191,6 +191,11 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `max_iterations` | 20 | yes | Cycles per run; `--iterations` overrides |
 | `keep_threshold` | 0.0 | yes | Minimum gain relative to `abs(best)` |
 | `confirm_keep` | true | yes | Re-run before a keep when sigma > 0 (heavy always re-runs) |
+| `profile` | none | yes | `fast` sets `fused: true`, `auto_cards: true`, `repo_map_max_chars: 1200`, `ledger_tail_for_prompt: 3`, `recall_top_k: 4`, `eval_stderr_max_chars: 400`, `eval_stderr_handle: true`. Precedence: defaults, then the profile, then explicit `loop:` keys. An unknown name is a startup error |
+| `fused` | false | yes (`run.py`) | One Engineer call writes the card (labelled lines in its reply) and implements it; no Analyst call. The card is parsed and checked before the evaluation; a missing or vague card is a crash and the edit is reset; a duplicate is dropped before the evaluation; a heavy card still goes to the critic |
+| `auto_cards` | false | yes (`run.py`) | The next untested `program.md` hypothesis becomes the card with no Analyst call (CHANGE "the smallest change that tests it", REJECT IF "the metric does not beat the keep bar"); a line naming a heavy file gets `TIER: heavy`; lines over 300 characters go to the Analyst |
+| `eval_stderr_handle` | false | yes (`run.py`) | A cut stderr excerpt ends with the path of `.keeploop/scorer_notes.json` (the full text) |
+| `confirm_skip_z` | 0 (off) | yes (`run.py`) | Skip the confirm re-run of a light change whose gain is at least this many times a 95% upper bound on sigma (sigma > 0; must exceed `noise_z`). The added false-keep chance is below 0.22% at 3 baseline runs (argued in `run.py`). Not part of `profile: fast` |
 | `eval_cache` | false | yes (`run.py`) | Reuse a score when the workspace files (git tree), `evaluate.py` and `eval_cmd` are identical to an earlier evaluation; only when sigma is 0, never for the baseline or `holdout.py`. Stored in `.keeploop/eval_cache.json` |
 | `engineer_repairs` | 1 | yes | Extra Engineer calls for a repairable failure |
 | `repo_map_max_chars` | 3000 | yes (`run.py`); `kl map` uses the default | Analyst repo map size |
@@ -529,7 +534,7 @@ filler slop patterns).
 - `python run.py --mock --iterations 5` exits 0 offline with keeps at cycles
   1, 2, 5, a discard at 3, a crash with lesson L-001 at 4, best metric 1.0
   (verdicts supported, supported, rejected, untested, supported).
-- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 232 tests).
+- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 259 tests).
 - `python scout.py --dry-run` exits 0 online and offline (manual check, no
   test).
 - `CHANGELOG.md` has a section for `prepare.__version__` (checked by
