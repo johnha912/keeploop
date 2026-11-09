@@ -63,6 +63,25 @@ release. The one-time PyPI setup and the steps are in
   scripted engineer applies the patch named on the card, so a dropped duplicate card
   never puts the analyst and engineer out of step.
 - AGENTS.md: run `kl doctor` before `kl begin` on a new project.
+- The fast path for your own AI: `kl next` (one brief instead of `status` + `recall`) and
+  `kl try card.md` (card, gates, evaluation, keep or discard in one command). A routine
+  cycle takes 2 `kl` commands instead of 6, and AGENTS.md opens with a fast-path section
+  of about 1,350 characters, so the AI need not read the whole 12,000-character file to
+  run a cycle (measured on the offline demo). `kl try` asks for an Auditor verdict on a
+  heavy change or a light gain that is not decisive, stricter than `kl keep` alone.
+- `kl handoff` / `kl apply` for chat AIs without repo access (ChatGPT, Gemini,
+  Perplexity): one packet out, one reply in, one round trip per cycle instead of one
+  command at a time. BOOTSTRAP.md uses them. `apply` never executes the reply and refuses
+  unsafe or unseen paths.
+- keeploop-lite fast mode (en, vi, zh-CN): a compact report per cycle with the full ledger
+  every 3 cycles, `run N cycles` (up to 5 in one reply), `save`, and `careful mode` for the
+  old pace. The full best version is no longer reprinted every cycle, so the chat uses
+  less of its context and the person sends fewer messages.
+- `lite/KEEPLOOP-LITE-MINI.md` (en, vi, zh-CN): the same loop in about 1,200 words for
+  small context windows and search assistants, and `llms.txt` at the repo root, an index
+  of these files for AIs that browse.
+- Claude Code permissions: `kl next`, `kl try` and `kl doctor` are allowed; `kl handoff`
+  and `kl apply` ask first.
 
 - Brakes against doing more than was asked, set by the human in
   `team.yaml`: `loop.target` (good enough; at or above it the job is done)
