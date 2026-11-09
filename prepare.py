@@ -63,13 +63,30 @@ CONFIG = {
     "auto_cards": False,            # an untested program.md hypothesis becomes the card: no Analyst call
     "confirm_skip_z": 0.0,          # skip the confirm re-run of a light change > this many sigma over best; 0 = off
     "eval_stderr_handle": False,    # a cut scorer-stderr excerpt names the file that holds all of it
+    "audit_every_keep": False,      # `kl try` asks for an Auditor verdict on every keep (headless always audits)
 }
 
 # `loop.profile: NAME` presets (run.project_config: CONFIG < profile < explicit loop: keys).
 # "fast" = fewer AI calls and shorter prompts, same keep law. Not in it: confirm_skip_z
 # (it saves an evaluation, not an AI call, and its safety argument needs roughly normal
 # noise; see run.confirm_skippable).
+# The CEO picks one with `kl level --stakes low|medium|high` after asking the user how
+# much a wrong change would cost (AGENTS.md). Every level keeps the lessons, the fence,
+# the gates and the target/stall brakes; a level only changes how much is measured,
+# re-run and audited, and how many AI calls a cycle makes.
+_LEAN = {
+    "fused": True,
+    "auto_cards": True,
+    "repo_map_max_chars": 1200,     # ~300 tokens: a pointer; the agent reads files itself
+    "ledger_tail_for_prompt": 3,    # recency only; "already tested" carries the rejected ideas
+    "recall_top_k": 4,              # the 4 most relevant open lessons (checked ones run anyway)
+    "eval_stderr_max_chars": 400,   # the excerpt; the full text is one file read away
+    "eval_stderr_handle": True,
+}
 PROFILES = {
+    # small, reversible work with a deterministic score (a draft, a script, a config):
+    # few cycles, stop early, no noise measurement (one baseline run; sigma is 0)
+    "light": {**_LEAN, "max_iterations": 3, "stall_cycles": 2, "noise_runs": 1, "confirm_keep": False},
     "fast": {
         "fused": True,
         "auto_cards": True,
@@ -79,6 +96,9 @@ PROFILES = {
         "eval_stderr_max_chars": 400,   # the excerpt; the full text is one file read away
         "eval_stderr_handle": True,
     },
+    # work people rely on, or a claim you will publish: measure the noise properly, re-run
+    # before every keep, an Auditor verdict on every keep, the full Analyst
+    "rigorous": {"noise_runs": 5, "confirm_keep": True, "audit_every_keep": True},
 }
 
 # The demo workspace: parameters of a toy training run. For a real project,

@@ -29,7 +29,10 @@ part is missing, re-score the best version as a new baseline; never guess.
 
 ## Setup (ask one or two at a time, wait for answers)
 
-1. "Paste what you want to improve, exactly as it is now. Who is it for?"
+1. "Paste what you want to improve, exactly as it is now. Who is it for? If a
+   worse version went out, could you fix it tomorrow, or does it go out once
+   (a job application, a contract)?" Goes out once: start in **careful
+   mode** and say so; otherwise fast mode.
 2. "What would a better version do for you? What bothers you now?"
 3. Write a **scorecard**: 3 to 5 criteria, each a short name, one sentence
    on what a 10 looks like, scored 0 to 10. Prefer what can be judged by

@@ -32,7 +32,10 @@ không bao giờ đoán.
 
 ## Thiết lập (hỏi một hoặc hai câu một lần, chờ trả lời)
 
-1. "Bạn dán giúp mình thứ cần cải thiện, đúng như hiện tại nhé. Nó dành cho ai?"
+1. "Bạn dán giúp mình thứ cần cải thiện, đúng như hiện tại nhé. Nó dành cho ai?
+   Nếu một bản kém hơn lọt ra, mai bạn sửa lại được, hay nó chỉ gửi đi một lần
+   (hồ sơ xin việc, hợp đồng)?" Chỉ gửi một lần: bắt đầu ở **chế độ cẩn thận**
+   và nói rõ; nếu không, dùng chế độ nhanh.
 2. "Một phiên bản tốt hơn sẽ giúp bạn điều gì? Hiện giờ bạn chưa ưng điểm nào?"
 3. Viết một **bảng chấm điểm**: 3 đến 5 tiêu chí, mỗi tiêu chí có tên ngắn,
    một câu mô tả thế nào là điểm 10, chấm từ 0 đến 10. Ưu tiên điều chấm

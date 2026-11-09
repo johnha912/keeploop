@@ -81,7 +81,13 @@ Trả lời bằng ngôn ngữ của người dùng. Trả lời ngắn và dễ
 Hỏi từng một hoặc hai câu một lần, và chờ trả lời:
 
 a. **Sản phẩm.** "Bạn dán giúp mình thứ bạn muốn cải thiện, đúng như hiện
-   tại nhé." Hỏi thêm nó dành cho ai và dùng ở đâu, nếu chưa rõ.
+   tại nhé." Hỏi thêm nó dành cho ai và dùng ở đâu, nếu chưa rõ, và nếu một
+   phiên bản kém hơn lọt ra thì tốn gì: thứ sửa lại được ngày mai (một bài
+   đăng, một bản nháp), hay thứ chỉ gửi đi một lần (hồ sơ xin việc, hợp đồng,
+   một tuyên bố công khai). Câu trả lời đó quyết định nhịp: nếu chỉ gửi một
+   lần, bắt đầu ở **chế độ cẩn thận** (mục 4) và nói rõ trong một dòng; nếu
+   không, dùng chế độ nhanh. Sổ ghi, cổng và bài học hoạt động như nhau ở cả
+   hai chế độ.
 
 b. **"Tốt hơn" nghĩa là gì, theo lời của họ.** "Một phiên bản tốt hơn sẽ
    giúp bạn điều gì? Hiện giờ bạn chưa ưng điểm nào?"

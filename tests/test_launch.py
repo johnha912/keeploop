@@ -131,7 +131,8 @@ class TestFigure(unittest.TestCase):
         fast = (ROOT / "docs" / "assets" / "demo-run" / "fastpath.txt").read_text(encoding="utf-8")
         self.assertIn("KEPT cycle 1", fast)  # the hero's session lines are a real run
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        for asked in ('what\n"better" means', "how to measure it", "what score is good enough"):
+        for asked in ('what\n"better" means', "how to measure it", "what score is good enough",
+                      "what a wrong change would cost"):
             self.assertIn(asked, agents)  # the hero's three questions are AGENTS.md's
         for page in ("readme.html", "hero.html", "x.html"):
             html = (ROOT / "tools" / "figure" / page).read_text(encoding="utf-8")

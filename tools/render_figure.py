@@ -134,16 +134,16 @@ def hero_data() -> dict:
     wall = 1 - fast["wall_s_per_cycle_median"] / slow["wall_s_per_cycle_median"]
     calls = lambda b: sum(b["calls_per_cycle_median"].values())  # noqa: E731
     t = {"reset": 0.9, "ask": 1.0}
-    t["team"] = round(t["ask"] + 4 * 0.75 + 0.5, 2)
+    t["team"] = round(t["ask"] + 5 * 0.75 + 0.5, 2)
     t["cycle"] = round(t["team"] + 2.3, 2)
     t["stats"] = round(t["cycle"] + 5.2, 2)
     t["end"] = round(t["stats"] + 2.6, 2)
     esc = lambda s: s.replace("&", "&amp;").replace("<", "&lt;")  # noqa: E731
     return {
         # the CEO's first-time questions (AGENTS.md: what "better" means, how to measure
-        # it, what score is good enough), asked in one message
+        # it, what score is good enough, what a wrong change would cost), asked in one message
         "questions": ["What should get better, in your words?", "How do we measure it?",
-                      "What score is good enough?"],
+                      "What score is good enough?", "What would a wrong change cost you?"],
         "subs": {"ask": "It asks you first.", "team": "It staffs the team.",
                  "cycle": "Two commands a cycle.", "fast": "Fewer calls, fewer tokens.",
                  "done": "With a CEO beside you."},
