@@ -115,17 +115,17 @@ h1 > span { display: block; }
 
 .best { display: flex; align-items: center; gap: 10px; color: var(--ink); }
 .best .pill.num { font-size: 20px; padding: 3px 12px; display: inline-block; }
-.cyc { border: 1.5px solid var(--ink); border-radius: 18px; padding: 16px 22px 16px; background: var(--panel); }
+.cyc { border: 1.5px solid var(--ink); border-radius: 18px; padding: 12px 22px 12px; background: var(--panel); }
 .cyc .h { display: flex; align-items: center; gap: 10px; }
 .cyc .h b { font: 700 18px var(--mono); letter-spacing: 2.5px; margin-right: 8px; }
 .st { font: 600 17px var(--mono); padding: 4px 11px; border-radius: 999px; border: 1.5px solid var(--line); color: var(--muted); background: var(--panel); }
 .st.on { color: var(--c); border-color: var(--c); background: var(--s); }
-.cyc .b { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.cyc .b { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
 .cyc .chg { flex: 1; font: 700 26px/1.25 Inter, sans-serif; }
-.need { margin-top: 10px; font: 500 21px/1.3 Inter, sans-serif; color: var(--ink2); }
-.need .ans { display: inline-block; margin-left: 6px; background: var(--ink); color: #fff; border-radius: 10px; padding: 2px 10px; font-weight: 600; }
+.need { margin-top: 8px; font: 500 21px/1.3 Inter, sans-serif; color: var(--ink2); }
+.need .ans { display: table; margin-top: 6px; background: var(--ink); color: #fff; border-radius: 10px; padding: 2px 10px; font-weight: 600; }
 .n2 { font: 500 22px/1.35 Inter, sans-serif; color: var(--ink2); padding: 0 6px; }
-.cyc .n { margin-top: 10px; font: 500 22px/1.35 Inter, sans-serif; color: var(--ink2); }
+.cyc .n { margin-top: 6px; font: 500 22px/1.35 Inter, sans-serif; color: var(--ink2); }
 
 .ledger { font: 500 20px/1.5 var(--mono); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 16px; background: #fdfcf9; padding: 16px 22px; position: relative; }
 .ledger .t { font-weight: 800; letter-spacing: 1px; }
@@ -308,16 +308,16 @@ h1 > span { display: block; }
 </section>
 
 <!-- 5 · run cycles -->
-<section class="scene sm" id="s5">
+<section class="scene" id="s5">
   <div class="left">
-    <h1><span class="l1">Say “run 3 cycles”.</span><span class="l2" style="color:var(--keep)">Only a better score stays.</span></h1>
+    <h1><span class="l1">Say “run 3 cycles”.</span><span class="l2" style="color:var(--keep)">Only better is kept.</span></h1>
     <div class="body">Each cycle: one change, proposed, made, checked cold. It is <b>kept</b> only if it passes every gate and beats the best. If a change needs a real fact, it asks; it never makes one up.</div>
     <div class="tags"><span class="tag">FAST</span></div>
   </div>
     <div class="stage">
     <div class="win card" style="top:0;height:770px">
       <div class="bar"><span class="d"><i></i><i></i><i></i></span>keeploop-lite<span class="r best">best so far <span class="pill num" data-fx="swap" data-vals="4/30|10/30" data-ats="0|2.55"></span></span></div>
-      <div class="msgs" style="gap:16px;padding-top:20px">
+      <div class="msgs" style="gap:12px;padding-top:16px;padding-bottom:12px">
         <div class="msg you" data-fx="up" data-at="0.95"><div class="bub">run 3 cycles</div></div>
         <div class="msg ai wide" data-fx="up" data-at="1.15">
           <div class="cyc">
