@@ -82,6 +82,9 @@ loop:
   # stall_cycles: 5      # this many cycles in a row without a keep: the same brake (0 = off)
   # noise_runs: 5        # baseline evaluations that measure sigma (default 3; `kl doctor` advises)
   # eval_cache: true     # reuse a score for identical files + evaluate.py; only when sigma is 0
+  # profile: fast       # fewer AI calls and tokens: the engineer writes the card itself
+                         # (fused), program.md hypotheses become cards with no call
+                         # (auto_cards), leaner prompts. Same keep law. docs/SPEC.md §4
 
 # Optional, off by default: lessons shared across your projects. `kl lesson share L-ID`
 # copies one lesson to ~/.keeploop/lessons/lessons.jsonl (a human decision). With
