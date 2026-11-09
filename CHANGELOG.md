@@ -76,10 +76,19 @@ release. The one-time PyPI setup and the steps are in
   starts no cycle; it stops at a `STOP:` line even before 3 cycles; the
   first-time interview asks what score is good enough.
 
+- The README hero: `docs/assets/keeploop-figure.gif` / `.mp4` / `.png`, a one-page
+  technical note, "A Commit Law for Noisy Evaluations", in a dark paper style (abstract,
+  naive vs keeploop loop, Algorithm 1, a real run drawn cycle by cycle, the 25-seed table
+  with its price, the keep bar on a number line) with a highlight that walks through it,
+  3:4 for X. Rendered by
+  `tools/render_figure.py` from `docs/proof/proof.json` and `docs/assets/demo-run/`
+  (build-time only: Playwright's Chromium, ffmpeg, Pillow); no number is typed into
+  the template.
+
 ### Changed
 
-- README (en, vi, zh-CN): the new demo, the proof-run numbers and their trade-off at
-  the top.
+- README (en, vi, zh-CN): the hero figure, the proof-run numbers and their trade-off at
+  the top; the terminal demo is linked from the caption.
 - The version badge in the three READMEs reads PyPI and links to
   <https://pypi.org/project/keeploop/>, so it no longer needs a hand edit per
   release; the test now checks the PyPI badge instead of a version string.
