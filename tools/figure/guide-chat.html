@@ -476,7 +476,7 @@ function fx(e, lt) {
   } else if (f === "type") {
     const txt = e.dataset.text, d = +(e.dataset.dur || Math.max(0.3, txt.length / 28));
     const k = clamp((lt - at) / d), n = lt < at ? 0 : Math.round(k * txt.length);
-    const caret = lt >= at && (k < 1 || Math.floor(lt * 4) % 2 === 0);
+    const caret = lt >= at && lt < at + d + 0.5;
     e.innerHTML = esc(txt.slice(0, n)) + (caret ? '<span class="caret"></span>' : "") + `<span class="ghost">${esc(txt.slice(n))}</span>`;
   } else if (f === "compose") {
     const txt = e.dataset.text, a = +e.dataset.at, snd = +e.dataset.send;
@@ -496,7 +496,7 @@ function render(t) {
     sc.style.visibility = on ? "visible" : "hidden";
     if (!on) return;
     const last = i === scenes.length - 1;
-    const out = last ? 1 : clamp((DUR[i] - lt) / 0.35);
+    const out = last ? 1 : clamp((DUR[i] - lt) / 0.3);
     sc.style.opacity = out;
     sc.style.transform = `translateY(${(1 - ease(out)) * -14}px)`;
     sc.anims.forEach(e => fx(e, lt));

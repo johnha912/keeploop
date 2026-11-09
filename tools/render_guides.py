@@ -32,7 +32,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 FIG = REPO / "tools" / "figure"
 PAGES = {"chat": "guide-chat.html", "code": "guide-code.html"}
-POSTER_AT = {"chat": 23.0, "code": 18.5}  # seconds: a busy, finished frame of a middle step
+POSTER_AT = {"chat": 22.5, "code": 21.0}  # seconds: a busy, finished frame of a middle step
 
 DRIVER = r"""
 const { chromium } = require('playwright');
@@ -128,10 +128,11 @@ def encode(name: str, tmp: Path, out: Path, fps: int, total: float) -> None:
                     "-movflags", "+faststart", str(mp4)], check=True)
     poster = tmp / f"f{round(POSTER_AT[name] * fps):05d}.png"
     shutil.copyfile(poster, png)
-    # the GIF: 1280 wide, 12 fps, one shared palette; the flat light design keeps it small
-    for gfps, colors in ((12, 96), (10, 64), (8, 48)):
+    # the GIF: 1280 wide, one shared palette, no dither; area scaling adds no ringing, which
+    # keeps the palette small. Take the smoothest setting that stays under 4 MB.
+    for gfps, colors in ((12, 64), (12, 48), (10, 48), (8, 48)):
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", pat,
-                        "-vf", f"fps={gfps},scale=1280:-1:flags=lanczos,split[a][b];"
+                        "-vf", f"fps={gfps},scale=1280:-1:flags=area,split[a][b];"
                         f"[a]palettegen=max_colors={colors}:stats_mode=full[p];"
                         "[b][p]paletteuse=dither=none:diff_mode=rectangle",
                         "-loop", "0", str(gif)], check=True)

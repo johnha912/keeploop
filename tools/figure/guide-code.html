@@ -30,7 +30,7 @@ h1 > span { display: block; }
 .tag { font: 700 17px var(--mono); letter-spacing: 2px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--panel); color: var(--ink); }
 .tag::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--keep); margin-right: 10px; vertical-align: 1px; }
 .src { position: absolute; left: 96px; top: 872px; width: 760px; font: 500 19px/1.45 var(--mono); color: var(--muted); }
-.sm h1 { font-size: 68px; letter-spacing: -2.2px; }
+.left h1 { font-size: 68px; letter-spacing: -2.2px; }
 
 .stage { position: absolute; left: 900px; top: 150px; width: 924px; height: 770px; }
 .win { position: absolute; left: 0; right: 0; background: var(--panel); border: 1.5px solid var(--ink); border-radius: 22px;
@@ -260,7 +260,7 @@ h1 > span { display: block; }
     <div class="tags"><span class="tag">ASKS FIRST</span><span class="tag">FEWER TOKENS</span></div>
   </div>
   <div class="stage">
-    <div class="win card" style="top:0;height:500px">
+    <div class="win card" style="top:0;height:532px">
       <div class="bar"><span class="d"><i></i><i></i><i></i></span>first time in your project</div>
       <div class="msgs" style="gap:14px;padding-top:18px">
         <div class="msg ai" style="max-width:92%" data-fx="ai" data-at="0.8"><div class="who">CEO</div><div class="tdots"><i></i><i></i><i></i></div>
@@ -273,7 +273,7 @@ h1 > span { display: block; }
           <div class="bub" style="font-size:25px">Here is an <b>evaluate.py</b>: it prints one number, higher is better. OK to use it?</div></div>
       </div>
     </div>
-    <div class="term" style="top:530px" data-fx="up" data-at="3.2">
+    <div class="term" style="top:560px" data-fx="up" data-at="3.2">
       <div class="bar"><span class="d"><i></i><i></i><i></i></span>~/my-repo-keeploop</div>
       <div class="tb">
         <div class="ln"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="3.4" data-text="kl doctor"></span></div>
@@ -291,7 +291,7 @@ h1 > span { display: block; }
     <div class="body">Spend where a mistake is expensive, save where it is cheap. The auditor is called only when the number beats the bar.</div>
     <div class="tags"><span class="tag">FEWER TOKENS</span><span class="tag">RIGHT TEAM</span></div>
   </div>
-  <div class="src">team.yaml: roles analyst, engineer, auditor, each with its own vendor and model. Cost routing there is guidance: nothing is switched for you.</div>
+  <div class="src">Cost routing in team.yaml is guidance only.</div>
   <div class="stage">
     <div class="ceo" data-fx="deal" data-at="0.3" data-rot="0">
       <div class="job">LEAD<b>CEO</b></div>
@@ -325,7 +325,7 @@ h1 > span { display: block; }
     <div class="tags"><span class="tag">FAST</span><span class="tag">EASY</span></div>
   </div>
   <div class="stage">
-    <div class="term card" style="top:0;height:520px">
+    <div class="term card" style="top:0">
       <div class="bar"><span class="d"><i></i><i></i><i></i></span>~/my-repo-keeploop · your AI runs these</div>
       <div class="tb" style="padding-top:22px">
         <div class="ln"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="0.6" data-text="kl next"></span></div>
@@ -337,7 +337,7 @@ h1 > span { display: block; }
         <div class="flow" style="margin-top:12px" data-fx="up" data-at="3.15"><span class="out k">KEPT</span><span class="ar">a commit</span><span class="ar" style="margin:0 8px">or</span><span class="out x">DISCARDED</span><span class="ar">reset to the best</span></div>
       </div>
     </div>
-    <div class="panel2" style="top:552px;padding:20px 28px" data-fx="up" data-at="3.4">
+    <div class="panel2" style="top:428px;padding:20px 28px" data-fx="up" data-at="3.4">
       <div class="ph2">In Claude Code</div>
       <div style="display:flex;align-items:center;gap:20px;margin-top:12px">
         <span style="font:700 30px var(--mono);background:var(--ink);color:#fff;border-radius:14px;padding:10px 20px"><span data-fx="type" data-at="3.6" data-text="/keeploop 3"></span></span>
@@ -461,7 +461,7 @@ function fx(e, lt) {
   } else if (f === "type") {
     const txt = e.dataset.text, d = +(e.dataset.dur || Math.max(0.3, txt.length / 28));
     const k = clamp((lt - at) / d), n = lt < at ? 0 : Math.round(k * txt.length);
-    const caret = lt >= at && (k < 1 || Math.floor(lt * 4) % 2 === 0);
+    const caret = lt >= at && lt < at + d + 0.5;
     e.innerHTML = esc(txt.slice(0, n)) + (caret ? '<span class="caret"></span>' : "") + `<span class="ghost">${esc(txt.slice(n))}</span>`;
   } else if (f === "compose") {
     const txt = e.dataset.text, a = +e.dataset.at, snd = +e.dataset.send;
@@ -481,7 +481,7 @@ function render(t) {
     sc.style.visibility = on ? "visible" : "hidden";
     if (!on) return;
     const last = i === scenes.length - 1;
-    const out = last ? 1 : clamp((DUR[i] - lt) / 0.35);
+    const out = last ? 1 : clamp((DUR[i] - lt) / 0.3);
     sc.style.opacity = out;
     sc.style.transform = `translateY(${(1 - ease(out)) * -14}px)`;
     sc.anims.forEach(e => fx(e, lt));
