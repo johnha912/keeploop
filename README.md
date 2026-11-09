@@ -48,9 +48,9 @@ in the current conversation:
   <a href="docs/GUIDE.md">Full guide</a>
 </p>
 
-<p align="center"><img src="docs/assets/keeploop-figure.gif" alt="keeploop as a one-page technical note, A Commit Law for Noisy Evaluations: an abstract; Fig. 1, a naive keep-if-better loop next to keeploop's loop with its keep bar best + 2σ, re-run and Auditor; Algorithm 1, one cycle; Fig. 2, a real run on examples/noisy-eval drawn cycle by cycle, where cycle 7 scores 0.755 against a best of 0.754 inside the noise band and is reset, and cycle 8 scores 0.793 with a re-run of 0.786, both above the bar of 0.777, and is committed; Table 1, naive vs keeploop over 25 seeds, 2.76 vs 0.44 changes kept with no true gain and 1.28 vs 2.64 real gains discarded; the price; Fig. 3, the keep bar on a number line; takeaway: a gain inside the noise is not a gain." width="720"></p>
+<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="The keep gate, animated: a number line with the best score, a yellow noise band up to the bar at best + 2σ, and three real changes from the noisy-eval run. Cycle 7 scores 0.755 against a best of 0.754, inside the band, and is reset. Cycle 8 scores 0.793 and 0.786 on a re-run, both past the bar of 0.777, and is committed; the best moves to 0.786 and the bar to 0.809. Cycle 14 scores 0.795, more than cycle 8 did, but inside the new band, and is reset." width="860"></p>
 
-<p align="center"><sub>Every number is read from <a href="docs/proof/proof.json">docs/proof/proof.json</a> and <a href="docs/assets/demo-run">docs/assets/demo-run</a> by <code>python tools/render_figure.py</code>. The terminal version of the same run: <a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>.</sub></p>
+<p align="center"><sub>Real changes from <a href="examples/noisy-eval">examples/noisy-eval</a> (seed 2); every number is read from <a href="docs/proof/proof.json">docs/proof</a> by <code>python tools/render_figure.py</code>. The 48-second talk: <a href="docs/assets/keeploop-talk.mp4">keeploop-talk.mp4</a>. The terminal version: <a href="docs/assets/keeploop-demo.gif">keeploop-demo.gif</a>.</sub></p>
 
 AI agents are good at sounding sure. keeploop makes them prove it.
 
