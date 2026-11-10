@@ -196,7 +196,7 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `fused` | false | yes (`run.py`) | One Engineer call writes the card (labelled lines in its reply) and implements it; no Analyst call. The card is parsed and checked before the evaluation; a missing or vague card is a crash and the edit is reset; a duplicate is dropped before the evaluation; a heavy card still goes to the critic |
 | `auto_cards` | false | yes (`run.py`) | The next untested `program.md` hypothesis becomes the card with no Analyst call (CHANGE "the smallest change that tests it", REJECT IF "the metric does not beat the keep bar"); a line naming a heavy file gets `TIER: heavy`; lines over 300 characters go to the Analyst |
 | `eval_stderr_handle` | false | yes (`run.py`) | A cut stderr excerpt ends with the path of `.keeploop/scorer_notes.json` (the full text) |
-| `confirm_skip_z` | 0 (off) | yes (`run.py`) | Skip the confirm re-run of a light change whose gain is at least this many times a 95% upper bound on sigma (sigma > 0; must exceed `noise_z`). The added false-keep chance is below 0.22% at 3 baseline runs (argued in `run.py`). Not part of `profile: fast` |
+| `confirm_skip_z` | 0 (off) | yes (`run.py`) | Skip the confirm re-run of a light change whose gain is at least this many times a 95% upper bound on sigma (sigma > 0; must exceed `noise_z`). The added false-keep chance is below 0.04% at the default 5 baseline runs, 0.22% at 3 (argued in `run.py`). Not part of `profile: fast` |
 | `eval_cache` | false | yes (`run.py`) | Reuse a score when the workspace files (git tree), `evaluate.py` and `eval_cmd` are identical to an earlier evaluation; only when sigma is 0, never for the baseline or `holdout.py`. Stored in `.keeploop/eval_cache.json` |
 | `engineer_repairs` | 1 | yes | Extra Engineer calls for a repairable failure |
 | `repo_map_max_chars` | 3000 | yes (`run.py`); `kl map` uses the default | Analyst repo map size |
@@ -204,7 +204,7 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `max_diff_lines` | 400 | yes | Size gate, added+removed lines |
 | `max_consecutive_crashes` | 3 | yes | Crashes in a row that stop a run |
 | `eval_timeout_s` | 120 | no | Evaluation and lesson-check timeout |
-| `noise_runs` | 3 | yes | Baseline evaluations; their pstdev is sigma |
+| `noise_runs` | 5 | yes | Baseline evaluations, once per loop (never per cycle); their pstdev is sigma. Below 2 measures no noise: kl warns at the baseline, in the ledger and in `kl doctor` |
 | `noise_z` | 2.0 | yes | A keep must beat best by `noise_z * sigma` |
 | `metric_max` | none | yes | Top of `evaluate.py`'s scale, if it has one. A keep bar at or above it prints a "baseline at ceiling" warning in `kl begin`, `kl status` and `run.py`; with no value, a best of exactly 1.0 prints a hint |
 | `target` | none | yes | Good enough. When best is at or above it, `kl status` prints `STOP:`, `kl card` refuses a new card and `run.py` stops before the next cycle. Only a human raises it |

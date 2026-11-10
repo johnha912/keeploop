@@ -80,7 +80,7 @@ loop:
   # metric_max: 1.0      # top of evaluate.py's scale: warns when the keep bar is above it
   # target: 0.9          # good enough: once best reaches it, no new card and run.py stops
   # stall_cycles: 5      # this many cycles in a row without a keep: the same brake (0 = off)
-  # noise_runs: 5        # baseline evaluations that measure sigma (default 3; `kl doctor` advises)
+  # noise_runs: 5        # baseline evaluations that measure sigma, once per loop (default 5; `kl doctor` advises)
   # eval_cache: true     # reuse a score for identical files + evaluate.py; only when sigma is 0
   # profile: fast       # fewer AI calls and tokens: the engineer writes the card itself
                          # (fused), program.md hypotheses become cards with no call

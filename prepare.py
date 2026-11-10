@@ -36,7 +36,7 @@ CONFIG = {
     "max_diff_lines": 400,          # added+removed lines per diff (one idea)
     "max_consecutive_crashes": 3,
     "eval_timeout_s": 120,
-    "noise_runs": 3,                # baseline evaluations; their pstdev is sigma
+    "noise_runs": 5,                # baseline evaluations, once per loop; their pstdev is sigma
     "noise_z": 2.0,                 # a keep must beat best by noise_z * sigma
     "metric_max": None,             # top of evaluate.py's scale, if it has one (warns at the ceiling)
     "target": None,                 # good enough: at or above it, no new card and run.py stops
