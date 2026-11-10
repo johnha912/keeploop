@@ -2,6 +2,18 @@
 
 The full manual. The [README](../README.md) is the short version.
 
+## Video guides
+
+Two step-by-step videos, 1920×1080, about 80 seconds each. Click a picture to play.
+
+| Chat app, no code (keeploop-lite) | Coding AI (Claude Code, Codex, Cursor, Copilot, Gemini CLI) |
+|---|---|
+| [![keeploop-lite in a chat app: paste the file, paste your work, agree on better, meet the team, run cycles, save](assets/keeploop-guide-chat.png)](assets/keeploop-guide-chat.mp4) | [![keeploop with a coding AI: paste one prompt, answer 4 questions, set the weight, meet the team, run cycles, share](assets/keeploop-guide-code.png)](assets/keeploop-guide-code.mp4) |
+| [keeploop-guide-chat.mp4](assets/keeploop-guide-chat.mp4) · six steps, with Mai's post from [lite/EXAMPLE.md](../lite/EXAMPLE.md) (illustrative) | [keeploop-guide-code.mp4](assets/keeploop-guide-code.mp4) · six steps, from the README's Quick start, AGENTS.md and team.yaml |
+
+Every quoted line in the videos is checked word for word against its file, and every
+`kl` command against `kl.py`, before a frame is rendered (`tools/render_guides.py`).
+
 ## A cycle, command by command
 
 Needs Python 3.10+ and git.

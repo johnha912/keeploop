@@ -53,7 +53,7 @@ gì trong cuộc trò chuyện hiện tại:
 
 <p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop dưới dạng bảng đội ngũ. Bạn và CEO, tức AI của bạn: nó hỏi điều gì cần tốt hơn, đo bằng gì và điểm bao nhiêu là đủ, rồi đề xuất evaluate.py để bạn duyệt. Nó lập đội: Analyst trên model rẻ, nhanh viết một thẻ giả thuyết; Engineer trên model chính của bạn làm một thay đổi nhỏ; Auditor trên model mạnh nhất đọc diff thật trong ngữ cảnh mới. Thay đổi đi qua evaluate.py và cổng giữ best + 2σ: một cái được giữ và commit, cái sau bị reset kèm bài học. Hai lệnh mỗi chu kỳ, kl next và kl try. Với profile: fast, ít lượt gọi AI và ít token hơn mỗi chu kỳ." width="860"></p>
 
-<p align="center"><sub>Các dòng phiên làm việc là đầu ra thật của <code>kl next</code> / <code>kl try</code> trên bản demo offline (<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>); số đo tốc độ là đo thật (<a href="docs/proof">docs/proof/bench-latency-*.json</a>). Video cho X: <a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>. Hướng dẫn: <a href="docs/assets/keeploop-guide-chat.mp4">AI chat</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI code</a>.</sub></p>
+<p align="center"><sub>Các dòng phiên làm việc là đầu ra thật của <code>kl next</code> / <code>kl try</code> trên bản demo offline (<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>); số đo tốc độ là đo thật (<a href="docs/proof">docs/proof/bench-latency-*.json</a>). Video cho X: <a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>. Hướng dẫn: <a href="docs/GUIDE.md#video-guides">AI chat · AI code</a>.</sub></p>
 
 keeploop biến AI bạn đang dùng thành một đội nhỏ, có một CEO làm việc cùng bạn.
 
@@ -89,6 +89,10 @@ biết từ chối, không cần cài thêm gì, không gửi telemetry và khô
 > Perplexity, Project của Claude) thay vì dán vào mỗi cuộc chat.
 > **AI của bạn chạy được code?** Dùng bản đầy đủ bên dưới.
 
+<p align="center"><img src="docs/assets/keeploop-guide-chat.gif" alt="keeploop-lite trong ứng dụng chat, từng bước: dán file (hoặc lưu một lần làm chỉ dẫn cố định), dán thứ bạn muốn tốt hơn, thống nhất thế nào là tốt hơn thành một bảng điểm khóa lại, gặp đội đặt tên theo nghề của bạn, nói chạy 3 chu kỳ và chỉ bản tốt hơn được giữ, nói lưu để lấy sổ ghi." width="860"></p>
+
+<p align="center"><sub>Từng bước trong ứng dụng chat. Video bản đầy đủ (1080p): <a href="docs/GUIDE.md#video-guides">hướng dẫn chi tiết</a>.</sub></p>
+
 ## Bắt đầu nhanh
 
 **(a) Giao cho AI của bạn.** Nếu AI chạy được lệnh, hãy dán đoạn này vào
@@ -107,6 +111,10 @@ hỏi bằng lời thường "tốt hơn" nghĩa là gì và đo bằng cách n�
 một `evaluate.py` (một script nhỏ in ra con số đó) để bạn duyệt trước khi
 có gì thay đổi. Trong Claude Code, `/keeploop 3` chạy trong bản clone sẽ
 chạy ba chu kỳ.
+
+<p align="center"><img src="docs/assets/keeploop-guide-code.gif" alt="keeploop với AI lập trình, từng bước: dán một prompt, trả lời bốn câu hỏi bằng lời thường và duyệt evaluate.py, CEO chọn mức nặng nhẹ (light, fast hoặc rigorous), chia đội với một model cho mỗi vai, chạy hai lệnh mỗi chu kỳ (kl next, kl try) và chia sẻ kết quả bằng kl report." width="860"></p>
+
+<p align="center"><sub>Từng bước với AI lập trình. Video bản đầy đủ (1080p): <a href="docs/GUIDE.md#video-guides">hướng dẫn chi tiết</a>.</sub></p>
 
 <details>
 <summary><b>Ứng dụng chat không chạy được lệnh (ứng dụng ChatGPT, Gemini)</b></summary>
