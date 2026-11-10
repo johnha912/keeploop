@@ -238,9 +238,10 @@ class TestFused(Project):
         self.assertIn("duplicate of cycle 1", dup["desc"])
         self.assertIn("fused edit dropped before evaluation", dup["desc"])
         self.assertEqual(dup["metric"], "")
-        # 3 baseline runs + cycle 1 + cycle 3: the duplicate's sgd edit was never scored
-        self.assertEqual(len(seen), 5)
-        self.assertEqual([c["optimizer"] for c in seen[3:]], ["sgd", "adam"])
+        # the baseline runs + cycle 1 + cycle 3: the duplicate's sgd edit was never scored
+        nb = prepare.CONFIG["noise_runs"]
+        self.assertEqual(len(seen), nb + 2)
+        self.assertEqual([c["optimizer"] for c in seen[nb:]], ["sgd", "adam"])
         self.assertEqual(self.config()["optimizer"], "adam")  # and it was reset
         self.assertEqual(self.config()["batch_size"], 64)
 
@@ -387,14 +388,14 @@ class TestConfirmSkip(Project):
 
     def test_in_the_loop(self):
         # baseline 0.50/0.51/0.49: sigma 0.00816, upper bound 0.0441; 3 * that = 0.132
-        self.loop(confirm_skip_z="3")
+        self.loop(confirm_skip_z="3", noise_runs="3")  # the arithmetic above is for 3 runs
         self.run_loop(1, evals=[0.50, 0.51, 0.49, 0.90])  # +0.40: no re-run
         self.assertEqual(self.rows()[0]["status"], "keep")
         self.assertIn("confirm skipped", self.rows()[0]["desc"])
         self.assertNotIn("confirm_metric", self.hyps()[0])
 
     def test_small_gain_still_confirms(self):
-        self.loop(confirm_skip_z="3")
+        self.loop(confirm_skip_z="3", noise_runs="3")
         self.run_loop(1, evals=[0.50, 0.51, 0.49, 0.60, 0.59])  # +0.10 < 0.132: re-run
         self.assertEqual(self.rows()[0]["status"], "keep")
         self.assertNotIn("confirm skipped", self.rows()[0]["desc"])

@@ -192,11 +192,11 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `keep_threshold` | 0.0 | yes | Minimum gain relative to `abs(best)` |
 | `confirm_keep` | true | yes | Re-run before a keep when sigma > 0 (heavy always re-runs) |
 | `audit_every_keep` | false | yes (`kl try`) | Every keep needs an Auditor verdict, decisive or not (the headless loop audits every keep anyway). Set by `profile: rigorous` |
-| `profile` | none | yes | `light` (small, reversible work with a deterministic score: the `fast` caps plus `max_iterations: 3`, `stall_cycles: 2`, `noise_runs: 1`, `confirm_keep: false`), `rigorous` (`noise_runs: 5`, `confirm_keep: true`, `audit_every_keep: true`, the full Analyst), or `fast`, which sets `fused: true`, `auto_cards: true`, `repo_map_max_chars: 1200`, `ledger_tail_for_prompt: 3`, `recall_top_k: 4`, `eval_stderr_max_chars: 400`, `eval_stderr_handle: true`. Precedence: defaults, then the profile, then explicit `loop:` keys. An unknown name is a startup error |
+| `profile` | none | yes | `light` (small, reversible work: the `fast` caps plus `max_iterations: 3`, `stall_cycles: 2`, `noise_runs: 3`, `confirm_keep: false`; the noise is still measured, so a noisy score keeps its best + 2σ bar), `rigorous` (`noise_runs: 5`, `confirm_keep: true`, `audit_every_keep: true`, the full Analyst), or `fast`, which sets `fused: true`, `auto_cards: true`, `repo_map_max_chars: 1200`, `ledger_tail_for_prompt: 3`, `recall_top_k: 4`, `eval_stderr_max_chars: 400`, `eval_stderr_handle: true`. Precedence: defaults, then the profile, then explicit `loop:` keys. An unknown name is a startup error |
 | `fused` | false | yes (`run.py`) | One Engineer call writes the card (labelled lines in its reply) and implements it; no Analyst call. The card is parsed and checked before the evaluation; a missing or vague card is a crash and the edit is reset; a duplicate is dropped before the evaluation; a heavy card still goes to the critic |
 | `auto_cards` | false | yes (`run.py`) | The next untested `program.md` hypothesis becomes the card with no Analyst call (CHANGE "the smallest change that tests it", REJECT IF "the metric does not beat the keep bar"); a line naming a heavy file gets `TIER: heavy`; lines over 300 characters go to the Analyst |
 | `eval_stderr_handle` | false | yes (`run.py`) | A cut stderr excerpt ends with the path of `.keeploop/scorer_notes.json` (the full text) |
-| `confirm_skip_z` | 0 (off) | yes (`run.py`) | Skip the confirm re-run of a light change whose gain is at least this many times a 95% upper bound on sigma (sigma > 0; must exceed `noise_z`). The added false-keep chance is below 0.22% at 3 baseline runs (argued in `run.py`). Not part of `profile: fast` |
+| `confirm_skip_z` | 0 (off) | yes (`run.py`) | Skip the confirm re-run of a light change whose gain is at least this many times a 95% upper bound on sigma (sigma > 0; must exceed `noise_z`). The added false-keep chance is below 0.04% at the default 5 baseline runs, 0.22% at 3 (argued in `run.py`). Not part of `profile: fast` |
 | `eval_cache` | false | yes (`run.py`) | Reuse a score when the workspace files (git tree), `evaluate.py` and `eval_cmd` are identical to an earlier evaluation; only when sigma is 0, never for the baseline or `holdout.py`. Stored in `.keeploop/eval_cache.json` |
 | `engineer_repairs` | 1 | yes | Extra Engineer calls for a repairable failure |
 | `repo_map_max_chars` | 3000 | yes (`run.py`); `kl map` uses the default | Analyst repo map size |
@@ -204,7 +204,7 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `max_diff_lines` | 400 | yes | Size gate, added+removed lines |
 | `max_consecutive_crashes` | 3 | yes | Crashes in a row that stop a run |
 | `eval_timeout_s` | 120 | no | Evaluation and lesson-check timeout |
-| `noise_runs` | 3 | yes | Baseline evaluations; their pstdev is sigma |
+| `noise_runs` | 5 | yes | Baseline evaluations, once per loop (never per cycle); their pstdev is sigma. Below 2 measures no noise: kl warns at the baseline, in the ledger and in `kl doctor` |
 | `noise_z` | 2.0 | yes | A keep must beat best by `noise_z * sigma` |
 | `metric_max` | none | yes | Top of `evaluate.py`'s scale, if it has one. A keep bar at or above it prints a "baseline at ceiling" warning in `kl begin`, `kl status` and `run.py`; with no value, a best of exactly 1.0 prints a hint |
 | `target` | none | yes | Good enough. When best is at or above it, `kl status` prints `STOP:`, `kl card` refuses a new card and `run.py` stops before the next cycle. Only a human raises it |
@@ -393,7 +393,9 @@ the Engineer only, and appends `<model_flag> <model>` when a model is set.
 | `codex-cli` | `codex exec` | `--full-auto` | `OPENAI_`, `CODEX_` |
 | `gemini-cli` | `gemini` | `--approval-mode auto_edit` | `GEMINI_`, `GOOGLE_`, `GOOGLE_GENAI_` |
 
-`api:*` names raise `VendorUnavailable` (not implemented in 0.1).
+`api:*` names raise `VendorUnavailable`: there are no built-in hosted-API
+vendors. A hosted API can serve a role through a CLI declared as a generic
+vendor (below).
 
 **Generic CLI vendor.** Any CLI can serve a role from `team.yaml`, no code
 change:
