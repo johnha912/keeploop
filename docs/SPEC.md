@@ -539,7 +539,7 @@ filler slop patterns).
 - `python run.py --mock --iterations 5` exits 0 offline with keeps at cycles
   1, 2, 5, a discard at 3, a crash with lesson L-001 at 4, best metric 1.0
   (verdicts supported, supported, rejected, untested, supported).
-- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 263 tests).
+- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 264 tests).
 - `python scout.py --dry-run` exits 0 online and offline (manual check, no
   test).
 - `CHANGELOG.md` has a section for `prepare.__version__` (checked by
