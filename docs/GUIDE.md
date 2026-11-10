@@ -63,7 +63,7 @@ like on the toy demo config:
 
 ```text
 $ python kl.py begin
-kl: baseline metric = 0.828178  sigma = 0.000000 (3 runs)  holdout baseline recorded
+kl: baseline metric = 0.828178  sigma = 0.000000 (5 runs)  holdout baseline recorded
 $ python kl.py recall "learning rate"
 nothing in memory matches; it is new
 $ python kl.py card card.txt
@@ -98,7 +98,7 @@ python run.py --mock --iterations 5
 ```
 
 ```text
-run: baseline metric = 0.828178  sigma = 0.000000 (3 runs)  holdout baseline recorded
+run: baseline metric = 0.828178  sigma = 0.000000 (5 runs)  holdout baseline recorded
 cycle 1: keep  metric=0.942  best=0.942000  tokens=3501
 cycle 2: keep  metric=0.992  best=0.992000  tokens=3568
 cycle 3: discard  metric=0.942  best=0.992000  tokens=2820
@@ -191,8 +191,9 @@ flowchart LR
    change when the evaluation has no noise), an approval, no rubric
    regression and every lesson check passing. Anything else is reset.
 
-Before the first cycle the loop runs the evaluation three times to measure
-its noise (σ), and a keep must clear `2σ`. If a `holdout.py` exists, it
+Before the first cycle the loop runs the evaluation five times
+(`loop.noise_runs`, once per loop, never per cycle) to measure its noise
+(σ), and a keep must clear `2σ`. If a `holdout.py` exists, it
 is scored once before and once after the run; the agents never see it, and
 a holdout gain far below the eval gain prints a warning that the keeps may
 be fitting the evaluation rather than the problem.

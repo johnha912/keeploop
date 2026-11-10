@@ -21,6 +21,53 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-10
+
+### Fixed
+
+A patch release: five findings from an external review of 0.3.0, each reproduced on
+`69c3fcc` before it was fixed. No new features; `evaluate.py`, `team.yaml` semantics and
+the `results.tsv` / `lessons.jsonl` formats are unchanged.
+
+- **The fence now covers a git worktree's real git dir** (security). In a worktree, the
+  setup AGENTS.md recommends, `<workspace>/.git` is a pointer file. The fence hashed
+  `<workspace>/.git/config`, `hooks/` and `info/`, which do not exist there, so a
+  change to the main repository's shared `.git/config` (a `core.hooksPath`, an alias)
+  or a new hook went undetected. They are now read where git reads them: the common git
+  dir (`git rev-parse --git-common-dir`) and the worktree's own git dir, from git's
+  pointer files, without running git. A plain-repo workspace keeps the same fence
+  entries. **Upgrading:** a worktree loop sealed by 0.3.0 asks once for
+  `kl begin --accept-changes` (its fence gains the `<git-common>/` entries).
+- **`profile: light` measures the noise.** It ran one baseline evaluation, so sigma was
+  0 and the keep bar was the best itself, with nothing checking that the score is
+  deterministic; on a noisy `evaluate.py` a lucky run was kept. Light now takes 3
+  baseline runs (still at most 3 cycles, stop after 2 without a keep, no re-run). A
+  deterministic score still gets sigma 0; a noisy one keeps its best + 2σ bar.
+- **An unmeasured sigma is never silent.** With an explicit `loop.noise_runs: 1`, the
+  baseline prints a loud warning, the ledger's baseline row says so (in its free-text
+  description; the columns are unchanged), `best.json` records the run count, and
+  `kl level` repeats it. `kl doctor` flags an existing loop whose baseline came from one
+  run, or whose sigma-0 baseline now sits over a noisy score.
+- **No version promises in shipped text.** The `api:*` refusal, the `team.yaml`
+  template, the `vendors.py` docstring and docs/SPEC.md said the API vendors "land in
+  v0.2". They now say what works: `claude-cli`, `codex-cli`, `gemini-cli`, any CLI
+  declared under `vendors:` (a hosted API can be reached through one), or `mock`. A
+  test keeps shipped text free of such promises.
+
+### Changed
+
+- **Default `loop.noise_runs` is 5, was 3.** `kl doctor` itself warned that a 3-run sigma
+  swings widely (docs/proof/sweep.tsv: 0.0017 to 0.026 for a true sigma of about
+  0.014). The cost is **2 more baseline evaluations, once per loop setup, never per
+  cycle**: `noise_runs` drives evaluations only in the baseline (`run.take_baseline`);
+  elsewhere it is arithmetic (`sigma_upper`) or text. `examples/noisy-eval` pins
+  `noise_runs: 3`, so the proof run reproduces as before.
+- Per-cycle cost (`tools/bench_cycle.py`, mock demo, median of 7 reps x 6 cycles): tokens
+  and AI calls per cycle are identical to 0.3.0 (3390.8 tokens; 1.0 / 1.167 / 0.5
+  calls); wall time is within run-to-run noise (+2.2% and -0.6% in two interleaved
+  0.3.0 / 0.3.1 pairs).
+- CI tests Python 3.13 as well (3.10 to 3.13, `requires-python >=3.10`).
+
 ## [0.3.0] - 2026-11-10
 
 ### Added

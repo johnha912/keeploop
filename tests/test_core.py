@@ -28,7 +28,7 @@ import rubric  # noqa: E402
 import scout  # noqa: E402
 import run as run_mod  # noqa: E402
 import vendors  # noqa: E402
-from prepare import CONTROL_RX, INITIAL_WORKSPACE, load_team  # noqa: E402
+from prepare import CONFIG, CONTROL_RX, INITIAL_WORKSPACE, load_team  # noqa: E402
 
 FAIL = [sys.executable, "-c", "import sys; sys.exit(1)"]
 PASS = [sys.executable, "-c", "import sys; sys.exit(0)"]
@@ -923,7 +923,8 @@ class TestNoise(unittest.TestCase):
             rc, work = run_with(vendors.MockVendor, tmp, 0, before=noisy)
             best = json.loads((work / ".keeploop" / "best.json").read_text())
             self.assertGreater(best["sigma"], 0)
-            self.assertRegex(run_with.out, r"sigma = 0\.0\d+ \(3 runs\)")
+            self.assertRegex(run_with.out, rf"sigma = 0\.0\d+ \({CONFIG['noise_runs']} runs\)")
+            self.assertEqual(CONFIG["noise_runs"], 5)  # the default since 0.3.1
         with tempfile.TemporaryDirectory() as tmp:
             rc, work = run_with(vendors.MockVendor, tmp, 0)
             self.assertEqual(json.loads((work / ".keeploop" / "best.json").read_text())["sigma"], 0)
@@ -1108,7 +1109,7 @@ class TestConfirmAndTier(unittest.TestCase):
 
     def test_light_deterministic_change_skips_the_confirm_run(self):
         n, rows = self.evals()
-        self.assertEqual(n, 3 + 1)  # three baseline runs, one cycle, no confirm
+        self.assertEqual(n, CONFIG["noise_runs"] + 1)  # the baseline runs, one cycle, no confirm
         self.assertIn("tier: light", rows[1]["description"])
 
     def test_noise_forces_the_confirm_run(self):
@@ -1117,11 +1118,11 @@ class TestConfirmAndTier(unittest.TestCase):
 
     def test_heavy_by_glob_and_by_size_always_confirms(self):
         n, rows = self.evals(before=edit_team("workspace:", "heavy: config.json\nworkspace:"))
-        self.assertEqual(n, 3 + 2)
+        self.assertEqual(n, CONFIG["noise_runs"] + 2)
         self.assertIn("tier: heavy", rows[1]["description"])
         n, rows = self.evals(before=edit_team("  max_iterations: 20",
                                               "  max_iterations: 20\n  heavy_diff_lines: 1"))
-        self.assertEqual(n, 3 + 2)
+        self.assertEqual(n, CONFIG["noise_runs"] + 2)
         self.assertIn("tier: heavy", rows[1]["description"])
 
     def test_tier_globs(self):

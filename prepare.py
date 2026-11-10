@@ -19,7 +19,7 @@ import json
 import subprocess
 from pathlib import Path
 
-__version__ = "0.3.0"  # the single source; pyproject reads it, see CHANGELOG.md
+__version__ = "0.3.1"  # the single source; pyproject reads it, see CHANGELOG.md
 
 ROOT = Path(__file__).resolve().parent
 STATE_DIR = ROOT / ".keeploop"
@@ -36,7 +36,7 @@ CONFIG = {
     "max_diff_lines": 400,          # added+removed lines per diff (one idea)
     "max_consecutive_crashes": 3,
     "eval_timeout_s": 120,
-    "noise_runs": 3,                # baseline evaluations; their pstdev is sigma
+    "noise_runs": 5,                # baseline evaluations, once per loop; their pstdev is sigma
     "noise_z": 2.0,                 # a keep must beat best by noise_z * sigma
     "metric_max": None,             # top of evaluate.py's scale, if it has one (warns at the ceiling)
     "target": None,                 # good enough: at or above it, no new card and run.py stops
@@ -84,9 +84,11 @@ _LEAN = {
     "eval_stderr_handle": True,
 }
 PROFILES = {
-    # small, reversible work with a deterministic score (a draft, a script, a config):
-    # few cycles, stop early, no noise measurement (one baseline run; sigma is 0)
-    "light": {**_LEAN, "max_iterations": 3, "stall_cycles": 2, "noise_runs": 1, "confirm_keep": False},
+    # small, reversible work (a draft, a script, a config): few cycles, stop early, no
+    # re-run before a keep. The noise is still measured (3 baseline runs, once per loop):
+    # a deterministic score gets sigma 0 and the bar is the best, as before, but a noisy
+    # one keeps its best + 2 sigma bar instead of being kept on a lucky run.
+    "light": {**_LEAN, "max_iterations": 3, "stall_cycles": 2, "noise_runs": 3, "confirm_keep": False},
     "fast": {
         "fused": True,
         "auto_cards": True,

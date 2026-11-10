@@ -1,9 +1,10 @@
 """vendors.py — one interface, every AI vendor.
 
 The team's roles are routed to vendors in team.yaml. A vendor is anything
-that can take a prompt and return text: a hosted API (v0.2), a local CLI
-(`claude`, `codex`, `gemini`), or the built-in deterministic MockVendor
-used by the demo and the tests.
+that can take a prompt and return text: a local CLI (`claude`, `codex`,
+`gemini`), any other CLI declared under `vendors:` in team.yaml (a hosted API
+can be reached through one), or the built-in deterministic MockVendor used by
+the demo and the tests. There are no built-in hosted-API vendors.
 
 Contract (docs/SPEC.md §5):
 - `available()` says whether the vendor can be called at all.
@@ -380,5 +381,6 @@ def get_vendor(name: str, *, timeout_s: int = 240, model: str | None = None,
         return CliVendor(name, *CLI_VENDORS[name], timeout_s, ENV_KEEP.get(name, ()), model)
     if name.startswith("api:"):
         raise VendorUnavailable(
-            f"{name}: API vendors land in v0.2 — use a CLI vendor or mock for now")
+            f"{name}: keeploop has no built-in API vendors; use claude-cli, codex-cli, gemini-cli, "
+            "a CLI declared under `vendors:` in team.yaml (docs/SPEC.md), or mock")
     raise VendorUnavailable(f"unknown vendor: {name!r}")
