@@ -393,7 +393,9 @@ the Engineer only, and appends `<model_flag> <model>` when a model is set.
 | `codex-cli` | `codex exec` | `--full-auto` | `OPENAI_`, `CODEX_` |
 | `gemini-cli` | `gemini` | `--approval-mode auto_edit` | `GEMINI_`, `GOOGLE_`, `GOOGLE_GENAI_` |
 
-`api:*` names raise `VendorUnavailable` (not implemented in 0.1).
+`api:*` names raise `VendorUnavailable`: there are no built-in hosted-API
+vendors. A hosted API can serve a role through a CLI declared as a generic
+vendor (below).
 
 **Generic CLI vendor.** Any CLI can serve a role from `team.yaml`, no code
 change:

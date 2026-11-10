@@ -1,8 +1,10 @@
 # team.yaml — the one config file you edit.
 # Roles -> vendors -> budgets. Vendor names: mock, claude-cli, codex-cli,
-# gemini-cli (api:* lands in v0.2). The auditor must not be the vendor that
-# engineered the change; if both name the same vendor, the loop runs the
-# audit in a fresh context and flags the verdict (see docs/SPEC.md).
+# gemini-cli, or any CLI you declare under `vendors:` below (there are no
+# built-in api:* vendors; a hosted API can be reached through a CLI). The
+# auditor must not be the vendor that engineered the change; if both name the
+# same vendor, the loop runs the audit in a fresh context and flags the
+# verdict (see docs/SPEC.md).
 
 pack: software
 
