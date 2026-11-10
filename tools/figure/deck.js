@@ -13,24 +13,27 @@
    Pacing is computed, not hand-tuned: inside a step every cue is PACE.at times its
    data-at, every motion PACE.dur times its base length, and a step holds until its
    headline and text can be read at PACE.wps words a second, and at least PACE.hold
-   seconds after its last motion. A page calls DECK.start({ steps: [...] }) and gets window.render(t) and
-   window.TOTAL. Discrete states (a class, a swapped label, a caret, the progress line) are
+   seconds after its last motion. A page calls DECK.start({ steps, poster, height?, pace? }) and
+   gets window.render(t) and window.TOTAL; a page of another frame size sets height (one
+   step) and its own --deck-mask. Discrete states (a class, a swapped label, a caret, the progress line) are
    set from t after the seek, without callbacks. */
 (function () {
   gsap.registerPlugin(ScrollToPlugin, SplitText, TextPlugin, DrawSVGPlugin, Flip);
   const PACE = { at: 1.4, dur: 1.3, cps: 18, wps: 4.2, hold: 2.4, scroll: 1.1, end: 3.5 };
-  const H = 1080;
   const A = s => +s * PACE.at, M = s => s * PACE.dur;
   const clamp = k => Math.max(0, Math.min(1, k));
   const words = e => (e.textContent.match(/\S+/g) || []).length;
 
   function start(cfg) {
+    // a page may set its own step height and pace (the X cut is square and brisker)
+    const H = cfg.height || 1080;
+    Object.assign(PACE, cfg.pace || {});
     const STEPS = cfg.steps, NSTEP = STEPS.length;
     const css = document.createElement("style");
     css.textContent = `
       #view { position: absolute; inset: 0; overflow: hidden;
-        -webkit-mask-image: linear-gradient(to bottom, transparent 108px, #000 146px, #000 936px, transparent 972px);
-                mask-image: linear-gradient(to bottom, transparent 108px, #000 146px, #000 936px, transparent 972px); }
+        -webkit-mask-image: var(--deck-mask, linear-gradient(to bottom, transparent 108px, #000 146px, #000 936px, transparent 972px));
+                mask-image: var(--deck-mask, linear-gradient(to bottom, transparent 108px, #000 146px, #000 936px, transparent 972px)); }
       #reel { position: relative; width: 100%; }
       .top, .prog { z-index: 2; }
       .hl { background-repeat: no-repeat; background-size: 100% 100%; }`;
