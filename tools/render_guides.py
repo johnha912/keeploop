@@ -15,6 +15,8 @@ fetches it once into a cache outside the repo, and nothing of it is committed.
 - x-cli: tools/figure/x-cli.html -> keeploop-x-cli.mp4 / .png, square 1080x1080 for X:
   the coding-AI path in about 40 s. Its measured numbers are filled in from
   docs/proof/bench-latency-*.json (the page has a __DATA__ slot); none is typed in.
+- x-lite: tools/figure/x-lite.html -> keeploop-x-lite.mp4 / .png, the same square cut for
+  chat apps (keeploop-lite), with Mai's post from lite/EXAMPLE.md (illustrative).
 
 Each page exposes window.render(t), a pure function of time, window.TOTAL (seconds) and
 window.POSTER (the time of the still written as the .png).
@@ -37,11 +39,12 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 FIG = REPO / "tools" / "figure"
-PAGES = {"chat": "guide-chat.html", "code": "guide-code.html", "x-cli": "x-cli.html"}
-SIZE = {"chat": (1920, 1080), "code": (1920, 1080), "x-cli": (1080, 1080)}
-STEM = {"chat": "keeploop-guide-chat", "code": "keeploop-guide-code", "x-cli": "keeploop-x-cli"}
-GIF = {"chat", "code"}  # the X cut is posted as a video only
-FROM = {"x-cli": 0.9}    # seconds trimmed off the start: X shows the first frame before play
+PAGES = {"chat": "guide-chat.html", "code": "guide-code.html", "x-cli": "x-cli.html", "x-lite": "x-lite.html"}
+SIZE = {"chat": (1920, 1080), "code": (1920, 1080), "x-cli": (1080, 1080), "x-lite": (1080, 1080)}
+STEM = {"chat": "keeploop-guide-chat", "code": "keeploop-guide-code", "x-cli": "keeploop-x-cli",
+        "x-lite": "keeploop-x-lite"}
+GIF = {"chat", "code"}  # the X cuts are posted as videos only
+FROM = {"x-cli": 0.9, "x-lite": 0.9}  # seconds trimmed off the start: X shows the first frame before play
 GSAP = "3.15.1"  # build-time only, under GSAP's standard no-charge license
 GSAP_FILES = ("gsap", "ScrollToPlugin", "SplitText", "TextPlugin", "DrawSVGPlugin", "Flip")
 
