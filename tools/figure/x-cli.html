@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>keeploop for X: the coding-AI path</title>
+<!-- The X cut: keeploop with a coding AI (Claude Code, Codex, Cursor, Copilot, Gemini CLI)
+     in about 40 s, square 1080x1080 so the feed shows it whole on a phone and a desktop.
+     The words are on screen because most people watch with the sound off. It runs on
+     the GSAP engine in deck.js, briskly paced, and tools/render_guides.py screenshots
+     render(t). Build-time only.
+     Facts: the prompt is README.md's Quick start (a); the session lines are the real
+     output in docs/assets/demo-run/fastpath.txt (an element with data-src is checked
+     against its file, word for word, before a frame is rendered); every `kl` command
+     shown (class "kl") is checked against kl.py; the speed numbers are filled in from
+     docs/proof/bench-latency-*.json through the __DATA__ slot, none is typed here. -->
+<link rel="stylesheet" href="kl.css">
+<style>
+body { width: 1080px; height: 1080px; }
+:root { --title: "Inter Display", Inter, "Liberation Sans", sans-serif; --mono: "JetBrains Mono", monospace;
+  --deck-mask: linear-gradient(to bottom, transparent 96px, #000 116px, #000 1018px, transparent 1030px); }
+.top { position: absolute; left: 64px; right: 64px; top: 40px; height: 40px; display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand .kick { font-size: 18px; letter-spacing: 3px; color: var(--ink); }
+.brand .kick span { color: var(--muted); }
+.stepno { font: 600 18px var(--mono); letter-spacing: 3px; color: var(--ink2); }
+.stepno b { color: var(--ink); }
+.prog { position: absolute; left: 64px; right: 64px; top: 1044px; display: flex; gap: 10px; }
+.prog .sg { flex: 1; }
+.prog .tr { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.prog .fl { height: 100%; width: 0; background: var(--ink); }
+.prog .lb { display: none; }
+
+.scene { position: absolute; inset: 0; visibility: hidden; }
+.left { position: absolute; left: 64px; top: 128px; width: 952px; }
+h1 { margin: 0; font: 800 76px/1.03 var(--title); letter-spacing: -2.6px; }
+h1 > span { display: block; }
+.hl { background: linear-gradient(transparent 60%, var(--number) 60%, var(--number) 92%, transparent 92%); padding: 0 4px; margin-left: -4px; }
+.body { margin-top: 20px; font: 500 29px/1.4 Inter, sans-serif; color: var(--ink2); }
+.body b { color: var(--ink); font-weight: 700; }
+.body code { font: 600 0.9em var(--mono); color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 1px 8px; }
+.src { position: absolute; left: 64px; top: 994px; width: 952px; font: 500 16px var(--mono); color: var(--muted); }
+
+.stage { position: absolute; left: 64px; top: 474px; width: 952px; height: 506px; }
+.win, .term, .panel { position: absolute; left: 0; right: 0; background: var(--panel); border: 1.5px solid var(--ink); border-radius: 22px;
+  box-shadow: 0 30px 60px -34px rgba(23, 24, 28, .35); overflow: hidden; }
+.win { display: flex; flex-direction: column; }
+.bar { height: 52px; flex: none; border-bottom: 1.5px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 0 22px;
+  font: 600 17px var(--mono); color: var(--ink2); background: #fdfcf9; }
+.bar .d { display: flex; gap: 7px; margin-right: 6px; }
+.bar .d i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line); }
+.msgs { flex: 1; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; }
+.msg { position: relative; max-width: 92%; }
+.msg.you { align-self: flex-end; }
+.who { font: 700 15px var(--mono); letter-spacing: 2px; text-transform: uppercase; color: var(--ink2); margin: 0 0 6px 4px; }
+.msg.you .who { text-align: right; margin-right: 4px; }
+.bub { font: 500 24px/1.38 Inter, sans-serif; padding: 13px 20px; border-radius: 20px; border: 1.5px solid var(--ink); background: var(--panel); }
+.msg.you .bub { background: var(--ink); color: #fff; border-bottom-right-radius: 6px; }
+.msg.ai .bub { border-bottom-left-radius: 6px; }
+.tdots { position: absolute; left: 0; top: 28px; display: flex; gap: 8px; padding: 16px 20px; border: 1.5px solid var(--line); border-radius: 20px; border-bottom-left-radius: 6px; background: var(--panel); }
+.tdots i { width: 11px; height: 11px; border-radius: 50%; background: var(--ink2); }
+.caret { display: inline-block; width: 0; height: 1.05em; border-left: 3px solid var(--ink); margin-right: -3px; vertical-align: -0.16em; }
+.qlist { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.qlist li { display: flex; gap: 14px; align-items: baseline; }
+.qlist li i { font: 800 21px var(--mono); font-style: normal; color: var(--ink2); }
+
+.tb { padding: 18px 26px 20px; font: 500 22px/1.6 var(--mono); color: var(--ink); background: #fdfcf9; }
+.tb .ln { white-space: pre-wrap; }
+.tb .p { color: var(--muted); }
+.tb .c { font-weight: 700; }
+.tb .o { font-size: 16px; line-height: 1.5; color: var(--ink2); padding-left: 30px; }
+.tb .o.k { color: var(--keep); font-weight: 800; }
+.tb .o.r { color: var(--reset); font-weight: 800; }
+.tb .cm { color: var(--ink2); font-size: 18px; padding-left: 30px; line-height: 1.5; }
+.tb .cm::before { content: "# "; color: var(--muted); }
+
+.roles { position: absolute; left: 0; right: 0; top: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.role { background: var(--panel); border: 1.5px solid var(--ink); border-radius: 20px; overflow: hidden; height: 360px; box-shadow: 0 30px 60px -34px rgba(23, 24, 28, .35); }
+.role .job { background: var(--c); color: #fff; font: 700 16px var(--mono); letter-spacing: 3px; padding: 11px 20px; }
+.role .av { width: 76px; height: 76px; border-radius: 50%; background: var(--s); border: 2.5px solid var(--c); margin: 22px 20px 14px; display: grid; place-items: center; }
+.role .nm { font: 800 31px/1.1 var(--title); letter-spacing: -0.8px; padding: 0 20px; }
+.role .ds { font: 500 21px/1.36 Inter, sans-serif; color: var(--ink2); padding: 8px 20px 0; min-height: 66px; }
+.role .md { margin: 14px 20px 0; display: inline-block; font: 700 16px var(--mono); padding: 6px 11px; border-radius: 10px; background: var(--s); color: var(--c); border: 1.5px solid var(--c); }
+.ceo { position: absolute; left: 0; right: 0; top: 384px; display: flex; align-items: center; gap: 18px; padding: 16px 22px; border-radius: 18px;
+  background: var(--ink); color: #c9cad0; font: 500 22px/1.35 Inter, sans-serif; }
+.ceo b { color: #fff; font: 800 26px var(--title); letter-spacing: -0.5px; }
+
+.stats { position: absolute; left: 0; right: 0; top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.stat { background: var(--panel); border: 1.5px solid var(--ink); border-radius: 20px; padding: 24px 22px 22px; height: 176px; box-shadow: 0 30px 60px -34px rgba(23, 24, 28, .35); }
+.stat .big { font: 800 66px/1 var(--title); letter-spacing: -2px; color: var(--ink); }
+.stat .lab { margin-top: 16px; font: 600 20px/1.3 var(--mono); color: var(--ink2); }
+.stat.g .big { color: var(--keep); }
+.rule { position: absolute; left: 0; right: 0; top: 222px; padding: 20px 24px; border: 1.5px dashed var(--ink); border-radius: 18px;
+  font: 500 24px/1.4 Inter, sans-serif; color: var(--ink2); background: var(--panel); }
+.rule b { color: var(--ink); }
+
+.cta { position: absolute; left: 0; right: 0; top: 20px; display: grid; gap: 20px; justify-items: start; }
+.install { font: 700 44px var(--mono); background: var(--ink); color: #fff; border-radius: 18px; padding: 20px 30px; }
+.install span { color: var(--number); }
+.repo { font: 700 30px var(--mono); padding: 14px 24px; border-radius: 16px; border: 2px solid var(--ink); background: var(--panel); }
+.works { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.works span { font: 700 18px var(--mono); padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--panel); }
+.fine { font: 500 19px var(--mono); color: var(--ink2); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="logo" viewBox="0 0 34 34"><path d="M24.5 8.5 A11 11 0 1 0 28 17" fill="none" stroke="#17181c" stroke-width="4.2" stroke-linecap="round"/><path d="M19 4.5 L25 8.5 L20 13.5" fill="none" stroke="#17181c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29.5" cy="11" r="3.6" fill="#1e9e5a"/></symbol>
+    <symbol id="i-card" viewBox="0 0 40 40"><rect x="8" y="9" width="24" height="22" rx="3" fill="#fff" stroke="currentColor" stroke-width="2.6"/><path d="M13 16 H27 M13 21 H27 M13 26 H21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 40 40"><path d="M10 30 L12 23 L25 10 L30 15 L17 28 Z" fill="#fff" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M22 13 L27 18" stroke="currentColor" stroke-width="2.6"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 40 40"><circle cx="18" cy="18" r="9" fill="#fff" stroke="currentColor" stroke-width="2.6"/><path d="M25 25 L32 32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="top">
+  <div class="brand"><svg width="36" height="36"><use href="#logo"/></svg><div class="kick">keeploop <span>/</span> for AI code</div></div>
+  <div class="stepno" id="stepno"></div>
+</div>
+
+<!-- 0 · the hook: the payoff first -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">Your AI proposes.</span><span class="l2"><span class="hl">A number decides.</span></span></h1>
+    <div class="body">keeploop runs your coding AI as a small team. A change is committed only when the number beats the best by more than its own noise.</div>
+  </div>
+  <div class="src">real output of kl try on the offline demo: docs/assets/demo-run/fastpath.txt</div>
+  <div class="stage">
+    <div class="term card" style="top:24px">
+      <div class="bar"><span class="d"><i></i><i></i><i></i></span>~/my-repo-keeploop · your AI runs this</div>
+      <div class="tb">
+        <div class="ln"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="0.35" data-text="kl try card.md"></span></div>
+        <div class="ln o k" data-fx="up" data-at="1.0" data-src="docs/assets/demo-run/fastpath.txt">KEPT cycle 1: metric 0.942000 (bar 0.828178); best is now 0.942000</div>
+        <div class="ln" style="margin-top:10px"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="1.5" data-text="kl try card.md"></span></div>
+        <div class="ln o r" data-fx="up" data-at="2.15" data-src="docs/assets/demo-run/fastpath.txt">discarded cycle 2 (discard); workspace back at best 0.942000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 · one prompt -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">Paste one prompt.</span><span class="l2"><span class="hl">Your AI does the rest.</span></span></h1>
+    <div class="body">It clones keeploop, reads <b>AGENTS.md</b> and acts as the CEO. You never type <code>kl</code>.</div>
+  </div>
+  <div class="src">the prompt: README.md, Quick start (a)</div>
+  <div class="stage">
+    <div class="win card" style="top:0;height:506px">
+      <div class="bar"><span class="d"><i></i><i></i><i></i></span>your coding AI</div>
+      <div class="msgs">
+        <div class="msg you" style="max-width:100%" data-fx="up" data-at="0.35"><div class="who">You · paste</div>
+          <div class="bub" style="font-size:20.5px;line-height:1.42" data-src="README.md" data-quote="Clone https://github.com/johnha912/keeploop next to my project (not inside it), run `python prepare.py` in the clone, then read its AGENTS.md and act as the CEO it describes. What I want better:">Clone https://github.com/johnha912/keeploop next to my project (not inside it), run <span style="font-family:var(--mono);font-size:.92em">`python prepare.py`</span> in the clone, then read its AGENTS.md and act as the CEO it describes. What I want better: <span style="color:var(--number)">&lt;make my test suite faster&gt;</span></div></div>
+        <div class="msg ai" data-fx="ai" data-at="1.3"><div class="who">CEO</div><div class="tdots"><i></i><i></i><i></i></div>
+          <div class="bub">Read AGENTS.md. Before I change anything, a few questions.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · it asks first -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">It asks first.</span><span class="l2"><span class="hl">In plain words.</span></span></h1>
+    <div class="body">You approve <b>evaluate.py</b> before anything changes. Your “good enough” is the target, so the loop stops there.</div>
+  </div>
+  <div class="stage">
+    <div class="win card" style="top:0;height:506px">
+      <div class="bar"><span class="d"><i></i><i></i><i></i></span>first time in your project</div>
+      <div class="msgs">
+        <div class="msg ai" data-fx="ai" data-at="0.45"><div class="who">CEO</div><div class="tdots"><i></i><i></i><i></i></div>
+          <div class="bub"><ul class="qlist">
+            <li data-fx="up" data-at="0.55"><i>1</i>What does “better” mean?</li>
+            <li data-fx="up" data-at="0.75"><i>2</i>How do we measure it?</li>
+            <li data-fx="up" data-at="0.95"><i>3</i>What score is good enough?</li>
+            <li data-fx="up" data-at="1.15"><i>4</i>What would a wrong change cost you?</li></ul></div></div>
+        <div class="msg ai" data-fx="ai" data-at="2.1"><div class="who">CEO</div><div class="tdots"><i></i><i></i><i></i></div>
+          <div class="bub">Here is an <b>evaluate.py</b>: it prints one number, higher is better. OK to use it?</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · the team -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">It staffs a team.</span><span class="l2"><span class="hl">Each role, its own model.</span></span></h1>
+    <div class="body">Spend where a mistake is expensive, save where it is cheap.</div>
+  </div>
+  <div class="src">cost routing in team.yaml is guidance only</div>
+  <div class="stage">
+    <div class="roles">
+      <div class="role" style="--c:var(--analyst);--s:var(--analyst-soft)" data-fx="deal" data-at="0.25" data-rot="-7">
+        <div class="job">PROPOSES</div><div class="av" style="color:var(--analyst)"><svg width="42" height="42"><use href="#i-card"/></svg></div>
+        <div class="nm">Analyst</div><div class="ds">Writes one hypothesis card</div><div class="md">cheap, fast model</div></div>
+      <div class="role" style="--c:var(--engineer);--s:var(--engineer-soft)" data-fx="deal" data-at="0.45" data-rot="5">
+        <div class="job">BUILDS</div><div class="av" style="color:var(--engineer)"><svg width="42" height="42"><use href="#i-pen"/></svg></div>
+        <div class="nm">Engineer</div><div class="ds">Makes exactly the card, nothing else</div><div class="md">your main model</div></div>
+      <div class="role" style="--c:var(--auditor);--s:var(--auditor-soft)" data-fx="deal" data-at="0.65" data-rot="-4">
+        <div class="job">AUDITS</div><div class="av" style="color:var(--auditor)"><svg width="42" height="42"><use href="#i-eye"/></svg></div>
+        <div class="nm">Auditor</div><div class="ds">Reads the real diff, in a fresh context</div><div class="md">strongest model</div></div>
+    </div>
+    <div class="ceo" data-fx="up" data-at="1.2"><b>CEO</b><span>Your AI, the one you talk to: it asks, runs <span class="mono">kl</span>, staffs the roles.</span></div>
+  </div>
+</section>
+
+<!-- 4 · two commands a cycle, real output -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">Two commands a cycle.</span><span class="l2"><span class="hl">Only real gains stay.</span></span></h1>
+    <div class="body">Your AI runs them. A change that beats the bar is committed; anything else is reset.</div>
+  </div>
+  <div class="src">real output of kl next / kl try on the offline demo: docs/assets/demo-run/fastpath.txt</div>
+  <div class="stage">
+    <div class="term card" style="top:0">
+      <div class="bar"><span class="d"><i></i><i></i><i></i></span>~/my-repo-keeploop · your AI runs these</div>
+      <div class="tb" style="padding-top:14px">
+        <div class="ln"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="0.3" data-text="kl next"></span></div>
+        <div class="ln cm" data-fx="up" data-at="0.6">one brief: the best, the keep bar, a card skeleton</div>
+        <div class="ln"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="1.0" data-text="kl try card.md"></span></div>
+        <div class="ln o" data-fx="up" data-at="1.55" data-src="docs/assets/demo-run/fastpath.txt">metric 0.942000  keep-bar 0.828178  best 0.828178  -&gt; beats the bar</div>
+        <div class="ln o k" data-fx="up" data-at="1.85" data-src="docs/assets/demo-run/fastpath.txt">KEPT cycle 1: metric 0.942000 (bar 0.828178); best is now 0.942000</div>
+        <div class="ln" style="margin-top:8px"><span class="p">$ </span><span class="c kl" data-fx="type" data-at="2.35" data-text="kl try card.md"></span></div>
+        <div class="ln o" data-fx="up" data-at="2.9" data-src="docs/assets/demo-run/fastpath.txt">metric 0.892000  keep-bar 0.942000  best 0.942000  -&gt; does not beat the bar (noise or worse)</div>
+        <div class="ln o r" data-fx="up" data-at="3.2" data-src="docs/assets/demo-run/fastpath.txt">discarded cycle 2 (discard); workspace back at best 0.942000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · fewer calls, measured -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">Fewer AI calls.</span><span class="l2"><span class="hl">Same keep rule.</span></span></h1>
+    <div class="body">With <code>profile: fast</code> the Engineer writes its own card, and the ideas you listed need no Analyst call.</div>
+  </div>
+  <div class="src" id="benchsrc"></div>
+  <div class="stage">
+    <div class="stats">
+      <div class="stat g" data-fx="up" data-at="0.3"><div class="big" data-k="tokens"></div><div class="lab">tokens per cycle</div></div>
+      <div class="stat g" data-fx="up" data-at="0.5"><div class="big" data-k="time"></div><div class="lab">time per cycle</div></div>
+      <div class="stat" data-fx="up" data-at="0.7"><div class="big" data-k="calls"></div><div class="lab">AI calls per cycle</div></div>
+    </div>
+    <div class="rule" data-fx="up" data-at="1.3">Lessons, the fence and the gates stay on. A change is still kept only if it beats <b>best + 2σ</b>.</div>
+  </div>
+</section>
+
+<!-- 6 · get it -->
+<section class="scene">
+  <div class="left">
+    <h1><span class="l1">Ask first. Then</span><span class="l2"><span class="hl">keep what is better.</span></span></h1>
+    <div class="body">Open source. Runs with the AI you already use.</div>
+  </div>
+  <div class="stage">
+    <div class="cta">
+      <div class="install" data-fx="pop" data-at="0.3"><span>$</span> pipx install keeploop</div>
+      <div class="repo" data-fx="up" data-at="0.6">github.com/johnha912/keeploop</div>
+      <div class="works" data-fx="up" data-at="0.9"><span>Claude Code</span><span>Codex</span><span>Cursor</span><span>Copilot</span><span>Gemini CLI</span></div>
+      <div class="fine" data-fx="up" data-at="1.1">stdlib only · no telemetry · no API keys · MIT</div>
+    </div>
+  </div>
+</section>
+
+<div class="prog" id="prog"></div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+// the measured numbers, from the bench files (filled in at render time)
+const DATA = JSON.parse(document.getElementById("data").textContent);
+document.querySelectorAll("[data-k]").forEach(e => { e.textContent = DATA[e.dataset.k]; });
+document.getElementById("benchsrc").textContent =
+  `offline demo, median of ${DATA.reps} reps: docs/proof/bench-latency-*.json`;
+</script>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollToPlugin.min.js"></script>
+<script src="vendor/SplitText.min.js"></script>
+<script src="vendor/TextPlugin.min.js"></script>
+<script src="vendor/DrawSVGPlugin.min.js"></script>
+<script src="vendor/Flip.min.js"></script>
+<script src="deck.js"></script>
+<script>DECK.start({ steps: ["One prompt", "It asks", "The team", "Two commands", "Fewer calls"], poster: 4,
+  pace: { at: 1.0, dur: 1.0, cps: 26, wps: 5.2, hold: 1.5, scroll: 0.8, end: 3.0 } });</script>
+</body></html>

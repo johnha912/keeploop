@@ -12,6 +12,9 @@ fetches it once into a cache outside the repo, and nothing of it is committed.
 - code: tools/figure/guide-code.html -> keeploop-guide-code.mp4 / .gif / .png.
   keeploop with a coding AI, five steps, from README.md "Quick start", AGENTS.md and
   team.yaml.
+- x-cli: tools/figure/x-cli.html -> keeploop-x-cli.mp4 / .png, square 1080x1080 for X:
+  the coding-AI path in about 40 s. Its measured numbers are filled in from
+  docs/proof/bench-latency-*.json (the page has a __DATA__ slot); none is typed in.
 
 Each page exposes window.render(t), a pure function of time, window.TOTAL (seconds) and
 window.POSTER (the time of the still written as the .png).
@@ -34,14 +37,19 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 FIG = REPO / "tools" / "figure"
-PAGES = {"chat": "guide-chat.html", "code": "guide-code.html"}
+PAGES = {"chat": "guide-chat.html", "code": "guide-code.html", "x-cli": "x-cli.html"}
+SIZE = {"chat": (1920, 1080), "code": (1920, 1080), "x-cli": (1080, 1080)}
+STEM = {"chat": "keeploop-guide-chat", "code": "keeploop-guide-code", "x-cli": "keeploop-x-cli"}
+GIF = {"chat", "code"}  # the X cut is posted as a video only
+FROM = {"x-cli": 0.9}    # seconds trimmed off the start: X shows the first frame before play
 GSAP = "3.15.1"  # build-time only, under GSAP's standard no-charge license
 GSAP_FILES = ("gsap", "ScrollToPlugin", "SplitText", "TextPlugin", "DrawSVGPlugin", "Flip")
 
 DRIVER = r"""
 const { chromium } = require('playwright');
 (async () => {
-  const [html, out, fps, w, h, stills] = process.argv.slice(2);
+  const [html, out, fps, w, h, stills, from] = process.argv.slice(2);
+  const t0 = +(from || 0);   // the video starts here (the X cut opens on its headline, not a blank frame)
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: 1 });
   await p.goto('file://' + html);
@@ -71,9 +79,9 @@ const { chromium } = require('playwright');
       await p.screenshot({ path: `${out}/still-${(+s).toFixed(2)}.png` });
     }
   } else {
-    const n = Math.round(total * +fps);
+    const n = Math.round((total - t0) * +fps);
     for (let i = 0; i < n; i++) {
-      await p.evaluate(t => window.render(t), i / +fps);
+      await p.evaluate(t => window.render(t), t0 + i / +fps);
       await p.screenshot({ path: `${out}/f${String(i).padStart(5, '0')}.png` });
     }
   }
@@ -129,12 +137,27 @@ def gsap_dist() -> Path:
     return dist
 
 
+def measured() -> dict:
+    """The offline speed benchmark, as the README states it (docs/proof/bench-latency-*.json)."""
+    def bench(n):
+        return json.loads((REPO / "docs" / "proof" / f"bench-latency-{n}.json").read_text(encoding="utf-8"))
+    slow, fast = bench("default"), bench("fast")
+    calls = lambda b: sum(b["calls_per_cycle_median"].values())  # noqa: E731
+    return {"tokens": f"−{1 - fast['tokens_per_cycle_median'] / slow['tokens_per_cycle_median']:.0%}",
+            "time": f"−{1 - fast['wall_s_per_cycle_median'] / slow['wall_s_per_cycle_median']:.0%}",
+            "calls": f"{calls(slow):.1f}→{calls(fast):.1f}", "reps": slow["reps"]}
+
+
 def stage(name: str, tmp: Path) -> Path:
     """The page, its stylesheet, the engine and GSAP, side by side, as the page links them."""
     site = tmp / "site"
     (site / "vendor").mkdir(parents=True)
     for f in (PAGES[name], "kl.css", "deck.js"):
         shutil.copyfile(FIG / f, site / f)
+    page = site / PAGES[name]
+    html = page.read_text(encoding="utf-8")
+    if "__DATA__" in html:
+        page.write_text(html.replace("__DATA__", json.dumps(measured())), encoding="utf-8")
     dist = gsap_dist()
     for f in GSAP_FILES:
         shutil.copyfile(dist / f"{f}.min.js", site / "vendor" / f"{f}.min.js")
@@ -143,8 +166,9 @@ def stage(name: str, tmp: Path) -> Path:
 
 def frames(name: str, tmp: Path, fps: int, stills: str = "") -> dict:
     (tmp / "driver.js").write_text(DRIVER, encoding="utf-8")
-    subprocess.run(["node", str(tmp / "driver.js"), str(stage(name, tmp)), str(tmp), str(fps), "1920", "1080",
-                    stills], check=True)
+    w, h = SIZE[name]
+    subprocess.run(["node", str(tmp / "driver.js"), str(stage(name, tmp)), str(tmp), str(fps), str(w), str(h),
+                    stills, str(FROM.get(name, 0))], check=True)
     (tmp / "warmup.png").unlink(missing_ok=True)
     facts = json.loads((tmp / "facts.json").read_text(encoding="utf-8"))
     check(facts, PAGES[name])
@@ -152,14 +176,19 @@ def frames(name: str, tmp: Path, fps: int, stills: str = "") -> dict:
 
 
 def encode(name: str, tmp: Path, out: Path, fps: int, total: float, poster_at: float) -> None:
-    stem = f"keeploop-guide-{name}"
+    stem = STEM[name]
     mp4, gif, png = out / f"{stem}.mp4", out / f"{stem}.gif", out / f"{stem}.png"
     pat = str(tmp / "f%05d.png")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", pat,
                     "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p",
                     "-movflags", "+faststart", str(mp4)], check=True)
-    poster = tmp / f"f{round(poster_at * fps):05d}.png"
+    poster = tmp / f"f{round((poster_at - FROM.get(name, 0)) * fps):05d}.png"
     shutil.copyfile(poster, png)
+    if name not in GIF:
+        for f in (mp4, png):
+            print(f"wrote {f.relative_to(REPO) if f.is_relative_to(REPO) else f} ({f.stat().st_size / 1e6:.2f} MB)")
+        print(f"{stem}: {total - FROM.get(name, 0):.1f} s, {fps} fps, {SIZE[name][0]}x{SIZE[name][1]}")
+        return
     # the GIF: 1280 wide, one shared palette, no dither; area scaling adds no ringing, which
     # keeps the palette small. Take the smoothest setting that stays under 8 MB.
     for gfps, colors in ((12, 64), (12, 48), (10, 48), (8, 48), (8, 32), (6, 32)):
