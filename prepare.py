@@ -19,7 +19,7 @@ import json
 import subprocess
 from pathlib import Path
 
-__version__ = "0.3.0"  # the single source; pyproject reads it, see CHANGELOG.md
+__version__ = "0.3.1"  # the single source; pyproject reads it, see CHANGELOG.md
 
 ROOT = Path(__file__).resolve().parent
 STATE_DIR = ROOT / ".keeploop"
