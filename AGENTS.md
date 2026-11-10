@@ -15,19 +15,32 @@ measure ("make the tests faster", "raise the score"), run the cycle below
 yourself, without waiting for `/keeploop`. Default to 3 cycles, then
 report with `kl report`. First time in a project, if `evaluate.py` is
 still the demo, do not start the loop: ask the user, in plain words, what
-"better" means, how to measure it and what score is good enough (it
-becomes `loop.target`), then propose an `evaluate.py` for them to approve.
-Ask everything you need in one message; never make the user learn
-commands or flags.
+"better" means, how to measure it, what score is good enough (it becomes
+`loop.target`) and what a wrong change would cost them (a draft they can
+redo, something other people use, or work they will publish or ship), then
+propose an `evaluate.py` for them to approve. Their last answer sets how
+heavy the loop is: `python kl.py level --stakes low|medium|high --apply`
+picks light, fast or rigorous from it and from the score's noise; lessons,
+the fence and the gates stay on at every level. Ask everything you need in
+one message; never make the user learn commands or flags.
 
 **Measuring is not improving.** When the user asks where things stand (a
 number for a report or a handover, "how good is it now?"), measure and
 report only: `kl begin` the first time, then `kl status`, `kl eval` or
 `kl report`. Change nothing and start no cycle; improving is a separate
-request. **Stop when it is enough.** When `kl status` prints a `STOP:`
-line (the target is reached, or the loop stalled), report and stop, even
-before 3 cycles. Never invent another card to keep going; `kl card`
-refuses it anyway.
+request. **Stop when it is enough.** When `kl next` or `kl status` prints
+a `STOP:` line (the target is reached, or the loop stalled), report and
+stop, even before 3 cycles. Never invent another card to keep going; `kl
+card` and `kl try` refuse it anyway.
+
+## Fast path (one cycle, three steps)
+
+1. `python kl.py next` - best, keep bar, any `STOP:` line, a pending card, the next hypothesis, the 3 most relevant memories (do not repeat them) and a card skeleton.
+2. Fill the card (Analyst), save it outside this repo, then edit the workspace to implement exactly it (Engineer).
+3. `python kl.py try CARD` - registers the card, runs the gates and the evaluation, then keeps or discards and records it, one line per step. Exit 0 kept, 4 discarded, 1 refused (fix the reason, run it again), 2 fence broken (stop, tell the human).
+   Exit 3 waits for a verdict and prints the next command. A heavy card needs the Critic first: `python kl.py debate N --critic FILE`, then `python kl.py try`. A heavy change, or a gain that is not decisive (it must clear the keep bar by the bar's own margin again and by 1% of best), needs a fresh-context Auditor (step 6 below), then `python kl.py try --audit-verdict FILE`.
+
+`kl try` runs steps 2 and 4 to 8 below with the same rules; they stay the reference, and the Hard rules and Learning still apply. A chat AI with no repo access: the user runs `python kl.py handoff`, pastes the packet, saves the reply to a file and runs `python kl.py apply FILE`, one paste each way. `python kl.py handoff --audit` (or `--critic`) prints the packet for that verdict, for a new chat.
 
 ## Pointing keeploop at the user's own repo (first time)
 
@@ -48,8 +61,11 @@ ready to paste; you never write them yourself (see Hard rules):
    while it fails.
 4. The mission in `program.md`.
 
-Then run `python kl.py begin`. Every keep is a commit on the `keeploop`
-branch of that worktree; the human merges the ones they want.
+Then run `python kl.py level --stakes ... --apply` with the user's answer about
+what a wrong change costs, and `python kl.py doctor`: it runs `evaluate.py` a few
+times and says how noisy it is and the smallest gain the keep bar lets through.
+Show its warnings to the human before going on. Then run `python kl.py begin`. Every keep is a commit
+on the `keeploop` branch of that worktree; the human merges the ones they want.
 
 To run a worked example instead: `python tools/make_sandbox.py examples/<name> <new short folder>`
 builds its sandbox in seconds and prints the next command (docs/GUIDE.md).
@@ -116,4 +132,4 @@ In this interactive mode you have the same file rights as `kl`. Its fence snapsh
 
 ## Command list
 
-`begin` `status` `card` `debate` `check` `eval` `audit --vendor` `keep` `discard` `report` `slow` `recall` `map` `lesson` `scout` `staff` `pack new` `cite` `init` `run`. `python kl.py --help` has one line each.
+`begin` `next` `try` `handoff` `apply` `status` `card` `debate` `check` `eval` `audit --vendor` `keep` `discard` `report` `slow` `recall` `map` `lesson` `scout` `staff` `pack new` `cite` `init` `run`. `python kl.py --help` has one line each.

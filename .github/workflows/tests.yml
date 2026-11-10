@@ -38,3 +38,18 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install build==1.2.2
       - run: python tools/check_dist.py
+
+  # The golden gate: the noisy-eval proof run (25 seeds x 2 keep laws) must give
+  # exactly the keeps, discards and scores committed in docs/proof/proof.json.
+  # Merge and release time only; never part of a loop cycle.
+  proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          git config --global user.name ci
+          git config --global user.email ci@example.com
+      - run: python tools/proof_run.py --check

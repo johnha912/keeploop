@@ -53,6 +53,16 @@ workspace: .keeploop/workspace
 # Windows, launchers such as npm need their full name (npm.cmd).
 # eval_cmd: npm test --silent
 
+# Cost routing, guidance only (nothing is switched for you). Spend where a mistake is
+# expensive, save where it is cheap:
+# - scout, analyst drafts, engineer on small light diffs: a cheap, fast model;
+# - auditor (and its heavy_model): the strongest model you have. It is the one fresh
+#   pair of eyes between a diff and a commit, and it runs only when the metric beats
+#   the bar, so it is called on a minority of cycles;
+# - evaluation: a deterministic evaluate.py costs no tokens; `kl doctor` tells you
+#   whether repeats are worth their time.
+# `kl staff --goal cost` proposes such a staffing; `kl slow` shows where the time goes.
+
 roles:
   analyst:
     vendor: mock
@@ -70,6 +80,20 @@ loop:
   # metric_max: 1.0      # top of evaluate.py's scale: warns when the keep bar is above it
   # target: 0.9          # good enough: once best reaches it, no new card and run.py stops
   # stall_cycles: 5      # this many cycles in a row without a keep: the same brake (0 = off)
+  # noise_runs: 5        # baseline evaluations that measure sigma (default 3; `kl doctor` advises)
+  # eval_cache: true     # reuse a score for identical files + evaluate.py; only when sigma is 0
+  # profile: fast       # fewer AI calls and tokens: the engineer writes the card itself
+                         # (fused), program.md hypotheses become cards with no call
+                         # (auto_cards), leaner prompts. Same keep law. docs/SPEC.md §4
+
+# Optional, off by default: lessons shared across your projects. `kl lesson share L-ID`
+# copies one lesson to ~/.keeploop/lessons/lessons.jsonl (a human decision). With
+# enabled: true, `kl recall` and each headless cycle also read the most relevant shared
+# lessons: at most max_lessons (5 is the hard cap) within max_tokens (chars / 4).
+# global_lessons:
+#   enabled: true
+#   max_lessons: 3
+#   max_tokens: 400
 
 # Optional: flag cycles slower than this many seconds in `kl report`, and use it as
 # the target `kl slow` proposes for a lesson check. Default: none.

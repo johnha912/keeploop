@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>keeploop: the keep gate</title>
+<!-- README animation: "the keep gate". One number line; real changes from the proof
+     run drop onto it as tokens; the yellow band is the noise above the best; a token
+     inside it is reset, a token past the bar (twice) is committed and moves the bar.
+     tools/render_figure.py fills DATA and screenshots render(t). Build-time only. No
+     result is typed here: every number is set from DATA. -->
+<style>
+:root { --cream: #f4efe4; --ink: #151515; --ink2: #5b574f; --muted: #9a958a; --sun: #ffd23f;
+  --sun-edge: #e0b000; --go: #12804c; --stop: #e0502c; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--cream); }
+body { width: 1280px; height: 620px; overflow: hidden; color: var(--ink);
+  font-family: "Inter Display", Inter, "Liberation Sans", sans-serif; position: relative; }
+.brand { position: absolute; left: 44px; top: 34px; display: flex; align-items: center; gap: 10px;
+  font: 800 24px "Inter Display", Inter, sans-serif; letter-spacing: -0.5px; }
+.law { position: absolute; right: 44px; top: 38px; font: 600 15px "JetBrains Mono", monospace; color: var(--ink2); }
+.law b { background: var(--sun); padding: 2px 7px; color: var(--ink); }
+.say { position: absolute; left: 44px; top: 88px; width: 1190px; font-weight: 900; font-size: 50px;
+  line-height: 1.05; letter-spacing: -1.6px; }
+.say span { display: block; }
+.say .two { color: var(--ink2); font-weight: 800; }
+.foot { position: absolute; left: 44px; right: 44px; bottom: 22px; display: flex; justify-content: space-between;
+  font: 13.5px "JetBrains Mono", monospace; color: var(--muted); }
+svg { position: absolute; left: 0; top: 0; }
+svg text { font-family: "JetBrains Mono", monospace; }
+</style></head>
+<body>
+<div class="brand"><svg width="30" height="30" viewBox="0 0 34 34" style="position:static"><path d="M24.5 8.5 A11 11 0 1 0 28 17" fill="none" stroke="#151515" stroke-width="4.2" stroke-linecap="round"/><path d="M19 4.5 L25 8.5 L20 13.5" fill="none" stroke="#151515" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29.5" cy="11" r="3.6" fill="#12804c"/></svg>keeploop</div>
+<div class="law">keep only above <b>best + 2σ</b>, measured twice</div>
+<div class="say"><span id="say1"></span><span class="two" id="say2"></span></div>
+<svg id="s" width="1280" height="620"></svg>
+<div class="foot"><span id="src"></span><span>pipx install keeploop</span></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const NS = "http://www.w3.org/2000/svg";
+const C = { ink: "#151515", ink2: "#5b574f", muted: "#9a958a", sun: "#ffd23f", sunEdge: "#e0b000",
+  go: "#12804c", stop: "#e0502c", card: "#fffdf7", cream: "#f4efe4" };
+function el(p, tag, a, txt) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]);
+  if (txt !== undefined) e.textContent = txt; p.appendChild(e); return e; }
+const f3 = x => x.toFixed(3);
+const sig = D.run.sigma, R = D.run.cyc, beats = D.readme.beats;
+const S = document.getElementById("s");
+document.getElementById("src").textContent =
+  `real run · examples/noisy-eval, seed ${D.run.seed} · σ = ${sig.toFixed(4)} · numbers: docs/proof`;
+// the number line
+const lo = D.readme.lo, hi = D.readme.hi, AX = 470, X0 = 70, X1 = 1210;
+const X = v => X0 + (v - lo) / (hi - lo) * (X1 - X0);
+const band = el(S, "rect", { y: 300, height: AX - 300, fill: C.sun, stroke: C.sunEdge, "stroke-width": 1.5 });
+const bandT = el(S, "text", { y: 322, "font-size": 15, fill: C.ink, "font-weight": 700 }, "noise band");
+el(S, "line", { x1: X0 - 20, x2: X1 + 20, y1: AX, y2: AX, stroke: C.ink, "stroke-width": 3 });
+for (let v = Math.ceil(lo * 100) / 100; v <= hi + 1e-9; v += 0.01) {
+  el(S, "line", { x1: X(v), x2: X(v), y1: AX, y2: AX + 9, stroke: C.ink, "stroke-width": 2 });
+  el(S, "text", { x: X(v), y: AX + 30, "font-size": 15, fill: C.ink2, "text-anchor": "middle" }, v.toFixed(2));
+}
+const bestL = el(S, "line", { y1: 282, y2: AX + 4, stroke: C.ink, "stroke-width": 5 });
+const bestT = el(S, "text", { y: 274, "font-size": 16, "font-weight": 700, fill: C.ink, "text-anchor": "middle" });
+const barL = el(S, "line", { y1: 282, y2: AX + 4, stroke: C.ink, "stroke-width": 2.5, "stroke-dasharray": "7 6" });
+const barT = el(S, "text", { y: 274, "font-size": 16, "font-weight": 700, fill: C.ink, "text-anchor": "middle" });
+function setBest(b) {
+  const bar = b + 2 * sig;
+  band.setAttribute("x", X(b)); band.setAttribute("width", X(bar) - X(b));
+  bandT.setAttribute("x", X(b) + 10);
+  bestL.setAttribute("x1", X(b)); bestL.setAttribute("x2", X(b)); bestT.setAttribute("x", X(b)); bestT.textContent = `best ${f3(b)}`;
+  barL.setAttribute("x1", X(bar)); barL.setAttribute("x2", X(bar)); barT.setAttribute("x", X(bar)); barT.textContent = `bar ${f3(bar)}`;
+}
+// a token per beat
+function token(b) {
+  const g = el(S, "g", { opacity: 0 });
+  g.pin = el(g, "line", { stroke: C.ink, "stroke-width": 2 });
+  g.dot = el(g, "circle", { r: 9, fill: C.ink });
+  g.dot2 = el(g, "circle", { r: 9, fill: "none", stroke: C.ink, "stroke-width": 3, opacity: 0 });
+  g.dot2t = el(g, "text", { "font-size": 14, fill: C.ink, "text-anchor": "middle", opacity: 0 }, `re-run ${f3(b.rerun || 0)}`);
+  g.box = el(g, "rect", { width: 250, height: 70, rx: 12, fill: C.card, stroke: C.ink, "stroke-width": 2.5 });
+  g.t1 = el(g, "text", { "font-size": 14, fill: C.ink2 }, `cycle ${b.cycle} · ${b.score_label}`);
+  g.t2 = el(g, "text", { "font-size": 19, "font-weight": 700, fill: C.ink }, b.change);
+  g.stamp = el(g, "text", { "font-size": 22, "font-weight": 800, "text-anchor": "start", opacity: 0,
+    "font-family": "Inter Display, Inter, sans-serif", "letter-spacing": "1" }, b.verdict === "keep" ? "COMMIT" : "RESET");
+  return g;
+}
+const toks = beats.map(token);
+const ease = k => 1 - Math.pow(1 - Math.max(0, Math.min(1, k)), 3);
+function place(g, b, t0, t) {   // the token's life inside its beat
+  const x = X(b.score), k = ease((t - t0) / 0.7);          // drop
+  const y = 150 + k * 210, h = 70;
+  g.setAttribute("opacity", t >= t0 ? 1 : 0);
+  g.box.setAttribute("x", x - 125); g.box.setAttribute("y", y - h);
+  g.t1.setAttribute("x", x - 110); g.t1.setAttribute("y", y - h + 26);
+  g.t2.setAttribute("x", x - 110); g.t2.setAttribute("y", y - h + 53);
+  g.pin.setAttribute("x1", x); g.pin.setAttribute("x2", x); g.pin.setAttribute("y1", y); g.pin.setAttribute("y2", y + (AX - y) * k);
+  g.dot.setAttribute("cx", x); g.dot.setAttribute("cy", AX); g.dot.setAttribute("opacity", k >= 1 ? 1 : 0);
+  let col = C.ink, judged = t >= t0 + 1.2;
+  if (b.rerun !== null) {          // the confirm re-run lands as a second ring
+    const xr = X(b.rerun), on = t >= t0 + 1.2;
+    g.dot2.setAttribute("cx", xr); g.dot2.setAttribute("cy", AX); g.dot2.setAttribute("opacity", on ? 1 : 0);
+    g.dot2t.setAttribute("x", xr); g.dot2t.setAttribute("y", AX - 18); g.dot2t.setAttribute("opacity", on ? 1 : 0);
+    judged = t >= t0 + 1.9;
+  }
+  if (judged) col = b.verdict === "keep" ? C.go : C.stop;
+  g.box.setAttribute("stroke", col); g.box.setAttribute("fill", judged ? (b.verdict === "keep" ? "#e3f2e8" : "#fbe3da") : C.card);
+  g.dot.setAttribute("fill", col);
+  g.stamp.setAttribute("fill", col); g.stamp.setAttribute("x", x + 137); g.stamp.setAttribute("y", y - h / 2 + 8);
+  g.stamp.setAttribute("opacity", judged ? 1 : 0);
+  // a reset token sinks away; a committed one stays until the next beat
+  const out = ease((t - (t0 + (b.verdict === "keep" ? 3.6 : 2.9))) / 0.6);
+  g.setAttribute("transform", `translate(0 ${out * 40})`);
+  if (out > 0) g.setAttribute("opacity", 1 - out);
+}
+const T = D.readme.timeline;
+function render(t) {
+  // which beat, and the best in force (the committed token moves it)
+  let best = beats[0].best, say = D.readme.idle;
+  beats.forEach((b, i) => {
+    const t0 = T.beats[i], end = T.beats[i + 1] ?? T.rewind;
+    if (t >= t0 && t < end) say = [b.say1, t >= t0 + (b.rerun !== null ? 1.9 : 1.2) ? b.say2 : ""];
+    if (b.verdict === "keep" && t >= t0 + 2.3) best = b.best + (b.score_new_best - b.best) * ease((t - t0 - 2.3) / 0.6);
+    toks[i].setAttribute("opacity", 0);
+    if (t >= t0 && t < end) place(toks[i], b, t0, t);
+  });
+  if (t >= T.rewind) {   // rewind to the start so the loop is seamless
+    const k = ease((t - T.rewind) / 0.8), b1 = beats.find(b => b.verdict === "keep").score_new_best;
+    best = b1 + (beats[0].best - b1) * k; say = D.readme.idle;
+  }
+  if (t >= T.beats[0] - 0.01 || t < T.beats[0]) setBest(best);
+  if (t < T.beats[0]) say = D.readme.idle;
+  document.getElementById("say1").textContent = say[0];
+  document.getElementById("say2").textContent = say[1];
+}
+window.render = render;
+render(0);
+</script>
+</body></html>

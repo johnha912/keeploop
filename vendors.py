@@ -68,6 +68,33 @@ def _estimate_tokens(text: str) -> int:
     return max(1, len(text) // 4)
 
 
+# The first words of a loop.fused prompt (run.fused_ask): one Engineer call writes the
+# card and implements it. Defined here so the mock can recognise it without importing run.
+FUSED_MARK = "You are the Analyst and the Engineer in one call."
+
+
+def mock_latency(role: str, spec: str | None = None) -> float:
+    """Seconds the mock sleeps per call, from KEEPLOOP_MOCK_LATENCY (off when unset):
+    "analyst=2,engineer=4,auditor=2", and a bare number for every other role ("1.5" or
+    "auditor=2,0.5"). For honest wall-time measurement (tools/bench_cycle.py --latency)."""
+    spec = os.environ.get("KEEPLOOP_MOCK_LATENCY", "") if spec is None else spec
+    out = rest = 0.0
+    for part in (p.strip() for p in spec.split(",") if p.strip()):
+        name, sep, value = part.rpartition("=")
+        try:
+            sec = float(value)
+        except ValueError:
+            raise VendorUnavailable(f"KEEPLOOP_MOCK_LATENCY: bad entry {part!r}") from None
+        if not sep:
+            rest = sec
+        elif name.strip() == role:
+            out = sec
+            break
+    else:
+        out = rest
+    return max(0.0, out)
+
+
 class Vendor:
     name = "base"
     is_mock = False
@@ -91,6 +118,11 @@ class MockVendor(Vendor):
       teaches nothing. Asked to repair, it changes nothing (and the script
       does not advance), so the demo stays deterministic.
     - auditor:  always approves.
+
+    A scripted project (run.py loads mock_script.json into `script`): entries are
+    {"hypothesis": "...", "set": {...}}. The analyst writes the patch as JSON on its
+    CHANGE line and the engineer applies the patch it reads from the card, so a card
+    the loop drops (a duplicate) never puts the two roles out of step.
     """
 
     name = "mock"
@@ -106,6 +138,7 @@ class MockVendor(Vendor):
 
     def __init__(self):
         self._calls: dict[str, int] = {}
+        self.script: list[dict] | None = None  # mock_script.json, see the class docstring
 
     def _next(self, role: str) -> int:
         n = self._calls.get(role, 0)
@@ -116,10 +149,15 @@ class MockVendor(Vendor):
                  cwd=None) -> VendorResult:
         start = time.time()
         text = ""
-        if role == "analyst":
+        fused = role == "engineer" and FUSED_MARK in prompt  # card + edit in one call
+        if self.script:
+            text = self._scripted(prompt, role, cwd, fused)
+        elif role == "analyst" or fused:
             # names the parameter and value the engineer will change next, so every
             # card differs from the others (the duplicate precheck compares them)
-            param, value = next(iter(self.PATCH_SCRIPT[self._next(role) % len(self.PATCH_SCRIPT)].items()))
+            # (a fused call writes the card for the patch it applies: one counter)
+            patch = self.PATCH_SCRIPT[self._next(role) % len(self.PATCH_SCRIPT)]
+            param, value = next(iter(patch.items()))
             # (kept short on purpose: two cards that differ in one token must still
             # score below the 0.8 duplicate threshold)
             text = (f"HYPOTHESIS: Setting {param} to {value} helps.\n"
@@ -128,6 +166,8 @@ class MockVendor(Vendor):
                     f"EXPECT: the metric rises.\n"
                     f"REJECT IF: the metric does not beat the best so far.\n"
                     f"MISSING: none")
+            if fused:
+                self._apply(cwd, patch)
         elif role == "engineer":
             text = "done"
             path = Path(cwd) / "config.json" if cwd else None
@@ -138,11 +178,64 @@ class MockVendor(Vendor):
                                 encoding="utf-8")
         elif role == "auditor":
             text = "APPROVED: diff matches the card; nothing else touched."
-        return VendorResult(text=text,
-                            tokens_in=_estimate_tokens(prompt),
-                            tokens_out=_estimate_tokens(text),
-                            model="mock-1",
-                            latency_s=time.time() - start)
+        res = VendorResult(text=text,
+                           tokens_in=_estimate_tokens(prompt),
+                           tokens_out=_estimate_tokens(text),
+                           model="mock-1",
+                           latency_s=time.time() - start)
+        if sleep := mock_latency(role):
+            time.sleep(sleep)
+            res.latency_s = time.time() - start
+        if log := os.environ.get("KEEPLOOP_MOCK_LOG"):  # bench_cycle.py: calls per role
+            with open(log, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"role": role, "fused": fused, "tokens": res.tokens,
+                                    "latency_s": round(res.latency_s, 3)}) + "\n")
+        return res
+
+    @staticmethod
+    def _apply(cwd, patch: dict) -> None:
+        """Merge a patch into cwd/config.json, as an agent editing the file would."""
+        path = Path(cwd) / "config.json" if cwd else None
+        if path and path.exists():
+            cfg = json.loads(path.read_text(encoding="utf-8"))
+            path.write_text(json.dumps({**cfg, **patch}, indent=2) + "\n", encoding="utf-8")
+
+    def _closest(self, prompt: str) -> dict | None:
+        """loop.auto_cards gives the engineer a card with no patch on it (CHANGE: the
+        smallest change that tests it): the script entry whose hypothesis shares the most
+        words with the card's, the first on a tie; None when no word is shared."""
+        m = re.search(r"^HYPOTHESIS: (.*)$", prompt, re.M)
+        words = set(re.findall(r"[a-z0-9]+", m.group(1).lower())) if m else set()
+        best, score = None, 0.0
+        for entry in self.script:
+            other = set(re.findall(r"[a-z0-9]+", entry["hypothesis"].lower()))
+            s = len(words & other) / len(words | other) if words | other else 0.0
+            if s > score:
+                best, score = entry, s
+        return best and best["set"]
+
+    def _scripted(self, prompt: str, role: str, cwd, fused: bool = False) -> str:
+        if role == "analyst" or fused:
+            entry = self.script[self._next("analyst") % len(self.script)]
+            if fused and "Your last attempt failed" not in prompt:
+                self._apply(cwd, entry["set"])
+            return (f"HYPOTHESIS: {entry['hypothesis']}\n"
+                    f"ALTERNATIVES: the gain is noise; the keep bar and the confirm re-run "
+                    f"tell them apart.\n"
+                    f"CHANGE: set in config.json {json.dumps(entry['set'])}\n"
+                    f"EXPECT: the metric rises.\n"
+                    f"REJECT IF: the metric does not beat the keep bar.\n"
+                    f"MISSING: none")
+        if role == "engineer":
+            m = re.search(r"^CHANGE: set in config\.json (\{.*\})$", prompt, re.M)
+            if "Your last attempt failed" not in prompt:
+                if m:
+                    self._apply(cwd, json.loads(m.group(1)))
+                elif re.search(r"^CHANGE: the smallest change that tests it$", prompt, re.M):
+                    if patch := self._closest(prompt):
+                        self._apply(cwd, patch)
+            return "done"
+        return "APPROVED: diff matches the card; nothing else touched."
 
 
 class CliVendor(Vendor):

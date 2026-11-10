@@ -1,0 +1,15 @@
+{
+  "what": "examples/noisy-eval/evaluate.py on its initial config.json, 10 calls, KEEPLOOP_DEMO_SEED=2",
+  "scores": [
+    0.655,
+    0.667,
+    0.639,
+    0.61,
+    0.648,
+    0.648,
+    0.674,
+    0.678,
+    0.659,
+    0.694
+  ]
+}

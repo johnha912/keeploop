@@ -170,6 +170,8 @@ the fence snapshot; every later command refuses (exit 2) if it changed.
 | 8 Record | `report`, `slow` | Facts from the ledger; bottleneck phase and levers. |
 | Staffing | `staff [--goal speed\|quality\|cost] [--apply]` | Section 4. |
 | Packs, memory | `pack new NAME`, `lesson ...`, `scout ...`, `cite FILE` | |
+| Fast path | `next`, `try [CARD] [--audit-verdict FILE] [--tokens N]` | `next` is one brief (best, bar, sigma, STOP, pending card, next hypothesis, top 3 memory hits, a card skeleton). `try` runs `card` + `check` + `eval` + `keep`/`discard` through the same functions. Exit 0 kept, 4 discarded, 3 waiting for a verdict (the cycle stays open, the next command is printed), 1 refused, 2 fence broken. A gain is decisive when it clears the bar by the bar's own margin again and by 1% of best; a heavy change or a light gain that is not decisive needs an Auditor verdict, and a heavy card stops for the Critic first. A refused keep ends in a discard, as in `run.py`. Lines over 300 characters are cut; the full text is `.keeploop/last-try.txt`. |
+| Chat AIs | `handoff [--files GLOB ...] [--max-chars N] [--audit\|--critic]`, `apply REPLY` | `handoff` prints one packet for a chat AI without repo access (mission, metric, best/bar, recent ledger, rejected hypotheses, open lessons, chosen files, the reply format) and records what it showed in `.keeploop/handoff.json`. `apply` registers the reply's card, writes its `file:` blocks and runs the `try` flow. It refuses absolute paths, `..`, `\\`, drive letters, `:`, `~`, `.git*`, protected paths, symlinked paths and an existing file the last handoff did not show whole; nothing in the reply is executed. |
 
 Differences from headless: the Auditor is optional for a light change that
 beats the bar (the CEO decides; `keep` demands a verdict only for heavy);
@@ -189,6 +191,13 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `max_iterations` | 20 | yes | Cycles per run; `--iterations` overrides |
 | `keep_threshold` | 0.0 | yes | Minimum gain relative to `abs(best)` |
 | `confirm_keep` | true | yes | Re-run before a keep when sigma > 0 (heavy always re-runs) |
+| `audit_every_keep` | false | yes (`kl try`) | Every keep needs an Auditor verdict, decisive or not (the headless loop audits every keep anyway). Set by `profile: rigorous` |
+| `profile` | none | yes | `light` (small, reversible work with a deterministic score: the `fast` caps plus `max_iterations: 3`, `stall_cycles: 2`, `noise_runs: 1`, `confirm_keep: false`), `rigorous` (`noise_runs: 5`, `confirm_keep: true`, `audit_every_keep: true`, the full Analyst), or `fast`, which sets `fused: true`, `auto_cards: true`, `repo_map_max_chars: 1200`, `ledger_tail_for_prompt: 3`, `recall_top_k: 4`, `eval_stderr_max_chars: 400`, `eval_stderr_handle: true`. Precedence: defaults, then the profile, then explicit `loop:` keys. An unknown name is a startup error |
+| `fused` | false | yes (`run.py`) | One Engineer call writes the card (labelled lines in its reply) and implements it; no Analyst call. The card is parsed and checked before the evaluation; a missing or vague card is a crash and the edit is reset; a duplicate is dropped before the evaluation; a heavy card still goes to the critic |
+| `auto_cards` | false | yes (`run.py`) | The next untested `program.md` hypothesis becomes the card with no Analyst call (CHANGE "the smallest change that tests it", REJECT IF "the metric does not beat the keep bar"); a line naming a heavy file gets `TIER: heavy`; lines over 300 characters go to the Analyst |
+| `eval_stderr_handle` | false | yes (`run.py`) | A cut stderr excerpt ends with the path of `.keeploop/scorer_notes.json` (the full text) |
+| `confirm_skip_z` | 0 (off) | yes (`run.py`) | Skip the confirm re-run of a light change whose gain is at least this many times a 95% upper bound on sigma (sigma > 0; must exceed `noise_z`). The added false-keep chance is below 0.22% at 3 baseline runs (argued in `run.py`). Not part of `profile: fast` |
+| `eval_cache` | false | yes (`run.py`) | Reuse a score when the workspace files (git tree), `evaluate.py` and `eval_cmd` are identical to an earlier evaluation; only when sigma is 0, never for the baseline or `holdout.py`. Stored in `.keeploop/eval_cache.json` |
 | `engineer_repairs` | 1 | yes | Extra Engineer calls for a repairable failure |
 | `repo_map_max_chars` | 3000 | yes (`run.py`); `kl map` uses the default | Analyst repo map size |
 | `eval_stderr_max_chars` | 1500 | yes (`run.py`) | `evaluate.py` stderr of the current best shown to the Analyst (control characters stripped, secrets redacted); 0 = off. Never `holdout.py` |
@@ -213,6 +222,25 @@ or the evaluation runner, so a `loop:` entry has no effect on them.
 | `recall_top_k` | 8 | yes | More open lessons than this: inject only the k most relevant |
 | `scout_max_proposals` | 3 | no (`--max`) | Per scout run |
 | `scout_min_relevance` | 0.35 | no (`--min-score`) | Applies to the relevance factor |
+
+Top-level `global_lessons:` (off by default): `enabled` (false), `path` (default
+`~/.keeploop/lessons`, or `$KEEPLOOP_HOME/lessons`), `max_lessons` (5, also the hard
+cap), `max_tokens` (400, characters / 4). Only `kl lesson share L-ID` writes the store.
+When enabled, `kl recall` and each headless cycle's card-relevant guardrails add the
+most relevant shared lessons within both caps; nothing is injected when it is off.
+
+`run.py --narrate` prints each step of a cycle (card, diff lines, score against the keep
+bar, decision); off by default. With `--mock`, a `mock_script.json` beside `team.yaml`
+(`[{"hypothesis": "...", "set": {...}}, ...]`) replaces the mock's built-in proposals.
+
+Init-time commands, never part of a cycle: `kl level --stakes low|medium|high [--apply]` is
+the CEO's choice of `loop.profile` from the user's answer about what a wrong change costs and
+the score's noise (sigma from the baseline, or 3 runs if not begun): high gives `rigorous`, low
+with sigma 0 gives `light`, anything else `fast`; `--apply` writes it into `team.yaml`. Lessons,
+the fence, the gates and the brakes are the same at every level. `kl doctor [--runs N] [--want GAIN]` runs
+`evaluate.py` N times (default 5, at least 3) and reports sigma and the smallest gain the
+keep bar lets through; `kl quickstart TEMPLATE` and `kl import-lite LEDGER` write a
+control folder. `kl report --html FILE | --svg FILE` draws the ledger (no model call).
 
 No key of the earlier spec was removed. `keep_threshold` now feeds the bar
 `max(abs(best) * keep_threshold, noise_z * sigma)`.
@@ -331,6 +359,9 @@ appended; every entry says "needs an experiment card before adoption".
   or the ledger.
 - `scout_seen.json`: URLs already fetched. `nohooks/`: empty hooks dir.
 - `cycle.json`, `fence.json`: interactive-mode state.
+- `next.json` (cycle start for `kl slow`), `handoff.json` (what the last handoff showed),
+  `last-try.txt` (the full `kl try` output), `eval-stderr.txt` (an evaluation crash's
+  full stderr, secrets redacted): fast-path state.
 
 ### `team.yaml`
 Restricted YAML: up to three levels of `key: value`, scalars, `#` comments,
@@ -508,9 +539,11 @@ filler slop patterns).
 - `python run.py --mock --iterations 5` exits 0 offline with keeps at cycles
   1, 2, 5, a discard at 3, a crash with lesson L-001 at 4, best metric 1.0
   (verdicts supported, supported, rejected, untested, supported).
-- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 138 tests).
+- `python -m unittest discover -s tests` passes in both default and `-X utf8` mode (currently 264 tests).
 - `python scout.py --dry-run` exits 0 online and offline (manual check, no
   test).
 - `CHANGELOG.md` has a section for `prepare.__version__` (checked by
   `TestVersion`).
 - `docs/DEMO-OUTPUT.txt` is regenerated from a fresh copy.
+- `python tools/proof_run.py --check` passes (the golden gate: every keep, discard and
+  score of the 25-seed proof run matches `docs/proof/proof.json`).

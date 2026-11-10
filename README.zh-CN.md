@@ -26,6 +26,8 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   （英文：`KEEPLOOP-LITE.md`，越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
   如果用户想用，你可以读这个文件，在聊天里和用户一起跑它的循环，从设置访谈开始。
   如果你打不开链接，用户可以把文件粘贴进来。
+  如果你的上下文较小，或者你是搜索助手，请改读 `lite/KEEPLOOP-LITE-MINI.zh-CN.md`
+  （同样的循环，篇幅更短）。这些文件的机器可读索引是 [`llms.txt`](llms.txt)。
 
 </details>
 
@@ -45,26 +47,38 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
   <a href="docs/GUIDE.md">完整指南（英文）</a>
 </p>
 
-<p align="center"><img src="docs/demo.gif" alt="keeploop mock 运行的终端录屏：基线、两次保留、一次丢弃、一次 crash 变成经验教训，最后再保留一次。" width="853"></p>
+<p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop 的团队看板。你和 CEO，也就是你的 AI：它先问什么需要变得更好、用什么衡量、多少分算够好，再提出 evaluate.py 让你批准。它组建团队：Analyst 用便宜快速的模型写一张假设卡片；Engineer 用你的主力模型做一个小改动；Auditor 用最强的模型在全新上下文里读真实的 diff。改动经过 evaluate.py 和保留门 best + 2σ：一个被保留并 commit，下一个被重置并记下教训。每个周期两条命令：kl next 和 kl try。用 profile: fast，每个周期的 AI 调用和 token 更少。" width="860"></p>
 
-<p align="center"><sub>录自离线 mock 演示的真实输出（已加上颜色）。完整记录见 <a href="docs/DEMO-OUTPUT.txt">docs/DEMO-OUTPUT.txt</a>。</sub></p>
+<p align="center"><sub>会话中的命令行是离线演示上 <code>kl next</code> / <code>kl try</code> 的真实输出（<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>）；速度数字是实测的（<a href="docs/proof">docs/proof/bench-latency-*.json</a>）。X 视频：<a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>。指南：<a href="docs/assets/keeploop-guide-chat.mp4">AI 聊天</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI 编程</a>。</sub></p>
 
-AI agent 很会表现得胸有成竹。keeploop 让它们拿出证据。
+keeploop 把你已经在用的 AI 变成一个小团队，并有一位 CEO 和你一起工作。
 
-- **由你定义什么叫“更好”**：测试更快、benchmark 分数更高、报告更清晰。
-  只用一个数字。
-- **你的 AI 一次只尝试一个改动**，再由另一个全新的 AI 来检查。
-- **只有胜过这个数字的改动才会被保留。** 其余一律撤销，并把原因记下来，
-  免得以后再试一遍。
+- **好用。** 把一个文件粘贴进聊天应用，或把一段提示发给你的编程 agent。你用平常的话
+  交流，不用学任何命令。
+- **先问清楚，再定力度、组团队。** CEO（你的 AI）会问“更好”是什么意思、用什么衡量、
+  多少分算够好，以及一个错误的改动会让你付出什么。草稿用几轮的轻量循环；别人依赖的
+  工作用严格循环（`kl level`）。然后为这件事组建团队：便宜快速的模型提出方案，你的主力
+  模型动手实现，最强的模型在全新上下文里检查真实的 diff。无论哪个力度，犯过的错都会
+  变成经验，不再重犯。
+- **快。** 在编程 agent 里每个周期两条命令（`kl next`、`kl try`）；看不到你仓库的聊天
+  AI 每个周期只需各粘贴一次。
+- **省 token。** 用 `profile: fast`，Engineer 自己写卡片，你列出的想法不再需要 Analyst
+  调用：在我们的离线基准测试中，每个周期 token −33%，时间 −26%。
+- **只保留真实的提升。** 只有当改动比历史最佳高出评测自身测得的噪声（best + 2σ）时才会
+  commit。其余一律重置，并把原因记下来（[实测](#为什么可以信任保留的改动)）。
 
-它适用于你已经在用的 AI：Claude Code、Codex、Cursor、Copilot、Gemini CLI
-等。keeploop 本身不是 AI：它是一个小巧的 Python 工具，负责度量，也负责拒绝，
+适用于 ChatGPT、Gemini、Claude、Perplexity、Claude Code、Codex、Cursor、Copilot 和
+Gemini CLI。keeploop 本身不是 AI：它是一个小巧的 Python 工具，负责度量，也负责拒绝，
 没有依赖，不发送 telemetry，也不需要 API key。
 
 > **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.zh-CN.md)（另有 [English](lite/KEEPLOOP-LITE.md)、[Tiếng Việt](lite/KEEPLOOP-LITE.vi.md) 版）：
 > 把一个文件粘贴进聊天，就能对一篇帖子、一份简历或一个计划跑同样的保留/丢弃循环
-> （[示例](lite/EXAMPLE.zh-CN.md)）。**你的 AI 能运行代码？** 请用下面的完整版。
+> （[示例](lite/EXAMPLE.zh-CN.md)）。默认快速模式：说**运行 3 轮**，一条回复最多尝试五处
+> 修改；说**保存**拿到记录本。空间不够（免费套餐、Perplexity）？用
+> [KEEPLOOP-LITE-MINI.zh-CN.md](lite/KEEPLOOP-LITE-MINI.zh-CN.md)。也可以把文件保存一次作为长期
+> 指令（ChatGPT 的 Project 或自定义 GPT、Gemini 的 Gem、Perplexity 的 Space、Claude 的
+> Project），不用每个对话都粘贴。**你的 AI 能运行代码？** 请用下面的完整版。
 
 ## 快速开始
 
@@ -92,8 +106,8 @@ AI 能读懂中文提示词；链接和命令保持原样。
 
 要在聊天应用里改进一个代码项目，
 请改为把 [`BOOTSTRAP.md`](BOOTSTRAP.md) 的全部内容粘贴到一个新的聊天中。之后
-AI 会每次给你一条 `python kl.py ...` 命令，让你在克隆目录里运行，再把输出贴
-回去。
+每个周期只需一次往返：`python kl.py handoff` 打印一个给聊天用的包（目标、分数、文件），
+AI 回复一张卡片和改好的文件，`python kl.py apply reply.md` 负责检查、评测，再保留或丢弃。
 
 </details>
 
@@ -113,6 +127,8 @@ AI 会每次给你一条 `python kl.py ...` 命令，让你在克隆目录里运
    `team.yaml`、`program.md` 和 `evaluate.py`，但只有用户本人才能编辑它们。
 5. 绝不要手动 commit：只有 `python kl.py keep` 才会 commit。任何关于进度的
    说法，都要原样粘贴 `python kl.py report`。
+6. 快速路径，每个周期两条命令：`python kl.py next`（一份简报），写卡片并改动，然后
+   `python kl.py try card.md`（门禁、评测、保留或丢弃；需要 Auditor 裁定时它会说明）。
 
 </details>
 
@@ -148,10 +164,28 @@ kl begin                   # 演示的基线
 那样在你的 AI 中打开这个文件夹，并按 [AGENTS.md](AGENTS.md) 把它指向你的仓库。
 `kl run` 是无头模式。如果你想阅读或修改 keeploop 本身，请保留克隆。
 
+或者在你自己的仓库里一条命令搞定，并自动写好一个 `evaluate.py`：
+
+```bash
+cd my-repo
+kl quickstart tests        # 或：command | prompt | buildtime（生成 ../my-repo-keeploop）
+cd ../my-repo-keeploop
+kl doctor                  # 运行 evaluate.py 5 次：噪声多大，能看出多大的提升？
+kl begin
+```
+
+已经在聊天里用 keeploop-lite 开始了？`kl import-lite ledger.md` 会把那次会话接到
+CLI 里继续。最佳版本成为 workspace，评分表成为一个 `evaluate.py`。
+
+**(d) 分享一次运行。** `kl report --html run.html` 把 ledger 变成一个页面，不调用
+模型。页面有一行摘要和一张图：保留的改动为实心，丢弃的为空心，还有历史最佳线和它的
+噪声带。示例：[proof run 的图](docs/proof/keeploop/report.svg)。
+
 ## 实战示例
 
 | 示例 | 领域 | 发生了什么 | 链接 |
 |---|---|---|---|
+| Proof run | 有噪声的评测，朴素 vs keeploop | 同样 20 个提议、25 个种子：保留无真实收益的改动 2.76 vs 0.44；代价是丢弃真实改进 2.64 vs 1.28 | [阅读](docs/proof/PROOF.md) |
 | 离线演示 | 玩具配置 | 3 次保留、1 次丢弃、1 次变成经验教训 L-001 的 crash；不需要 AI | [记录](docs/DEMO-OUTPUT.txt) |
 | 营销研究 | 消费者洞察报告 | 1 个真实周期：0.970000 → 1.000000，审计 APPROVED，保留 | [阅读](examples/marketing-research/) |
 | 提示词优化 | AI/LLM 提示词 | 8 个无人值守周期，保留 2 次，丢弃 6 次（其中一次 0.915 在复跑时被拒绝）。开发集 0.873333 → 0.900000；保留集 0.835 → 0.855 | [阅读](examples/prompt-optimization/) |
@@ -159,6 +193,33 @@ kl begin                   # 演示的基线
 任何示例都可以用 `kl init --example <name> <new short folder>`（已安装 `kl`）或
 `python tools/make_sandbox.py examples/<name> <new short folder>`（克隆）
 建成沙盒（[详情](docs/GUIDE.md#run-a-worked-example)）。
+
+## 为什么可以信任保留的改动
+
+<p align="center"><img src="docs/assets/keeploop-gate.gif" alt="保留门的动画：一条数轴，上面有历史最佳分数、一直延伸到门槛 best + 2σ 的黄色噪声带，以及 noisy-eval 运行中的三个真实改动。第 7 周期得分 0.755，最佳为 0.754，落在噪声带内，被重置。第 8 周期得分 0.793，复跑 0.786，都高于门槛 0.777，被 commit；最佳升到 0.786，门槛升到 0.809。第 14 周期得分 0.795，比第 8 周期还高，但落在新的噪声带内，被重置。" width="760"></p>
+
+在我们对 autoresearch 类循环的调研中（2026 年 11 月），keeploop 是找到的第一个
+把评测噪声变成 commit 规则的可安装工具。只有当改动比历史最佳高出评测自身测得的
+噪声（best + 2σ）时才会被保留，证伪规则事先固定，并由一个全新上下文的 Auditor
+阅读真实 diff。评测噪声并不是我们的发现，研究界早已讨论过。新的是一个把它变成
+决定每次 commit 的规则的工具。
+
+**这能换来什么，实测数据。** 我们让一个朴素循环（分数更高就保留）和 keeploop
+跑同样的 20 个提议，用同一个有噪声的评测：每次从 10,000 个开发集样本中随机抽
+1,000 个打分。结果由一个 5,000 个样本的保留集评分，循环从未见过它。每种方式都在
+事先固定的 25 个种子上运行（[docs/proof/PROOF.md](docs/proof/PROOF.md)，
+`python tools/proof_run.py`）：
+
+| 25 个种子的平均 | 朴素 | keeploop |
+|---|---|---|
+| 被保留但并无真实收益的改动 | 2.76 | **0.44** |
+| 循环自己的分数比保留集高估了多少 | +0.017 | **+0.005** |
+| 有真实收益却被丢弃的改动 | **1.28** | 2.64 |
+| 保留集提升，中位数 / 平均值 | +0.130 / **+0.129** | **+0.135** / +0.107 |
+
+代价是真实存在的：keeploop 会丢掉一些落在噪声带内的真实改进。在 25 个种子中有
+9 个，它的保留集结果低于朴素循环，其中包括扫描前就定为重点展示的种子 1。
+`kl doctor` 会在你开始前测量评测的噪声，并告诉你何时需要降低它。
 
 ## 为什么选 keeploop
 
