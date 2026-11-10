@@ -3,8 +3,9 @@
     python tools/render_guides.py [--only chat|code] [--out docs/assets]
     python tools/render_guides.py --only chat --stills 3.1,9.5 --out /tmp/x   # PNGs at those times
 
-Not a keeploop dependency: needs Node with Playwright's Chromium (require('playwright'))
-and ffmpeg.
+Not a keeploop dependency: needs Node with Playwright's Chromium (require('playwright')),
+npm and ffmpeg. The motion engine (tools/figure/deck.js) runs on GSAP, pinned below; npm
+fetches it once into a cache outside the repo, and nothing of it is committed.
 
 - chat: tools/figure/guide-chat.html -> keeploop-guide-chat.mp4 / .gif / .png.
   keeploop-lite in a chat app, six steps, illustrated with lite/EXAMPLE.md.
@@ -12,7 +13,8 @@ and ffmpeg.
   keeploop with a coding AI, five steps, from README.md "Quick start", AGENTS.md and
   team.yaml.
 
-Each page exposes window.render(t), a pure function of time, and window.TOTAL (seconds).
+Each page exposes window.render(t), a pure function of time, window.TOTAL (seconds) and
+window.POSTER (the time of the still written as the .png).
 Before any frame is rendered, two checks run on the page:
 - every element with data-src="FILE" (its data-quote, or else its text) must appear word
   for word in FILE (whitespace folded), so a quoted line or score cannot drift from the
@@ -22,6 +24,7 @@ Before any frame is rendered, two checks run on the page:
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -32,7 +35,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 FIG = REPO / "tools" / "figure"
 PAGES = {"chat": "guide-chat.html", "code": "guide-code.html"}
-POSTER_AT = {"chat": 22.5, "code": 21.0}  # seconds: a busy, finished frame of a middle step
+GSAP = "3.15.1"  # build-time only, under GSAP's standard no-charge license
+GSAP_FILES = ("gsap", "ScrollToPlugin", "SplitText", "TextPlugin", "DrawSVGPlugin", "Flip")
 
 DRIVER = r"""
 const { chromium } = require('playwright');
@@ -43,6 +47,7 @@ const { chromium } = require('playwright');
   await p.goto('file://' + html);
   await p.evaluate(() => document.fonts.ready);
   const total = await p.evaluate(() => window.TOTAL);
+  const poster = await p.evaluate(() => window.POSTER);
   // the facts each page claims, for the Python side to check
   const facts = await p.evaluate(() => {
     const T = window.TOTAL, q = [], cmds = [];
@@ -53,7 +58,7 @@ const { chromium } = require('playwright');
     }
     return { q, cmds };
   });
-  require('fs').writeFileSync(`${out}/facts.json`, JSON.stringify({ total, ...facts }));
+  require('fs').writeFileSync(`${out}/facts.json`, JSON.stringify({ total, poster, ...facts }));
   // warm-up: walk the whole timeline once, so every lazily loaded font is in before frame 0
   for (let t = 0; t <= total; t += 0.5) {
     await p.evaluate(t => window.render(t), t);
@@ -109,9 +114,36 @@ def check(facts: dict, page: str) -> None:
           f"{len({fold(c) for c in facts['cmds']})} kl commands exist")
 
 
+def gsap_dist() -> Path:
+    """GSAP's dist folder, fetched once with npm into a cache outside the repo."""
+    cache = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "keeploop-build" / f"gsap-{GSAP}"
+    dist = cache / "node_modules" / "gsap" / "dist"
+    if not (dist / "gsap.min.js").exists():
+        if not shutil.which("npm"):
+            raise SystemExit("npm not found (build-time only: it fetches GSAP)")
+        cache.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["npm", "install", "--prefix", str(cache), "--no-audit", "--no-fund", "--silent",
+                        f"gsap@{GSAP}"], check=True)
+    if f"GSAP {GSAP}" not in (dist / "gsap.min.js").read_text(encoding="utf-8")[:200]:
+        raise SystemExit(f"{dist}: not GSAP {GSAP}")
+    return dist
+
+
+def stage(name: str, tmp: Path) -> Path:
+    """The page, its stylesheet, the engine and GSAP, side by side, as the page links them."""
+    site = tmp / "site"
+    (site / "vendor").mkdir(parents=True)
+    for f in (PAGES[name], "kl.css", "deck.js"):
+        shutil.copyfile(FIG / f, site / f)
+    dist = gsap_dist()
+    for f in GSAP_FILES:
+        shutil.copyfile(dist / f"{f}.min.js", site / "vendor" / f"{f}.min.js")
+    return site / PAGES[name]
+
+
 def frames(name: str, tmp: Path, fps: int, stills: str = "") -> dict:
     (tmp / "driver.js").write_text(DRIVER, encoding="utf-8")
-    subprocess.run(["node", str(tmp / "driver.js"), str(FIG / PAGES[name]), str(tmp), str(fps), "1920", "1080",
+    subprocess.run(["node", str(tmp / "driver.js"), str(stage(name, tmp)), str(tmp), str(fps), "1920", "1080",
                     stills], check=True)
     (tmp / "warmup.png").unlink(missing_ok=True)
     facts = json.loads((tmp / "facts.json").read_text(encoding="utf-8"))
@@ -119,24 +151,24 @@ def frames(name: str, tmp: Path, fps: int, stills: str = "") -> dict:
     return facts
 
 
-def encode(name: str, tmp: Path, out: Path, fps: int, total: float) -> None:
+def encode(name: str, tmp: Path, out: Path, fps: int, total: float, poster_at: float) -> None:
     stem = f"keeploop-guide-{name}"
     mp4, gif, png = out / f"{stem}.mp4", out / f"{stem}.gif", out / f"{stem}.png"
     pat = str(tmp / "f%05d.png")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", pat,
                     "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p",
                     "-movflags", "+faststart", str(mp4)], check=True)
-    poster = tmp / f"f{round(POSTER_AT[name] * fps):05d}.png"
+    poster = tmp / f"f{round(poster_at * fps):05d}.png"
     shutil.copyfile(poster, png)
     # the GIF: 1280 wide, one shared palette, no dither; area scaling adds no ringing, which
-    # keeps the palette small. Take the smoothest setting that stays under 4 MB.
-    for gfps, colors in ((12, 64), (12, 48), (10, 48), (8, 48)):
+    # keeps the palette small. Take the smoothest setting that stays under 8 MB.
+    for gfps, colors in ((12, 64), (12, 48), (10, 48), (8, 48), (8, 32), (6, 32)):
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", pat,
                         "-vf", f"fps={gfps},scale=1280:-1:flags=area,split[a][b];"
                         f"[a]palettegen=max_colors={colors}:stats_mode=full[p];"
                         "[b][p]paletteuse=dither=none:diff_mode=rectangle",
                         "-loop", "0", str(gif)], check=True)
-        if gif.stat().st_size < 4e6:
+        if gif.stat().st_size < 8e6:
             break
     for f in (mp4, gif, png):
         print(f"wrote {f.relative_to(REPO) if f.is_relative_to(REPO) else f} ({f.stat().st_size / 1e6:.2f} MB)")
@@ -150,7 +182,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--stills", default="", help="comma-separated times: write PNGs there instead of a video")
     a = ap.parse_args(argv)
-    for tool in ("node", "ffmpeg"):
+    for tool in ("node", "ffmpeg", "npm"):
         if not shutil.which(tool):
             raise SystemExit(f"{tool} not found (build-time only)")
     a.out.mkdir(parents=True, exist_ok=True)
@@ -163,7 +195,7 @@ def main(argv: list[str]) -> int:
                     shutil.copyfile(p, a.out / f"{name}-{p.name}")
                 print(f"wrote {len(a.stills.split(','))} stills of {name} to {a.out}")
             else:
-                encode(name, tmp, a.out, a.fps, facts["total"])
+                encode(name, tmp, a.out, a.fps, facts["total"], facts["poster"])
     return 0
 
 

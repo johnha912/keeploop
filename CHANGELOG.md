@@ -21,6 +21,20 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+### Changed
+
+- The two README figures are static paper figures with one motion each:
+  `keeploop-team.gif` (Fig. 1) is the complete team board, and a glow steps through
+  the stages; `keeploop-gate.gif` (Fig. 2) is three settled scenes (cycles 7, 8 and 14)
+  joined by instant cuts. Both have a caption, and their first and last frames are
+  identical.
+- The two user guides are about 2.5 times slower (about 80 s each), paced so the
+  headline and text of each step can be read. Their motion engine
+  (`tools/figure/deck.js`) now runs on GSAP, which `tools/render_guides.py` fetches at
+  build time, pinned (nothing of it is committed). The steps form one tall page that
+  scrolls to the next step; headlines rise word by word; commands are typed; icons are
+  drawn in; and in the chat guide the kept score flies to "best so far".
+
 ## [0.3.0] - 2026-11-09
 
 ### Added
