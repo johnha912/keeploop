@@ -346,17 +346,47 @@ def _hash_tree(top: Path, out: dict, label: str, skip=()) -> None:
             out[label + Path(d, n).relative_to(top).as_posix()] = _sha(Path(d, n))
 
 
+def git_dirs(workspace: Path) -> tuple[Path, Path]:
+    """(git dir, common git dir) of the workspace, as `git rev-parse --git-dir` and
+    `--git-common-dir` give them, read from git's own pointer files instead of running
+    git (whose config is what the fence guards). A plain repo: both are <workspace>/.git.
+    A worktree: <workspace>/.git is a file `gitdir: PATH`, and PATH/commondir names the
+    main repository's .git, where the config, hooks and info that git runs from live."""
+    dot = workspace / ".git"
+    if not dot.is_file():
+        return dot, dot
+    try:
+        line = dot.read_text(encoding="utf-8").strip()
+    except OSError:
+        return dot, dot
+    if not line.startswith("gitdir:"):
+        return dot, dot
+    gitdir = (workspace / line[len("gitdir:"):].strip()).resolve()
+    try:
+        common = (gitdir / (gitdir / "commondir").read_text(encoding="utf-8").strip()).resolve()
+    except OSError:
+        common = gitdir
+    return gitdir, common
+
+
 def fingerprint(root: Path, workspace: Path) -> dict:
     """{relpath: sha256} of everything an agent must not touch: all of root
     (.git, __pycache__, .venv and the state dir included) except the workspace
     and root .git/objects, plus the workspace's git config, info/ and hooks/
-    (config can make our own git calls run commands). Content, never size+mtime."""
+    (config can make our own git calls run commands). Content, never size+mtime.
+    For a worktree they are read where git reads them: the main repository's .git
+    (config, hooks, info) and the worktree's own git dir (config.worktree)."""
     out = {}
     _hash_tree(root, out, "", {workspace, root / ".git" / "objects"})
-    gitdir = workspace / ".git"
+    gitdir, common = git_dirs(workspace)
+    label = "<workspace>/.git/" if common == workspace / ".git" else "<git-common>/"
     for sub in ("info", "hooks"):
-        _hash_tree(gitdir / sub, out, f"<workspace>/.git/{sub}/")
-    out["<workspace>/.git/config"] = _sha(gitdir / "config")
+        _hash_tree(common / sub, out, f"{label}{sub}/")
+    out[f"{label}config"] = _sha(common / "config")
+    for d, lab in {(gitdir, "<workspace>/.git/" if gitdir == workspace / ".git" else "<git-dir>/"),
+                   (common, label)}:
+        if (d / "config.worktree").exists():
+            out[f"{lab}config.worktree"] = _sha(d / "config.worktree")
     return out
 
 
