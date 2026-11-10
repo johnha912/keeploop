@@ -812,7 +812,8 @@ def take_baseline(state: Path, loop_cfg: dict, evaluate, has_holdout: bool,
     """Score the untouched workspace noise_runs times, record best.json (+ the
     hidden holdout baseline) and ledger row 0. Returns (summary, error)."""
     runs = []
-    for _ in range(max(1, loop_cfg["noise_runs"])):  # repeats measure the noise
+    n_runs = max(1, int(loop_cfg["noise_runs"]))
+    for _ in range(n_runs):  # repeats measure the noise (baseline only, never per cycle)
         metric, error = evaluate()
         if metric is None:
             return "", f"baseline evaluation failed: {error}"
@@ -823,7 +824,7 @@ def take_baseline(state: Path, loop_cfg: dict, evaluate, has_holdout: bool,
         if held is None:
             return "", f"baseline holdout failed: {error}"
         _write_json(state / "holdout.json", {"baseline": held, "eval_baseline": metric})
-    best.update(metric=metric, sigma=sigma,
+    best.update(metric=metric, sigma=sigma, noise_runs=n_runs,
                 commit=git(workspace, "rev-parse", "HEAD").strip())
     _write_json(state / "best.json", best)
     save_scorer_notes(state, best["commit"])
@@ -831,9 +832,19 @@ def take_baseline(state: Path, loop_cfg: dict, evaluate, has_holdout: bool,
         "cycle": 0, "ts": _now(), "role_vendors": role_vendors,
         "metric": f"{metric:.6f}", "best_metric": f"{metric:.6f}",
         "status": "keep", "tokens": 0, "lesson_id": "",
-        "description": "baseline: untouched workspace"})
+        "description": "baseline: untouched workspace"
+                       + ("; WARNING sigma not measured (noise_runs 1): the keep bar is the best"
+                          if n_runs < 2 else "")})
     return (f"baseline metric = {metric:.6f}  sigma = {sigma:.6f} ({len(runs)} runs)"
-            + ("  holdout baseline recorded" if has_holdout else "")), ""
+            + ("  holdout baseline recorded" if has_holdout else "")
+            + ("\n" + UNMEASURED if n_runs < 2 else "")), ""
+
+
+# loop.noise_runs below 2 measures no noise: said loudly at the baseline, by kl level and
+# kl doctor, and in the ledger's baseline row, never silently
+UNMEASURED = ("WARNING: sigma is NOT measured (loop.noise_runs is 1): the keep bar is the best "
+              "itself, so with a noisy evaluate.py a lucky run is kept as a gain. Set "
+              "loop.noise_runs: 3 or more, or check with `kl doctor` that the score does not move.")
 
 
 def commit_keep(workspace: Path, state: Path, best: dict, n: int, card1: str,

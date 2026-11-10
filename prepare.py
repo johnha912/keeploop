@@ -84,9 +84,11 @@ _LEAN = {
     "eval_stderr_handle": True,
 }
 PROFILES = {
-    # small, reversible work with a deterministic score (a draft, a script, a config):
-    # few cycles, stop early, no noise measurement (one baseline run; sigma is 0)
-    "light": {**_LEAN, "max_iterations": 3, "stall_cycles": 2, "noise_runs": 1, "confirm_keep": False},
+    # small, reversible work (a draft, a script, a config): few cycles, stop early, no
+    # re-run before a keep. The noise is still measured (3 baseline runs, once per loop):
+    # a deterministic score gets sigma 0 and the bar is the best, as before, but a noisy
+    # one keeps its best + 2 sigma bar instead of being kept on a lucky run.
+    "light": {**_LEAN, "max_iterations": 3, "stall_cycles": 2, "noise_runs": 3, "confirm_keep": False},
     "fast": {
         "fused": True,
         "auto_cards": True,

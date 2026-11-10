@@ -727,7 +727,7 @@ def cmd_slow(c, a) -> int:
     if best.get("sigma") == 0:
         print(f"- noise: sigma is 0, so `loop.noise_runs` ({c.loop_cfg['noise_runs']}) can drop to 1 "
               "at the next baseline; saves (noise_runs-1) evaluations once; risk: a metric that "
-              "becomes noisy later goes unmeasured.")
+              "becomes noisy later goes unmeasured (kl begin and kl doctor then warn).")
     print("- scout: run `kl scout` once per session, not per cycle; saves its network time; "
           "risk: fewer fresh ideas.")
     print(f"Apply model/budget levers only through `{kl()} staff --goal speed --apply` "
@@ -1563,6 +1563,26 @@ def doctor_text(runs: list[float], loop_cfg: dict, want: float | None, secs: flo
     return out
 
 
+def unmeasured_loop(best: dict, loop_cfg: dict, measured_sd: float) -> list[str]:
+    """kl doctor on a loop whose keep bar is its best without the noise having been shown
+    to be 0: a baseline from one run, a noisy score under a sigma-0 baseline, or a
+    noise_runs below 2 for the next baseline."""
+    out = []
+    if best.get("metric") is not None:
+        n, sigma = best.get("noise_runs"), float(best.get("sigma") or 0.0)
+        if n is not None and int(n) < 2:
+            out.append(f"WARNING: this loop's baseline came from {n} run: its sigma was never "
+                       "measured and its keep bar is its best. A human must take a new baseline "
+                       "with loop.noise_runs 3 or more.")
+        elif sigma == 0 and measured_sd > 0:
+            out.append(f"WARNING: this loop's baseline sigma is 0, so its keep bar is its best, but "
+                       f"evaluate.py is noisy now (sigma {measured_sd:.6f}): a lucky run would be kept. "
+                       "A human must take a new baseline with loop.noise_runs 3 or more.")
+    if int(loop_cfg["noise_runs"]) < 2:
+        out.append(R.UNMEASURED)
+    return out
+
+
 STAKES = {
     "low": "a draft or a personal file you can redo",
     "medium": "something other people use, that you can still roll back",
@@ -1578,8 +1598,8 @@ def level_for(stakes: str, sigma: float) -> tuple[str, list[str]]:
                             "an Auditor verdict on every keep, the full Analyst"]
     if stakes == "low" and sigma == 0:
         return "light", ["a wrong keep is cheap to undo and the score does not move between runs: "
-                         "at most 3 cycles, stop after 2 without a keep, one baseline run, "
-                         "no re-run, fewer AI calls"]
+                         "at most 3 cycles, stop after 2 without a keep, no re-run, fewer AI "
+                         "calls; the noise is still measured (3 baseline runs)"]
     why = ["fewer AI calls and shorter prompts, the full keep law"]
     if stakes == "low":
         why.append(f"not light: the score moves between runs (sigma {sigma:.6f}), so the noise "
@@ -1601,7 +1621,7 @@ def _set_profile(team: Path, name: str) -> None:
 def cmd_level(c, a) -> int:
     best = R._read_json(c.state / "best.json")
     if best.get("metric") is not None:
-        sigma, src = float(best.get("sigma") or 0.0), f"baseline ({c.loop_cfg['noise_runs']} runs)"
+        sigma, src = float(best.get("sigma") or 0.0), f"baseline ({best.get('noise_runs', c.loop_cfg['noise_runs'])} runs)"
     else:  # not begun: measure, like kl doctor, without logging anything
         if problem := R.workspace_error(c.root, c.workspace):
             raise Refuse(problem)
@@ -1618,6 +1638,8 @@ def cmd_level(c, a) -> int:
     print("\n".join(f"  {w}" for w in why))
     print("  always on: lessons (a mistake is never repeated), the fence, the gates, "
           "loop.target and loop.stall_cycles")
+    if int(c.loop_cfg["noise_runs"]) < 2:  # an explicit loop.noise_runs: 1 wins over any level
+        print(R.UNMEASURED)
     cur = (c.team.get("loop") or {}).get("profile")
     if a.apply:
         _set_profile(c.root / "team.yaml", name)
@@ -1639,6 +1661,7 @@ def cmd_doctor(c, a) -> int:
             raise Refuse(f"evaluate.py failed on run {i + 1}: {error}")
         runs.append(metric)
     print("\n".join(doctor_text(runs, c.loop_cfg, a.want, (time.monotonic() - start) / len(runs))))
+    print("\n".join(unmeasured_loop(R._read_json(c.state / "best.json"), c.loop_cfg, statistics.stdev(runs))))
     print("nothing was logged: kl doctor only measures (the baseline is `" + kl() + " begin`)")
     return 0
 
