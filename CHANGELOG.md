@@ -115,6 +115,13 @@ release. The one-time PyPI setup and the steps are in
     your AI a team, it asks first (the illustrative lite example), it staffs the team, two
     commands a cycle, it keeps only what clears the noise (with the price), fewer calls and
     tokens, where it works.
+  - `docs/assets/keeploop-guide-chat.mp4` and `keeploop-guide-code.mp4` (+ GIFs), two
+    30-second step-by-step guides, one for chat apps (keeploop-lite: paste or save the file,
+    the setup questions, the scorecard, the team, "run 3 cycles", "save", on the lite
+    example) and one for coding agents (one prompt, the four questions, `kl level`, the
+    team, `kl next` / `kl try`, `kl report`, `kl handoff` / `kl apply`). Rendered by
+    `tools/render_guides.py`, which refuses to render if a quoted line is not word for word
+    in its source file or a `kl` command shown does not exist.
   - `docs/assets/keeploop-gate.gif`, "the keep gate", in the README's new "Why trust the
     keeps" section: three real changes from the proof run on one number line.
 - Measured speed of `profile: fast` on the offline demo with simulated call latency

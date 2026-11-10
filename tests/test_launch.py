@@ -109,7 +109,8 @@ class TestProofRun(Tmp):
         self.assertTrue(any(ln.strip().startswith("KEEP") for ln in cyc[b]))
         for name in ("keeploop-demo.gif", "keeploop-demo.mp4", "keeploop-demo-poster.png",
                      "keeploop-gate.gif", "keeploop-gate.png", "keeploop-team.gif", "keeploop-team.png",
-                     "keeploop-x.mp4", "keeploop-x.png"):
+                     "keeploop-x.mp4", "keeploop-x.png", "keeploop-guide-chat.mp4", "keeploop-guide-chat.gif",
+                     "keeploop-guide-code.mp4", "keeploop-guide-code.gif"):
             size = (ROOT / "docs" / "assets" / name).stat().st_size
             self.assertTrue(0 < size < 15_000_000, name)
 
@@ -141,6 +142,18 @@ class TestFigure(unittest.TestCase):
             typed += [f"{b['score']:.3f}" for b in beats] + [f"{x:.3f}" for x in sample["scores"]]
             for value in typed:  # every result on a page comes from DATA, none is typed in
                 self.assertNotIn(value, html, page)
+
+
+class TestReadmeLinks(unittest.TestCase):
+    def test_every_local_link_in_the_readmes_exists(self):
+        import re
+        for name in ("README.md", "README.vi.md", "README.zh-CN.md"):
+            text = re.sub(r"<!--.*?-->", "", (ROOT / name).read_text(encoding="utf-8"), flags=re.S)
+            links = re.findall(r'(?:\]\(|src="|href="|srcset=")([^)"\s#]+)', text)
+            for link in links:
+                if re.match(r"[a-z][a-z0-9+.-]*:", link, re.I):
+                    continue  # a URL
+                self.assertTrue((ROOT / link).exists(), f"{name} links to missing {link}")
 
 
 class TestNarrateAndReport(Tmp):
