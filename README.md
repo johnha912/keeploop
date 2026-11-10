@@ -53,7 +53,7 @@ in the current conversation:
 
 <p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop as a team board. You and the CEO, your AI: it asks what should get better, how to measure it and what score is good enough, then proposes evaluate.py for you to approve. It staffs a team: an Analyst on a cheap fast model writes one hypothesis card, an Engineer on your main model makes one small change, an Auditor on the strongest model reads the real diff in a fresh context. A change runs through evaluate.py and the keep gate, best + 2σ: one is kept and committed, the next is reset with a lesson. Two commands a cycle, kl next and kl try. With profile: fast, fewer AI calls and tokens per cycle." width="860"></p>
 
-<p align="center"><sub>The session lines are real output of <code>kl next</code> / <code>kl try</code> on the offline demo (<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>); the speed numbers are measured (<a href="docs/proof">docs/proof/bench-latency-*.json</a>). Video for X: <a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>. Guides: <a href="docs/assets/keeploop-guide-chat.mp4">AI chat</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI code</a>.</sub></p>
+<p align="center"><sub>The session lines are real output of <code>kl next</code> / <code>kl try</code> on the offline demo (<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>); the speed numbers are measured (<a href="docs/proof">docs/proof/bench-latency-*.json</a>). Video for X: <a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>. Guides: <a href="docs/GUIDE.md#video-guides">AI chat · AI code</a>.</sub></p>
 
 keeploop turns the AI you already use into a small team, with a CEO that works
 beside you.
@@ -90,6 +90,10 @@ measures and refuses, with no dependencies, no telemetry and no API keys.
 > Perplexity Space, a Claude Project) instead of pasting it into every chat.
 > **Your AI can run code?** Use the full version below.
 
+<p align="center"><img src="docs/assets/keeploop-guide-chat.gif" alt="keeploop-lite in a chat app, step by step: paste the file (or save it once as standing instructions), paste the thing you want better, agree on what better means as a locked scorecard, meet the team named for your field, say run 3 cycles and only a better version is kept, say save to get the ledger." width="860"></p>
+
+<p align="center"><sub>Step by step in a chat app. Full-size video (1080p): <a href="docs/GUIDE.md#video-guides">the guide</a>.</sub></p>
+
 ## Quick start
 
 **(a) Hand it to your AI.** If it can run commands, paste this and fill in
@@ -106,6 +110,10 @@ AI asks in plain words what "better" means and how to measure it, then
 proposes an `evaluate.py` (a small script that prints that number) for you
 to approve before anything changes. In Claude Code, `/keeploop 3` inside
 the clone runs three cycles.
+
+<p align="center"><img src="docs/assets/keeploop-guide-code.gif" alt="keeploop with a coding AI, step by step: paste one prompt, answer four questions in plain words and approve evaluate.py, the CEO sets the weight (light, fast or rigorous), staffs the team with a model per role, runs two commands a cycle (kl next, kl try) and shares the run with kl report." width="860"></p>
+
+<p align="center"><sub>Step by step with a coding AI. Full-size video (1080p): <a href="docs/GUIDE.md#video-guides">the guide</a>.</sub></p>
 
 <details>
 <summary><b>Chat app that cannot run commands (ChatGPT, Gemini apps)</b></summary>

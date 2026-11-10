@@ -49,7 +49,7 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
 
 <p align="center"><img src="docs/assets/keeploop-team.gif" alt="keeploop 的团队看板。你和 CEO，也就是你的 AI：它先问什么需要变得更好、用什么衡量、多少分算够好，再提出 evaluate.py 让你批准。它组建团队：Analyst 用便宜快速的模型写一张假设卡片；Engineer 用你的主力模型做一个小改动；Auditor 用最强的模型在全新上下文里读真实的 diff。改动经过 evaluate.py 和保留门 best + 2σ：一个被保留并 commit，下一个被重置并记下教训。每个周期两条命令：kl next 和 kl try。用 profile: fast，每个周期的 AI 调用和 token 更少。" width="860"></p>
 
-<p align="center"><sub>会话中的命令行是离线演示上 <code>kl next</code> / <code>kl try</code> 的真实输出（<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>）；速度数字是实测的（<a href="docs/proof">docs/proof/bench-latency-*.json</a>）。X 视频：<a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>。指南：<a href="docs/assets/keeploop-guide-chat.mp4">AI 聊天</a> · <a href="docs/assets/keeploop-guide-code.mp4">AI 编程</a>。</sub></p>
+<p align="center"><sub>会话中的命令行是离线演示上 <code>kl next</code> / <code>kl try</code> 的真实输出（<a href="docs/assets/demo-run/fastpath.txt">fastpath.txt</a>）；速度数字是实测的（<a href="docs/proof">docs/proof/bench-latency-*.json</a>）。X 视频：<a href="docs/assets/keeploop-x.mp4">keeploop-x.mp4</a>。指南：<a href="docs/GUIDE.md#video-guides">AI 聊天 · AI 编程</a>。</sub></p>
 
 keeploop 把你已经在用的 AI 变成一个小团队，并有一位 CEO 和你一起工作。
 
@@ -80,6 +80,10 @@ Gemini CLI。keeploop 本身不是 AI：它是一个小巧的 Python 工具，�
 > 指令（ChatGPT 的 Project 或自定义 GPT、Gemini 的 Gem、Perplexity 的 Space、Claude 的
 > Project），不用每个对话都粘贴。**你的 AI 能运行代码？** 请用下面的完整版。
 
+<p align="center"><img src="docs/assets/keeploop-guide-chat.gif" alt="在聊天应用里使用 keeploop-lite，一步一步：粘贴文件（或保存一次作为长期指令），粘贴你想改进的内容，把“更好”约定为一张锁定的评分表，认识按你的行业命名的团队，说运行 3 轮，只保留更好的版本，说保存拿到记录本。" width="860"></p>
+
+<p align="center"><sub>在聊天应用里一步一步。高清完整视频（1080p）：<a href="docs/GUIDE.md#video-guides">详细指南</a>。</sub></p>
+
 ## 快速开始
 
 **(a) 交给你的 AI。** 如果它能运行命令，把下面这段话粘贴给它，并补全最后
@@ -97,6 +101,10 @@ AI 能读懂中文提示词；链接和命令保持原样。
 “更好”指什么、怎么度量，然后提出一个 `evaluate.py`（一个输出那个数字的小
 脚本）供你批准，批准之前什么都不会改动。在 Claude Code 中，在克隆目录里运行
 `/keeploop 3` 就会跑三个周期。
+
+<p align="center"><img src="docs/assets/keeploop-guide-code.gif" alt="在编程 AI 中使用 keeploop，一步一步：粘贴一条提示词，用大白话回答四个问题并批准 evaluate.py，CEO 选择轻重（light、fast 或 rigorous），为每个角色配一个模型组建团队，每个周期两条命令（kl next、kl try），再用 kl report 分享结果。" width="860"></p>
+
+<p align="center"><sub>在编程 AI 中一步一步。高清完整视频（1080p）：<a href="docs/GUIDE.md#video-guides">详细指南</a>。</sub></p>
 
 <details>
 <summary><b>无法运行命令的聊天应用（ChatGPT、Gemini 应用）</b></summary>

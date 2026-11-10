@@ -2,8 +2,8 @@
 <html lang="en"><head><meta charset="utf-8">
 <title>keeploop for AI code</title>
 <!-- User guide B: keeploop with a coding AI (Claude Code, Codex, Cursor, Copilot,
-     Gemini CLI). A step-by-step motion deck, 1920x1080. tools/render_guides.py screenshots
-     render(t). Build-time only. The prompt is README.md's Quick start (a); the steps follow
+     Gemini CLI). A step-by-step motion deck, 1920x1080, on the GSAP engine in deck.js.
+     tools/render_guides.py screenshots render(t). Build-time only. The prompt is README.md's Quick start (a); the steps follow
      AGENTS.md and team.yaml. Every `kl` command shown (class "kl") is checked against
      `python kl.py --help`, and every data-src line against its file, before a frame is
      rendered. No result or score is shown. -->
@@ -428,115 +428,12 @@ h1 > span { display: block; }
 
 <div class="prog" id="prog"></div>
 
-<script>
-/* The deck engine: a pure function of t. Each scene lasts DUR[i] seconds; inside a scene,
-   an element with data-at="s" animates in at s seconds after the scene starts (data-fx says
-   how). Nothing reads the clock: render(t) sets every style from t alone. */
-const DUR = [2.0, 4.0, 4.2, 4.6, 4.0, 4.4, 3.8, 2.8];
-const STEPS = ["Paste one prompt", "Answer 4 questions", "Set the weight", "Meet the team", "Run cycles", "Share"];
-const NSTEP = STEPS.length;
-const START = DUR.reduce((a, d, i) => (a.push(i ? a[i - 1] + DUR[i - 1] : 0), a), []);
-const TOTAL = START[START.length - 1] + DUR[DUR.length - 1];
-const clamp = k => Math.max(0, Math.min(1, k));
-const ease = k => 1 - Math.pow(1 - clamp(k), 3);
-const back = k => { k = clamp(k); const c = 1.70158; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
-const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-const scenes = [...document.querySelectorAll(".scene")];
-scenes.forEach(sc => {
-  // defaults for the left column and the main card
-  const def = [[".l1", 0.05], [".l2", 0.22], [".left .body", 0.42], [".left .tags", 0.6], [".src", 0.8], [".card", 0.12]];
-  def.forEach(([q, at]) => sc.querySelectorAll(q).forEach(e => {
-    if (!e.dataset.at) { e.dataset.at = at; e.dataset.fx = e.dataset.fx || (q === ".card" ? "card" : "up"); }
-  }));
-  sc.anims = [...sc.querySelectorAll("[data-fx]")];
-  sc.anims.forEach(e => { if (e.dataset.fx === "type") e.innerHTML = `<span class="ghost">${esc(e.dataset.text)}</span>`; });
-  sc.anims.forEach(e => { if (e.dataset.fx === "swap") { e.vals = e.dataset.vals.split("|"); e.ats = e.dataset.ats.split("|").map(Number); } });
-});
-
-const prog = document.getElementById("prog");
-STEPS.forEach((s, i) => {
-  const g = document.createElement("div"); g.className = "sg";
-  g.innerHTML = `<div class="tr"><div class="fl"></div></div><div class="lb"><b>${String(i + 1).padStart(2, "0")}</b>${s}</div>`;
-  prog.appendChild(g);
-});
-const segs = [...prog.children];
-const stepno = document.getElementById("stepno");
-
-function fx(e, lt) {
-  const at = +e.dataset.at, f = e.dataset.fx, s = e.style;
-  if (f === "up" || f === "card") {
-    const k = ease((lt - at) / (f === "card" ? 0.6 : 0.45));
-    s.opacity = k;
-    s.transform = f === "card" ? `translateX(${(1 - k) * 70}px) scale(${0.97 + 0.03 * k})` : `translateY(${(1 - k) * 26}px)`;
-  } else if (f === "deal") {
-    const k = ease((lt - at) / 0.6), r = +(e.dataset.rot || -6);
-    s.opacity = clamp((lt - at) / 0.2);
-    s.transform = `translateY(${(1 - k) * 160}px) rotate(${(1 - k) * r}deg)`;
-  } else if (f === "pop") {
-    s.display = "inline-block";
-    s.opacity = clamp((lt - at) / 0.15);
-    s.transform = `scale(${lt < at ? 0.6 : 0.6 + 0.4 * back((lt - at) / 0.4)})`;
-  } else if (f === "ai") {
-    const dots = e.querySelector(".tdots"), body = e.children[2], who = e.children[0];
-    const typing = lt >= at - 0.6 && lt < at;
-    who.style.opacity = lt >= at - 0.6 ? 1 : 0;
-    dots.style.opacity = typing ? 1 : 0;
-    [...dots.children].forEach((d, i) => d.style.opacity = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin((lt * 9) - i * 1.1)));
-    const k = ease((lt - at) / 0.45);
-    body.style.opacity = k;
-    body.style.transform = `translateY(${(1 - k) * 22}px)`;
-  } else if (f === "state") {
-    const on = lt >= +(e.dataset.on ?? 99), cur = lt >= +(e.dataset.cur ?? 99) && !on;
-    e.classList.toggle("on", on); e.classList.toggle("cur", cur);
-  } else if (f === "swap") {
-    let i = 0; e.ats.forEach((a, j) => { if (lt >= a) i = j; });
-    e.textContent = e.vals[i];
-    if (e.dataset.cls) e.classList.toggle(e.dataset.cls, i > 0);
-    const since = lt - e.ats[i];
-    s.display = "inline-block";
-    s.transform = i > 0 && since < 0.4 ? `scale(${0.75 + 0.25 * back(since / 0.4)})` : "none";
-  } else if (f === "type") {
-    const txt = e.dataset.text, d = +(e.dataset.dur || Math.max(0.3, txt.length / 28));
-    const k = clamp((lt - at) / d), n = lt < at ? 0 : Math.round(k * txt.length);
-    const caret = lt >= at && lt < at + d + 0.5;
-    e.innerHTML = esc(txt.slice(0, n)) + (caret ? '<span class="caret"></span>' : "") + `<span class="ghost">${esc(txt.slice(n))}</span>`;
-  } else if (f === "compose") {
-    const txt = e.dataset.text, a = +e.dataset.at, snd = +e.dataset.send;
-    const typeEnd = snd - 0.22, k = clamp((lt - a) / Math.max(0.2, typeEnd - a));
-    if (lt < a || lt >= snd) { e.innerHTML = `<span class="ph">Message</span>`; return; }
-    const n = Math.round(k * txt.length);
-    const blink = (Math.floor(lt * 4) % 2 === 0) || k < 1;
-    e.innerHTML = esc(txt.slice(0, n)) + (blink ? '<span class="caret"></span>' : "");
-  }
-}
-
-function render(t) {
-  t = Math.max(0, Math.min(t, TOTAL - 1e-6));
-  const cur = START.findIndex((s, i) => t >= s && t < s + DUR[i]);
-  scenes.forEach((sc, i) => {
-    const lt = t - START[i], on = i === cur;
-    sc.style.visibility = on ? "visible" : "hidden";
-    if (!on) return;
-    const last = i === scenes.length - 1;
-    const out = last ? 1 : clamp((DUR[i] - lt) / 0.3);
-    sc.style.opacity = out;
-    sc.style.transform = `translateY(${(1 - ease(out)) * -14}px)`;
-    sc.anims.forEach(e => fx(e, lt));
-  });
-  // kicker step and progress line
-  const lt = t - START[cur];
-  stepno.innerHTML = cur === 0 ? `<b>${NSTEP}</b> STEPS` : cur > NSTEP ? `<b>DONE</b>` :
-    `STEP <b>${String(cur).padStart(2, "0")}</b> / ${String(NSTEP).padStart(2, "0")}`;
-  stepno.style.opacity = cur === 0 ? ease(lt / 0.4) : (lt < 0.3 ? ease(lt / 0.3) : 1);
-  segs.forEach((g, j) => {
-    const step = j + 1, f = step < cur ? 1 : step === cur ? clamp(lt / DUR[cur]) : 0;
-    g.querySelector(".fl").style.width = `${f * 100}%`;
-    g.classList.toggle("cur", step === cur); g.classList.toggle("done", step < cur);
-  });
-}
-window.render = render;
-window.TOTAL = TOTAL;
-render(0);
-</script>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollToPlugin.min.js"></script>
+<script src="vendor/SplitText.min.js"></script>
+<script src="vendor/TextPlugin.min.js"></script>
+<script src="vendor/DrawSVGPlugin.min.js"></script>
+<script src="vendor/Flip.min.js"></script>
+<script src="deck.js"></script>
+<script>DECK.start({ steps: ["Paste one prompt", "Answer 4 questions", "Set the weight", "Meet the team", "Run cycles", "Share"], poster: 5 });</script>
 </body></html>

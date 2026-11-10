@@ -44,7 +44,9 @@ DRIVER = r"""
 const { chromium } = require('playwright');
 (async () => {
   const [html, out, fps, total, w, h] = process.argv.slice(2);
-  const b = await chromium.launch();
+  // no partial raster: otherwise Chromium repaints a few anti-aliased edge pixels a
+  // couple of frames after a change, and a still scene shows a flicker
+  const b = await chromium.launch({ args: ['--disable-partial-raster'] });
   const p = await b.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: 1 });
   await p.goto('file://' + html);
   // warm-up: walk the whole timeline once, so every lazily loaded font is in before
@@ -133,24 +135,21 @@ def hero_data() -> dict:
     tok = 1 - fast["tokens_per_cycle_median"] / slow["tokens_per_cycle_median"]
     wall = 1 - fast["wall_s_per_cycle_median"] / slow["wall_s_per_cycle_median"]
     calls = lambda b: sum(b["calls_per_cycle_median"].values())  # noqa: E731
-    t = {"reset": 0.9, "ask": 1.0}
-    t["team"] = round(t["ask"] + 5 * 0.75 + 0.5, 2)
-    t["cycle"] = round(t["team"] + 2.3, 2)
-    t["stats"] = round(t["cycle"] + 5.2, 2)
-    t["end"] = round(t["stats"] + 2.6, 2)
+    # Fig. 1's one motion: a glow steps through the stages, then the whole board rests.
+    # Every hold is at least 1.2 s; the first and last frames are the resting board.
+    lead, rest = 0.5, 2.0
+    steps = [["analyst", 1.2], ["engineer", 1.2], ["evaluate", 1.2], ["gate", 1.6], ["commit", 1.6]]
     esc = lambda s: s.replace("&", "&amp;").replace("<", "&lt;")  # noqa: E731
+    log = ["<b>$ kl try card.md</b> · " + esc(kept), "<b>$ kl try card.md</b> · " + esc(dropped)]
+    assert "does not beat the bar" in metric  # the discarded line is the gate's verdict
     return {
         # the CEO's first-time questions (AGENTS.md: what "better" means, how to measure
         # it, what score is good enough, what a wrong change would cost), asked in one message
         "questions": ["What should get better, in your words?", "How do we measure it?",
                       "What score is good enough?", "What would a wrong change cost you?"],
-        "subs": {"ask": "It asks you first.", "team": "It staffs the team.",
-                 "cycle": "Two commands a cycle.", "fast": "Fewer calls, fewer tokens.",
-                 "done": "With a CEO beside you."},
-        "log": ["<b>$ kl next</b> · brief + card skeleton", "<b>$ kl try card.md</b> · " + esc(kept),
-                "<b>$ kl try card.md</b> · " + esc(metric.split("  -> ")[0]), esc(dropped)],
-        "log_done": ["<b>$ kl try card.md</b> · " + esc(kept), "<b>$ kl try card.md</b> · " + esc(dropped)],
-        "cycle0": 1,
+        "headline": "With a CEO beside you.",
+        "log": log,  # two real cycles of the fast path: one kept, one discarded
+        "ceo_note": f"cycle {len(log) + 1} · 2 commands each",
         "stats": [
             {"x": 40, "html": "<b>2</b> commands a cycle"},
             {"x": 262, "html": f"profile: fast · <b>−{tok:.0%}</b> tokens"},
@@ -159,7 +158,8 @@ def hero_data() -> dict:
         ],
         "measured": {"tokens": [slow["tokens_per_cycle_median"], fast["tokens_per_cycle_median"]],
                      "wall": [slow["wall_s_per_cycle_median"], fast["wall_s_per_cycle_median"]]},
-        "timeline": t, "total": round(t["end"] + 0.9, 2),
+        "lead": lead, "steps": steps, "rest": rest,
+        "total": round(lead + sum(s for _, s in steps) + rest, 2),
     }
 
 
@@ -228,22 +228,20 @@ def data(write: bool = False) -> dict:
                  and x["metric"] > first and x["metric"] <= new_best + 2 * sigma and x["true_effect"] <= 0)
     beats = [
         {"cycle": a, "change": label(c[a]["set"]), "score": c[a]["metric"], "rerun": None, "verdict": "discard",
-         "best": c[a]["best_before"], "score_label": f"scored {c[a]['metric']:.3f}",
-         "say1": f"Cycle {a} beats the best by +{c[a]['metric'] - c[a]['best_before']:.3f}.",
-         "say2": "That is inside the noise. Reset."},
+         "best": c[a]["best_before"], "score_label": f"scored {c[a]['metric']:.3f}"},
         {"cycle": b, "change": label(c[b]["set"]), "score": first, "rerun": rerun, "verdict": "keep",
-         "best": c[a]["best_before"], "score_new_best": new_best, "score_label": f"scored {first:.3f}",
-         "say1": f"Cycle {b} clears best + 2σ, then again on a re-run.",
-         "say2": "Committed. The bar moves up with the best."},
+         "best": c[a]["best_before"], "score_new_best": new_best, "score_label": f"scored {first:.3f}"},
         {"cycle": third["cycle"], "change": label(third["set"]), "score": third["metric"], "rerun": None,
-         "verdict": "discard", "best": new_best, "score_label": f"scored {third['metric']:.3f}",
-         "say1": f"Cycle {third['cycle']} scores {third['metric']:.3f}, more than cycle {b} did.",
-         "say2": "Inside the new band. Reset."},
+         "verdict": "discard", "best": new_best, "score_label": f"scored {third['metric']:.3f}"},
     ]
-    t, starts = 0.9, []
+    # Fig. 2: one settled scene per beat, joined by instant cuts; the bare figure opens
+    # the loop and rests at its end (>= 2 s), so the first and last frames are the same.
+    lead, rest = 1.0, 2.0
+    t, scenes = lead, []
     for bt in beats:
-        starts.append(round(t, 3))
-        t += 4.6 if bt["rerun"] is not None else 3.9
+        hold = 3.6 if bt["rerun"] is not None else 3.0  # the re-run scene has one more thing to read
+        scenes.append([round(t, 3), round(t + hold, 3)])
+        t += hold
     scores = [x["score"] for x in beats] + [rerun, c[a]["best_before"], new_best + 2 * sigma]
     seeds = sorted({r["seed"] for r in proof["sweep"]})
     lower = sum(by[s, "keeploop"]["holdout_gain"] < by[s, "naive"]["holdout_gain"] for s in seeds)
@@ -259,8 +257,8 @@ def data(write: bool = False) -> dict:
         "version": __version__,
         "run": {"seed": seed, "sigma": sigma},
         "readme": {"beats": beats, "lo": round(min(scores) - 0.012, 3), "hi": round(max(scores) + 0.008, 3),
-                   "idle": ["Keep only what beats the noise.", ""],
-                   "timeline": {"beats": starts, "rewind": round(t, 3)}, "total": round(t + 1.2, 3)},
+                   "headline": "Keep only what beats the noise.",
+                   "timeline": {"lead": lead, "scenes": scenes, "rest": rest}, "total": round(t + rest, 3)},
         "talk": {"noise": noise, "naive": slim(naive["cycles"]), "keep": slim(keep["cycles"])},
         "p": {"n": proof["summary"]["naive"], "k": proof["summary"]["keeploop"], "lower": lower, "seeds": len(seeds)},
     }

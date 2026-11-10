@@ -1,9 +1,11 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <title>keeploop: the keep gate</title>
-<!-- README animation: "the keep gate". One number line; real changes from the proof
-     run drop onto it as tokens; the yellow band is the noise above the best; a token
-     inside it is reset, a token past the bar (twice) is committed and moves the bar.
+<!-- README animation, Fig. 2: "the keep gate". A static number line: the best, a yellow
+     noise band up to the bar at best + 2σ. Three real changes from the proof run, one
+     settled scene each, joined by instant cuts (the one motion): inside the band is
+     reset; past the bar, twice, is committed and the next scene shows the new best and
+     bar. Nothing moves inside a scene. The loop opens and closes on the bare figure.
      tools/render_figure.py fills DATA and screenshots render(t). Build-time only. No
      result is typed here: every number is set from DATA. -->
 <style>
@@ -19,8 +21,9 @@ body { width: 1280px; height: 620px; overflow: hidden; color: var(--ink);
 .law b { background: var(--sun); padding: 2px 7px; color: var(--ink); }
 .say { position: absolute; left: 44px; top: 88px; width: 1190px; font-weight: 900; font-size: 50px;
   line-height: 1.05; letter-spacing: -1.6px; }
-.say span { display: block; }
-.say .two { color: var(--ink2); font-weight: 800; }
+.cap { position: absolute; left: 44px; right: 44px; top: 532px; padding-top: 10px; border-top: 1.5px solid #d8d0bf;
+  font: 16px/1.3 "Inter Display", Inter, sans-serif; color: var(--ink2); }
+.cap b { color: var(--ink); font-weight: 800; }
 .foot { position: absolute; left: 44px; right: 44px; bottom: 22px; display: flex; justify-content: space-between;
   font: 13.5px "JetBrains Mono", monospace; color: var(--muted); }
 svg { position: absolute; left: 0; top: 0; }
@@ -29,8 +32,9 @@ svg text { font-family: "JetBrains Mono", monospace; }
 <body>
 <div class="brand"><svg width="30" height="30" viewBox="0 0 34 34" style="position:static"><path d="M24.5 8.5 A11 11 0 1 0 28 17" fill="none" stroke="#151515" stroke-width="4.2" stroke-linecap="round"/><path d="M19 4.5 L25 8.5 L20 13.5" fill="none" stroke="#151515" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29.5" cy="11" r="3.6" fill="#12804c"/></svg>keeploop</div>
 <div class="law">keep only above <b>best + 2σ</b>, measured twice</div>
-<div class="say"><span id="say1"></span><span class="two" id="say2"></span></div>
+<div class="say" id="say"></div>
 <svg id="s" width="1280" height="620"></svg>
+<div class="cap"><b>Fig. 2</b> — The keep gate on a real noisy-eval run: inside the band is reset, past the bar is kept.</div>
 <div class="foot"><span id="src"></span><span>pipx install keeploop</span></div>
 <script id="data" type="application/json">__DATA__</script>
 <script>
@@ -41,92 +45,75 @@ const C = { ink: "#151515", ink2: "#5b574f", muted: "#9a958a", sun: "#ffd23f", s
 function el(p, tag, a, txt) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]);
   if (txt !== undefined) e.textContent = txt; p.appendChild(e); return e; }
 const f3 = x => x.toFixed(3);
-const sig = D.run.sigma, R = D.run.cyc, beats = D.readme.beats;
+const sig = D.run.sigma, beats = D.readme.beats, T = D.readme.timeline;
 const S = document.getElementById("s");
+document.getElementById("say").textContent = D.readme.headline;
 document.getElementById("src").textContent =
   `real run · examples/noisy-eval, seed ${D.run.seed} · σ = ${sig.toFixed(4)} · numbers: docs/proof`;
-// the number line
-const lo = D.readme.lo, hi = D.readme.hi, AX = 470, X0 = 70, X1 = 1210;
+
+// the number line (never moves)
+const lo = D.readme.lo, hi = D.readme.hi, AX = 462, X0 = 70, X1 = 1210, W = 1280;
 const X = v => X0 + (v - lo) / (hi - lo) * (X1 - X0);
-const band = el(S, "rect", { y: 300, height: AX - 300, fill: C.sun, stroke: C.sunEdge, "stroke-width": 1.5 });
-const bandT = el(S, "text", { y: 322, "font-size": 15, fill: C.ink, "font-weight": 700 }, "noise band");
+const BAND_TOP = 312, LAB_Y = 302, PAD = 14, EDGE = 24;
+const band = el(S, "rect", { y: BAND_TOP, height: AX - BAND_TOP, fill: C.sun, stroke: C.sunEdge, "stroke-width": 1.5 });
+const bandT = el(S, "text", { y: AX - 14, "font-size": 15, fill: C.ink, "font-weight": 700 }, "noise band");
 el(S, "line", { x1: X0 - 20, x2: X1 + 20, y1: AX, y2: AX, stroke: C.ink, "stroke-width": 3 });
 for (let v = Math.ceil(lo * 100) / 100; v <= hi + 1e-9; v += 0.01) {
   el(S, "line", { x1: X(v), x2: X(v), y1: AX, y2: AX + 9, stroke: C.ink, "stroke-width": 2 });
   el(S, "text", { x: X(v), y: AX + 30, "font-size": 15, fill: C.ink2, "text-anchor": "middle" }, v.toFixed(2));
 }
-const bestL = el(S, "line", { y1: 282, y2: AX + 4, stroke: C.ink, "stroke-width": 5 });
-const bestT = el(S, "text", { y: 274, "font-size": 16, "font-weight": 700, fill: C.ink, "text-anchor": "middle" });
-const barL = el(S, "line", { y1: 282, y2: AX + 4, stroke: C.ink, "stroke-width": 2.5, "stroke-dasharray": "7 6" });
-const barT = el(S, "text", { y: 274, "font-size": 16, "font-weight": 700, fill: C.ink, "text-anchor": "middle" });
-function setBest(b) {
-  const bar = b + 2 * sig;
-  band.setAttribute("x", X(b)); band.setAttribute("width", X(bar) - X(b));
-  bandT.setAttribute("x", X(b) + 10);
-  bestL.setAttribute("x1", X(b)); bestL.setAttribute("x2", X(b)); bestT.setAttribute("x", X(b)); bestT.textContent = `best ${f3(b)}`;
-  barL.setAttribute("x1", X(bar)); barL.setAttribute("x2", X(bar)); barT.setAttribute("x", X(bar)); barT.textContent = `bar ${f3(bar)}`;
-}
-// a token per beat
-function token(b) {
-  const g = el(S, "g", { opacity: 0 });
-  g.pin = el(g, "line", { stroke: C.ink, "stroke-width": 2 });
-  g.dot = el(g, "circle", { r: 9, fill: C.ink });
-  g.dot2 = el(g, "circle", { r: 9, fill: "none", stroke: C.ink, "stroke-width": 3, opacity: 0 });
-  g.dot2t = el(g, "text", { "font-size": 14, fill: C.ink, "text-anchor": "middle", opacity: 0 }, `re-run ${f3(b.rerun || 0)}`);
-  g.box = el(g, "rect", { width: 250, height: 70, rx: 12, fill: C.card, stroke: C.ink, "stroke-width": 2.5 });
+// best: line with its label to the left; bar: dashed line with its label to the right
+const bestL = el(S, "line", { y1: BAND_TOP - 6, y2: AX + 4, stroke: C.ink, "stroke-width": 5 });
+const bestT = el(S, "text", { y: LAB_Y, "font-size": 16, "font-weight": 700, fill: C.ink, "text-anchor": "end" });
+const barL = el(S, "line", { y1: BAND_TOP - 6, y2: AX + 4, stroke: C.ink, "stroke-width": 2.5, "stroke-dasharray": "7 6" });
+const barT = el(S, "text", { y: LAB_Y, "font-size": 16, "font-weight": 700, fill: C.ink, "text-anchor": "start" });
+
+// one callout per scene, built once; a scene shows exactly one of them, or none
+function callout(b) {
+  const keep = b.verdict === "keep", col = keep ? C.go : C.stop, x = X(b.score);
+  const g = el(S, "g", { display: "none" });
+  g.pin = el(g, "line", { x1: x, x2: x, y2: AX, stroke: C.ink, "stroke-width": 2 });
+  if (b.rerun !== null) {   // the confirm re-run: a ring on the axis, labelled to its left
+    const xr = X(b.rerun);
+    el(g, "circle", { cx: xr, cy: AX, r: 9, fill: "none", stroke: col, "stroke-width": 3 });
+    el(g, "text", { x: xr - 16, y: AX - 14, "font-size": 14, fill: C.ink, "text-anchor": "end" }, `re-run ${f3(b.rerun)}`);
+  }
+  el(g, "circle", { cx: x, cy: AX, r: 9, fill: col });
+  g.box = el(g, "rect", { rx: 12, fill: keep ? "#e3f2e8" : "#fbe3da", stroke: col, "stroke-width": 2.5 });
   g.t1 = el(g, "text", { "font-size": 14, fill: C.ink2 }, `cycle ${b.cycle} · ${b.score_label}`);
   g.t2 = el(g, "text", { "font-size": 19, "font-weight": 700, fill: C.ink }, b.change);
-  g.stamp = el(g, "text", { "font-size": 22, "font-weight": 800, "text-anchor": "start", opacity: 0,
-    "font-family": "Inter Display, Inter, sans-serif", "letter-spacing": "1" }, b.verdict === "keep" ? "COMMIT" : "RESET");
+  g.t3 = el(g, "text", { "font-size": 22, "font-weight": 800, fill: col,
+    "font-family": "Inter Display, Inter, sans-serif", "letter-spacing": "1" }, keep ? "COMMIT" : "RESET");
+  g.b = b; g.x = x;
   return g;
 }
-const toks = beats.map(token);
-const ease = k => 1 - Math.pow(1 - Math.max(0, Math.min(1, k)), 3);
-function place(g, b, t0, t) {   // the token's life inside its beat
-  const x = X(b.score), k = ease((t - t0) / 0.7);          // drop
-  const y = 150 + k * 210, h = 70;
-  g.setAttribute("opacity", t >= t0 ? 1 : 0);
-  g.box.setAttribute("x", x - 125); g.box.setAttribute("y", y - h);
-  g.t1.setAttribute("x", x - 110); g.t1.setAttribute("y", y - h + 26);
-  g.t2.setAttribute("x", x - 110); g.t2.setAttribute("y", y - h + 53);
-  g.pin.setAttribute("x1", x); g.pin.setAttribute("x2", x); g.pin.setAttribute("y1", y); g.pin.setAttribute("y2", y + (AX - y) * k);
-  g.dot.setAttribute("cx", x); g.dot.setAttribute("cy", AX); g.dot.setAttribute("opacity", k >= 1 ? 1 : 0);
-  let col = C.ink, judged = t >= t0 + 1.2;
-  if (b.rerun !== null) {          // the confirm re-run lands as a second ring
-    const xr = X(b.rerun), on = t >= t0 + 1.2;
-    g.dot2.setAttribute("cx", xr); g.dot2.setAttribute("cy", AX); g.dot2.setAttribute("opacity", on ? 1 : 0);
-    g.dot2t.setAttribute("x", xr); g.dot2t.setAttribute("y", AX - 18); g.dot2t.setAttribute("opacity", on ? 1 : 0);
-    judged = t >= t0 + 1.9;
-  }
-  if (judged) col = b.verdict === "keep" ? C.go : C.stop;
-  g.box.setAttribute("stroke", col); g.box.setAttribute("fill", judged ? (b.verdict === "keep" ? "#e3f2e8" : "#fbe3da") : C.card);
-  g.dot.setAttribute("fill", col);
-  g.stamp.setAttribute("fill", col); g.stamp.setAttribute("x", x + 137); g.stamp.setAttribute("y", y - h / 2 + 8);
-  g.stamp.setAttribute("opacity", judged ? 1 : 0);
-  // a reset token sinks away; a committed one stays until the next beat
-  const out = ease((t - (t0 + (b.verdict === "keep" ? 3.6 : 2.9))) / 0.6);
-  g.setAttribute("transform", `translate(0 ${out * 40})`);
-  if (out > 0) g.setAttribute("opacity", 1 - out);
+const calls = beats.map(callout);
+function layout(g) {   // padded box above the axis; flips left when it would run within EDGE of the right edge
+  const w = Math.ceil(Math.max(g.t1.getComputedTextLength(), g.t2.getComputedTextLength(),
+    g.t3.getComputedTextLength())) + 2 * PAD, h = 104, top = 172;
+  let left = g.x - 24;
+  if (left + w > W - EDGE) left = g.x + 24 - w;
+  g.box.setAttribute("x", left); g.box.setAttribute("y", top);
+  g.box.setAttribute("width", w); g.box.setAttribute("height", h);
+  [[g.t1, 28], [g.t2, 57], [g.t3, 90]].forEach(([e, dy]) => { e.setAttribute("x", left + PAD); e.setAttribute("y", top + dy); });
+  g.pin.setAttribute("y1", top + h);
 }
-const T = D.readme.timeline;
+function setBest(b) {   // settled values; the band label sits where no pin crosses it
+  const bar = b + 2 * sig, x0 = X(b), x1 = X(bar);
+  band.setAttribute("x", x0); band.setAttribute("width", x1 - x0);
+  bestL.setAttribute("x1", x0); bestL.setAttribute("x2", x0); bestT.setAttribute("x", x0 - 8); bestT.textContent = `best ${f3(b)}`;
+  barL.setAttribute("x1", x1); barL.setAttribute("x2", x1); barT.setAttribute("x", x1 + 8); barT.textContent = `bar ${f3(bar)}`;
+  return [x0, x1];
+}
 function render(t) {
-  // which beat, and the best in force (the committed token moves it)
-  let best = beats[0].best, say = D.readme.idle;
-  beats.forEach((b, i) => {
-    const t0 = T.beats[i], end = T.beats[i + 1] ?? T.rewind;
-    if (t >= t0 && t < end) say = [b.say1, t >= t0 + (b.rerun !== null ? 1.9 : 1.2) ? b.say2 : ""];
-    if (b.verdict === "keep" && t >= t0 + 2.3) best = b.best + (b.score_new_best - b.best) * ease((t - t0 - 2.3) / 0.6);
-    toks[i].setAttribute("opacity", 0);
-    if (t >= t0 && t < end) place(toks[i], b, t0, t);
-  });
-  if (t >= T.rewind) {   // rewind to the start so the loop is seamless
-    const k = ease((t - T.rewind) / 0.8), b1 = beats.find(b => b.verdict === "keep").score_new_best;
-    best = b1 + (beats[0].best - b1) * k; say = D.readme.idle;
-  }
-  if (t >= T.beats[0] - 0.01 || t < T.beats[0]) setBest(best);
-  if (t < T.beats[0]) say = D.readme.idle;
-  document.getElementById("say1").textContent = say[0];
-  document.getElementById("say2").textContent = say[1];
+  let i = -1;   // which scene: -1 is the bare figure that opens and closes the loop
+  T.scenes.forEach((s, k) => { if (t >= s[0] && t < s[1]) i = k; });
+  const b = beats[i], [x0, x1] = setBest(b ? b.best : beats[0].best);
+  calls.forEach((g, k) => { g.setAttribute("display", k === i ? "inline" : "none"); if (k === i) layout(g); });
+  const lw = bandT.getComputedTextLength(), pin = b ? X(b.score) : -1e9;
+  let lx = x1 - 10 - lw;
+  if (pin >= lx - 10 && pin <= lx + lw + 10) lx = x0 + 10;
+  bandT.setAttribute("x", lx);
 }
 window.render = render;
 render(0);
