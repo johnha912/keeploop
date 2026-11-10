@@ -1,0 +1,33 @@
+/* keeploop's motion design system (light). Shared by every animation in tools/figure/.
+   Build-time only. One idea: your AI as a team, with a CEO beside you. Each role has a
+   colour and keeps it everywhere: the CEO/lead is ink, the Analyst blue, the Engineer
+   orange, the Auditor violet; the number (evaluate.py) is yellow, a keep is green, a
+   reset is red. Light paper, thin ink lines, mono labels, big confident type. */
+:root {
+  --bg: #fbfaf6; --dot: #e6e2d6; --panel: #ffffff; --ink: #17181c; --ink2: #50525a; --muted: #94969d;
+  --line: #d9d6cc; --ceo: #17181c; --you: #17181c;
+  --analyst: #2f6fde; --analyst-soft: #e7effd;
+  --engineer: #e8743b; --engineer-soft: #fdeee5;
+  --auditor: #7a5af5; --auditor-soft: #efebfe;
+  --number: #f2c230; --number-soft: #fdf5d8;
+  --keep: #1e9e5a; --keep-soft: #e3f4ea;
+  --reset: #e5484d; --reset-soft: #fde8e8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+body { color: var(--ink); font-family: Inter, "Liberation Sans", sans-serif; overflow: hidden; position: relative;
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.3px); background-size: 26px 26px; }
+.mono { font-family: "JetBrains Mono", monospace; }
+.kick { font: 600 14px "JetBrains Mono", monospace; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ink2); }
+.panel { position: absolute; background: var(--panel); border: 1.5px solid var(--ink); border-radius: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 600 13px "JetBrains Mono", monospace;
+  border: 1.5px solid currentColor; border-radius: 999px; padding: 3px 10px; background: var(--panel); }
+.sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+.legend { display: flex; gap: 22px; font: 500 14px "JetBrains Mono", monospace; color: var(--ink2); }
+.bubble { position: absolute; border-radius: 14px; padding: 10px 14px; font-size: 16px; line-height: 1.35;
+  border: 1.5px solid var(--ink); background: var(--panel); }
+.bubble.you { background: var(--ink); color: #fff; }
+.log { position: absolute; background: var(--panel); border: 1.5px solid var(--line); border-radius: 12px;
+  font: 13.5px/1.7 "JetBrains Mono", monospace; color: var(--ink2); padding: 8px 14px; }
+.log b { color: var(--ink); font-weight: 600; }
+svg text { font-family: "JetBrains Mono", monospace; }

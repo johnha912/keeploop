@@ -18,7 +18,15 @@
       "Bash(python kl.py staff)",
       "Bash(python kl.py staff --goal *)",
       "Bash(python kl.py scout)",
-      "Bash(python kl.py scout --dry-run)"
+      "Bash(python kl.py scout --dry-run)",
+      "Bash(python kl.py next)",
+      "Bash(python kl.py try)",
+      "Bash(python kl.py try *)",
+      "Bash(python kl.py doctor)",
+      "Bash(python kl.py doctor *)",
+      "Bash(python kl.py level --stakes low)",
+      "Bash(python kl.py level --stakes medium)",
+      "Bash(python kl.py level --stakes high)"
     ],
     "ask": [
       "Bash(python kl.py begin --accept-changes*)",
@@ -26,7 +34,10 @@
       "Bash(python kl.py staff * --apply*)",
       "Bash(python kl.py lesson *)",
       "Bash(python kl.py audit *)",
-      "Bash(python kl.py cite *)"
+      "Bash(python kl.py cite *)",
+      "Bash(python kl.py handoff*)",
+      "Bash(python kl.py apply *)",
+      "Bash(python kl.py level * --apply*)"
     ]
   }
 }

@@ -27,13 +27,24 @@ keeps overfit evaluate.py.
 Usage:
     python run.py [--mock] [--iterations N] [--root PATH]
 
---mock routes every role to the deterministic MockVendor (offline demo).
+--mock routes every role to the deterministic MockVendor (offline demo). A
+mock_script.json next to team.yaml (a list of JSON patches for config.json)
+replaces the mock engineer's built-in script: the noisy-eval example uses it so
+every run sees the same proposals. --narrate prints each step of a cycle (card,
+diff, score against the keep bar, decision); off by default.
+
+Speed levers, team.yaml `loop:`, all off by default (the keep law never changes):
+fused (the Engineer writes the card and builds it in one call), auto_cards (an
+untested program.md hypothesis is the card, no call), confirm_skip_z (no re-run for
+a light gain far beyond the noise), eval_stderr_handle, and `profile: fast`
+(prepare.PROFILES: fused, auto_cards and smaller prompt caps).
 """
 
 import argparse
 import fnmatch
 import hashlib
 import json
+import math
 import os
 import re
 import shlex
@@ -50,8 +61,9 @@ import lessons
 import packs
 import rubric as rubric_mod
 import vendors
-from prepare import CONFIG, CONTROL_RX, GIT_AUTHOR, __version__, git, load_team, setup
-from vendors import safe_env
+from prepare import (CONFIG, CONTROL_RX, GIT_AUTHOR, PROFILES, __version__, git, load_team,
+                     setup)
+from vendors import FUSED_MARK, safe_env
 
 ROLES = ("analyst", "engineer", "auditor")
 PHASE = {"analyst": "a", "engineer": "e", "auditor": "q"}  # keys of the timing line
@@ -187,6 +199,66 @@ def declared_heavy(parsed: dict, heavy_globs: list[str]) -> bool:
     words_ = [w.strip("`'\".,;:()[]") for w in parsed.get("change", "").replace("\\", "/").split()]
     return (parsed.get("tier", "").strip().lower().startswith("heavy")
             or any(w and is_heavy([w], heavy_globs) for w in words_))
+
+
+def card_block(text: str) -> str:
+    """The labelled card inside a fused Engineer reply: from the first label to the
+    first blank line after the last one, so a closing remark ("done, edited x") never
+    runs into MISSING. Text with no label is returned as is (parse_card refuses it)."""
+    hits = list(CARD_LABEL.finditer(text))
+    if not hits:
+        return text.strip()
+    end = re.search(r"\n[ \t]*\n", text[hits[-1].end():])
+    return text[hits[0].start():hits[-1].end() + end.start() if end else len(text)].strip()
+
+
+CARD_LINES = (
+    "HYPOTHESIS: what we believe and why\n"
+    "ALTERNATIVES: at least one competing explanation, and why this card "
+    "discriminates between them\n"
+    "CHANGE: the smallest change\n"
+    "EXPECT: the expected effect on the metric\n"
+    "REJECT IF: the result that rejects the hypothesis\n"
+    "MISSING: the information that would change this decision, or none\n"
+    "DIFFERENT: only when re-proposing something under 'Already tested': what "
+    "is new this time (a card without it that repeats a tested hypothesis is "
+    "dropped without a run)\n"
+    "TIER: heavy - only when the change touches manifests, lockfiles, CI, "
+    "migrations or is large; a critic then reviews the card first")
+ANALYST_ASK = (
+    "You are the Analyst. The workspace is the current directory: read "
+    "it, change nothing. Think of competing hypotheses, then pick the one "
+    "the smallest change can tell apart from the others. Answer ONLY in "
+    "these labelled lines, fixed before anything is run:\n" + CARD_LINES)
+
+
+def fused_ask(protect: list[str]) -> str:
+    """loop.fused: the Analyst's job and the Engineer's in one call. The reply is the card;
+    the loop parses and fixes it before the evaluation runs, as for an Analyst card."""
+    return (f"{FUSED_MARK} The workspace is the current directory. Think of competing "
+            "hypotheses, pick the one the smallest change can tell apart from the others, "
+            "then implement exactly that change by editing files in the current directory, "
+            f"nothing else. Protected paths (never touch): {', '.join(protect) or '(none)'}. "
+            "Run the project's own tests/eval yourself if you can before finishing. The "
+            "loop fixes your card before it runs the evaluation. Reply ONLY with these "
+            "labelled lines, nothing before or after them:\n" + CARD_LINES)
+
+
+AUTO_CHANGE = "the smallest change that tests it"
+
+
+def auto_card(line: str, heavy_globs: list[str]) -> str:
+    """loop.auto_cards: the card for a human hypothesis from program.md, built without an
+    Analyst call. Pre-registered and falsifiable like any card (REJECT IF names the metric).
+    TIER: heavy when the line itself names a heavy file, so the critic round still runs."""
+    line = " ".join(line.split())
+    return ("HYPOTHESIS: " + line + "\n"
+            "ALTERNATIVES: none written (card built from program.md without an analyst call)\n"
+            f"CHANGE: {AUTO_CHANGE}\n"
+            "EXPECT: the metric rises\n"
+            "REJECT IF: the metric does not beat the keep bar\n"
+            "MISSING: none"
+            + ("\nTIER: heavy" if declared_heavy({"change": line}, heavy_globs) else ""))
 
 
 def critic_prompt(card: str, standards: str) -> str:
@@ -444,13 +516,21 @@ def save_scorer_notes(state: Path, commit: str) -> None:
     _write_json(state / "scorer_notes.json", {"commit": commit, "stderr": text.strip()[:65536]})
 
 
-def scorer_notes(state: Path, best: dict, cap: int) -> str:
-    """The saved scorer stderr for the current best, capped; "" when off or stale."""
+def scorer_notes(state: Path, best: dict, cap: int, handle: bool = False) -> str:
+    """The saved scorer stderr for the current best, capped; "" when off or stale.
+    handle (loop.eval_stderr_handle): a cut excerpt ends with the path of the file
+    that holds all of it, so the agent reads the rest only if it needs it."""
     path = state / "scorer_notes.json"
     if cap <= 0 or not path.exists():
         return ""
     saved = _read_json(path)
-    return str(saved.get("stderr", ""))[:cap] if saved.get("commit") == best.get("commit") else ""
+    if saved.get("commit") != best.get("commit"):
+        return ""
+    text = str(saved.get("stderr", ""))
+    if handle and len(text) > cap:
+        return (f"{text[:cap]}\n[cut at {cap} of {len(text)} chars; all of it: "
+                f"{path.resolve()} (JSON, key \"stderr\")]")
+    return text[:cap]
 
 
 def evaluate_workspace(root: Path, workspace: Path, script: str = "evaluate.py",
@@ -525,11 +605,15 @@ def project_config(root: Path) -> dict:
     team = load_team(root / "team.yaml") if (root / "team.yaml").exists() else {}
     protect = parse_protect(str(team.get("protect") or ""))
     raw = team["heavy"] if "heavy" in team else DEFAULT_HEAVY  # `heavy:` alone = size only
+    loop = {k: v for k, v in team.get("loop", {}).items() if k in CONFIG}
+    if loop.get("profile") is not None and loop["profile"] not in PROFILES:
+        raise ValueError(f"loop.profile: unknown profile {loop['profile']!r} "
+                         f"(known: {', '.join(PROFILES)})")
     return {
         "team": team, "protect": protect,
         "heavy_globs": parse_protect(str(raw or ""), "heavy"),
-        "loop_cfg": {**CONFIG, **{k: v for k, v in team.get("loop", {}).items()
-                                  if k in CONFIG}},
+        # defaults < the profile's preset < the keys written under loop:
+        "loop_cfg": {**CONFIG, **PROFILES.get(loop.get("profile"), {}), **loop},
         "workspace": (root / str(team.get("workspace") or ".keeploop/workspace")).resolve()}
 
 
@@ -628,6 +712,71 @@ def needs_confirm(heavy: bool, loop_cfg: dict, sigma: float) -> bool:
     return heavy or (loop_cfg["confirm_keep"] and sigma > 0)
 
 
+def _chi2_cdf(x: float, k: int) -> float:
+    """P(X <= x) for X ~ chi-square with k degrees of freedom (regularized lower
+    incomplete gamma, power series; exact enough for the small x a lower quantile needs)."""
+    if x <= 0:
+        return 0.0
+    a, h = k / 2, x / 2
+    term = total = 1.0 / a
+    n = 0
+    while term > total * 1e-15 and n < 10_000:
+        n += 1
+        term *= h / (a + n)
+        total += term
+    return min(1.0, math.exp(a * math.log(h) - h - math.lgamma(a)) * total)
+
+
+def sigma_upper(sigma: float, runs: int, alpha: float = 0.05) -> float:
+    """One-sided (1 - alpha) upper confidence bound on the true sigma, given `sigma`, the
+    pstdev of `runs` baseline scores: runs * sigma^2 / true^2 ~ chi-square(runs - 1).
+    Fewer than 2 runs measure no spread at all: infinite."""
+    if runs < 2:
+        return math.inf
+    lo, hi = 0.0, float(runs)
+    while _chi2_cdf(hi, runs - 1) < alpha:
+        hi *= 2
+    for _ in range(100):  # bisection for the alpha quantile
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if _chi2_cdf(mid, runs - 1) < alpha else (lo, mid)
+    return sigma * math.sqrt(runs / hi)
+
+
+def confirm_skippable(metric: float, best: float, sigma: float, heavy: bool,
+                      loop_cfg: dict) -> bool:
+    """loop.confirm_skip_z (0 = off): a light change whose first score beats best by at
+    least confirm_skip_z times the 95% upper bound on sigma keeps without the re-run.
+
+    The false-keep argument. Take a change with no true effect. Without the skip it is
+    kept only if the first score AND the re-run clear the bar. With it, it can also be
+    kept on the first score alone, when that score lands >= z * upper(sigma) over best.
+    So the extra false-keep probability is at most P(skip | no effect), and the skip only
+    removes a re-run that would have passed or failed. P(skip | no effect) is small even
+    when sigma is badly underestimated, because the bound grows with the doubt:
+    upper(sigma) = sigma * 5.41 at 3 runs, 2.65 at 5, 1.73 at 10, 1.41 at 20 (chi-square,
+    95%). Simulated on this exact law (normal noise, best = mean of the baseline runs,
+    noise_z 2, z 4, 200,000 changes per row):
+        noise_runs 3:  P(skip | no effect) 0.22%; false keeps 4.93% -> 5.03%
+        noise_runs 5:  P(skip | no effect) 0.04%; false keeps 1.87% -> 1.90%
+        noise_runs 10: P(skip | no effect) 0.003%; false keeps 0.58% -> 0.58%
+    (every difference is within the simulation's own noise). Using sigma itself instead
+    of the bound is NOT safe: sigma is the pstdev of a few runs and often far too small
+    (3 runs: P(estimate < half the truth) = 1 - exp(-3/8) = 0.31), and the same simulation
+    then gives 4.9% -> 7.8% false keeps at 3 runs, 0.57% -> 0.78% at 10.
+
+    What the argument does not cover: noise that is not roughly normal (one wild outlier
+    is exactly what a re-run catches), and drift between runs. Hence off by default and
+    not in `profile: fast`, which is about AI calls, not evaluations. Never for a heavy
+    change (its re-run is forced for reasons other than noise), sigma 0 (no re-run anyway)
+    or confirm_skip_z <= noise_z (it would skip every confirm). noise_runs must be the
+    count that measured best's sigma: change it only with a new baseline. A skipped keep
+    records the single score as best (no min of two): if anything, a higher bar later."""
+    z = float(loop_cfg.get("confirm_skip_z") or 0)
+    if z <= 0 or heavy or sigma <= 0 or z <= loop_cfg["noise_z"]:
+        return False
+    return metric - best >= z * sigma_upper(sigma, int(loop_cfg["noise_runs"]))
+
+
 def take_baseline(state: Path, loop_cfg: dict, evaluate, has_holdout: bool,
                   role_vendors: str, best: dict, workspace: Path) -> tuple[str, str]:
     """Score the untouched workspace noise_runs times, record best.json (+ the
@@ -699,11 +848,45 @@ def verdict_of(status: str, metric: float | None, bar_before: float,
             else "inconclusive" if metric > bar_before else "rejected")
 
 
-def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
+def mock_script(root: Path) -> list[dict] | None:
+    """mock_script.json: [{"hypothesis": str, "set": {...}}, ...], else None (built-in)."""
+    path = root / "mock_script.json"
+    if not path.is_file():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not (isinstance(data, list) and data and all(
+            isinstance(x, dict) and isinstance(x.get("hypothesis"), str) and x["hypothesis"].strip()
+            and "\n" not in x["hypothesis"] and isinstance(x.get("set"), dict) and x["set"]
+            for x in data)):
+        raise ValueError(f'{path.name}: must be a non-empty list of '
+                         f'{{"hypothesis": "one line", "set": {{...}}}} objects')
+    return data
+
+
+def eval_cache_key(root: Path, workspace: Path, eval_cmd: str | None) -> str:
+    """Exactly what the evaluation sees: the workspace's files (git tree of everything,
+    staged) plus evaluate.py and eval_cmd. Same key = same inputs."""
+    git(workspace, "add", "-A")
+    tree = git(workspace, "write-tree").strip()
+    scorer = hashlib.sha256((root / "evaluate.py").read_bytes()).hexdigest() \
+        if (root / "evaluate.py").exists() else ""
+    return hashlib.sha256(f"{tree}\0{scorer}\0{eval_cmd or ''}".encode()).hexdigest()
+
+
+def diff_lines(diff: str, limit: int = 4) -> list[str]:
+    """The changed lines of a diff (no headers), for --narrate."""
+    out = [ln for ln in diff.splitlines()
+           if ln[:1] in "+-" and not ln.startswith(("+++", "---"))]
+    return out[:limit] + ([f"... {len(out) - limit} more"] if len(out) > limit else [])
+
+
+def run(root: Path, *, mock: bool, iterations: int | None = None,
+        narrate: bool = False) -> int:
     root = root.resolve()
     state = setup(root)
     try:
         cfg = project_config(root)
+        script = mock_script(root) if mock else None
     except ValueError as exc:
         print(f"run: {exc}")
         return 1
@@ -730,6 +913,9 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         except vendors.VendorUnavailable as exc:
             print(f"run: {role}: {exc}")
             return None
+        for m in members:
+            if script and getattr(m, "is_mock", False):
+                m.script = script
         if not members:
             print(f"run: {role}: none of {names} is available (CLI not installed?)")
         return vendors.FallbackVendor(members) if members else None
@@ -757,6 +943,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         """Role -> vendor that actually answered (first member before any call)."""
         return {r: v.served or v.members[0].name for r, v in vendor_objs.items()}
 
+    gl = lessons.global_cfg(team)
     pack = packs.load_pack(root, team.get("pack", "software"))
     charter = ""
     if (root / "program.md").exists():
@@ -795,10 +982,21 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
                 sub[part] += time.monotonic() - start
 
     def evaluate(script="evaluate.py", part=None):
-        return timed("v", lambda: guard(
+        key = None
+        if (loop_cfg["eval_cache"] and script == "evaluate.py" and best.get("metric") is not None
+                and not best.get("sigma")):  # never for a noisy evaluation
+            key = eval_cache_key(root, workspace, team.get("eval_cmd"))
+            if (hit := cache.get(key)) is not None:
+                notes.append("eval: cached (same files, same evaluate.py)")
+                return hit, ""
+        metric, error = timed("v", lambda: guard(
             "evaluate", lambda: evaluate_workspace(
                 root, workspace, script, loop_cfg["eval_timeout_s"],
                 eval_cmd=team.get("eval_cmd"))), part)
+        if key and metric is not None:
+            cache[key] = metric
+            _write_json(state / "eval_cache.json", cache)
+        return metric, error
 
     def call(role, prompt, heavy=False, part=None):
         v = heavy_auditor if heavy and role == "auditor" and heavy_auditor else vendor_objs[role]
@@ -820,6 +1018,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         sealed is None or (sealed.get("files") == start_files
                            and sealed.get("best_sha") == _sha(state / "best.json")))
     best = _read_json(state / "best.json")
+    cache = (_read_json(state / "eval_cache.json")
+             if loop_cfg["eval_cache"] and (state / "eval_cache.json").exists() else {})
     hold_path = state / "holdout.json"  # never read into a prompt or the ledger
     has_holdout = (root / "holdout.py").exists()
     try:
@@ -837,6 +1037,18 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
 
     def bar(b):
         return keep_bar(b, loop_cfg["keep_threshold"], loop_cfg["noise_z"], sigma)
+
+    def say(step: str, text: str) -> None:  # --narrate only
+        if narrate:
+            print(f"  {step:<9} {text}", flush=True)
+
+    def bar_text(b: float) -> str:
+        z, th = loop_cfg["noise_z"], loop_cfg["keep_threshold"]
+        if bar(b) == b:
+            return f"bar {b:.6f} = best (no noise margin)"
+        rule = (f"best + {z:g}σ, σ {sigma:.6f}" if z * sigma >= abs(b) * th
+                else f"best + {th:g} x best")
+        return f"bar {bar(b):.6f} = {rule}"
 
     if warn := ceiling_warning(best["metric"], bar(best["metric"]), loop_cfg["metric_max"]):
         print(f"run: {warn}")
@@ -856,35 +1068,38 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         rows = read_hypotheses(state)
         tested = already_tested(rows)
         human = human_hypotheses(root / "program.md", rows)
-        diag = scorer_notes(state, best, loop_cfg["eval_stderr_max_chars"])
-        card = call("analyst", (
-            f"{charter}\n\n{standards}\n\nRepo map:\n"
-            f"{repo_map(workspace, loop_cfg['repo_map_max_chars'], state / 'map.json')}\n\nRecent ledger:\n"
-            f"{ledger.tail_text(state, loop_cfg['ledger_tail_for_prompt'])}\n\n"
-            + (f"Scorer diagnostics for the current best (evaluate.py stderr, capped):\n{diag}\n\n"
-               if diag else "")
-            + (f"Already tested (do not re-propose without saying what is "
-               f"different):\n{tested}\n\n" if tested else "")
-            + ("Human hypotheses (test the first one not yet in the registry "
-               "before proposing your own):\n"
-               + "\n".join(f"- {h}" for h in human[:5]) + "\n\n" if human else "")
-            + "You are the Analyst. The workspace is the current directory: read "
-            "it, change nothing. Think of competing hypotheses, then pick the one "
-            "the smallest change can tell apart from the others. Answer ONLY in "
-            "these labelled lines, fixed before anything is run:\n"
-            "HYPOTHESIS: what we believe and why\n"
-            "ALTERNATIVES: at least one competing explanation, and why this card "
-            "discriminates between them\n"
-            "CHANGE: the smallest change\n"
-            "EXPECT: the expected effect on the metric\n"
-            "REJECT IF: the result that rejects the hypothesis\n"
-            "MISSING: the information that would change this decision, or none\n"
-            "DIFFERENT: only when re-proposing something under 'Already tested': what "
-            "is new this time (a card without it that repeats a tested hypothesis is "
-            "dropped without a run)\n"
-            "TIER: heavy - only when the change touches manifests, lockfiles, CI, "
-            "migrations or is large; a critic then reviews the card first")).text.strip()
-        _revert(workspace, base)  # the analyst only reads
+
+        def context() -> str:  # what the card writer reads (Analyst, or the fused Engineer)
+            diag = scorer_notes(state, best, loop_cfg["eval_stderr_max_chars"],
+                                loop_cfg["eval_stderr_handle"])
+            return (
+                f"{charter}\n\n{standards}\n\nRepo map:\n"
+                f"{repo_map(workspace, loop_cfg['repo_map_max_chars'], state / 'map.json')}\n\nRecent ledger:\n"
+                f"{ledger.tail_text(state, loop_cfg['ledger_tail_for_prompt'])}\n\n"
+                + (f"Scorer diagnostics for the current best (evaluate.py stderr, capped):\n{diag}\n\n"
+                   if diag else "")
+                + (f"Already tested (do not re-propose without saying what is "
+                   f"different):\n{tested}\n\n" if tested else "")
+                + ("Human hypotheses (test the first one not yet in the registry "
+                   "before proposing your own):\n"
+                   + "\n".join(f"- {h}" for h in human[:5]) + "\n\n" if human else ""))
+
+        # Who writes the card. Default: the Analyst (read-only, workspace reverted after).
+        # loop.auto_cards: the next untested human hypothesis is the card, no call at all
+        # (one that would not fit the registry's 300 chars is left to the Analyst, or it
+        # would never count as tested). loop.fused: the Engineer writes the card and builds
+        # it in the same call; the edit stays (`built`) and is gated and evaluated only
+        # after the card has been parsed, checked and fixed, exactly as an Analyst's card.
+        built, source = False, ""
+        auto = [h for h in human if len(" ".join(h.split())) <= 300]
+        if loop_cfg["auto_cards"] and auto:
+            card, source = auto_card(auto[0], heavy_globs), "program.md"
+        elif loop_cfg["fused"]:
+            card = card_block(call("engineer", context() + fused_ask(protect)).text)
+            built, source = True, "engineer (fused)"
+        else:
+            card = call("analyst", context() + ANALYST_ASK).text.strip()
+            _revert(workspace, base)  # the analyst only reads
         parsed.update(parse_card(card) or {})
         if not parsed:
             notes.append("analyst card is not in the labelled format")
@@ -894,13 +1109,22 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             return "crash", None, learn(*L_VAGUE)
         ask_human(state, n, parsed["missing"])
         guardrails = lessons.guardrails_text(state, card, loop_cfg["recall_top_k"], loop_cfg)  # card-relevant
+        if gl["enabled"]:  # opt-in: capped lessons from other projects
+            guardrails += lessons.global_text(card, gl)
         standards = f"{guardrails}\n\nCraft standards:\n{taste}"
         card1 = " ".join(parsed["hypothesis"].split())
         notes.append("card: " + card1[:90])
+        if source:
+            notes.append(f"card by {source}")
+        say("card" if source else "analyst", "HYPOTHESIS: " + card1[:90])
 
         # 1b. DUPLICATE PRECHECK: no Engineer call for a repeat of a tested hypothesis
         if (twin := duplicate_of(parsed, rows, loop_cfg["duplicate_jaccard"])) is not None:
             notes.append(f"duplicate of cycle {twin}")
+            if built:  # the cycle's end resets the workspace to base: never evaluated
+                notes.append("fused edit dropped before evaluation")
+            say("DISCARD", f"repeats the rejected card of cycle {twin}: "
+                + ("edit dropped, not evaluated" if built else "no engineer call"))
             forced["verdict"] = "duplicate"
             return "discard", None, ""
 
@@ -917,6 +1141,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
                     "'KEEP: <your reason>'. The metric decides in the end, not this debate."
                 )).text.strip()
                 _revert(workspace, base)
+                built = False  # a fused edit went with the revert: the Engineer builds anew
                 new = parse_card(reply)
                 if new and falsifiable(new["reject_if"]):
                     card, new["different"] = reply, new["different"] or parsed["different"]
@@ -936,9 +1161,10 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             "if you can before finishing.")
         first, problem, lesson, heavy = None, "", L_NO_CHANGE, False
         for attempt in range(loop_cfg["engineer_repairs"] + 1):
-            call("engineer", eng_prompt if not attempt else (
-                f"{eng_prompt}\n\nYour last attempt failed: {problem}. The "
-                "workspace still holds your change; fix it."))
+            if attempt or not built:  # a fused call already made the first attempt
+                call("engineer", eng_prompt if not attempt else (
+                    f"{eng_prompt}\n\nYour last attempt failed: {problem}. The "
+                    "workspace still holds your change; fix it."))
             changed, diff, heavy, fail = qc_gates(workspace, base, protect, heavy_globs,
                                                   loop_cfg, slop)
             if fail:
@@ -962,13 +1188,19 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             lesson_id = learn(*first)
 
         notes.append("tier: " + ("heavy" if heavy else "light"))
+        for ln in diff_lines(diff):
+            say("engineer", ln)
 
         # 4. DECIDE on the metric alone first: a candidate that cannot be kept
         #    costs no Auditor call
         def beats(m):
             return m > bar(best["metric"])
 
+        b = best["metric"]
+        say("evaluate", f"{metric:.6f}   best {b:.6f}   {bar_text(b)}")
         if not beats(metric):
+            say("DISCARD", (f"+{metric - b:.6f} over best, inside the noise band -> git reset"
+                            if metric > b else "not above best -> git reset"))
             return "discard", metric, lesson_id
 
         # 5. AUDIT: one call gives the verdict and, when a pack has a rubric, the scores
@@ -978,6 +1210,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             heavy=heavy)
         forced["audited"] = True
         audit_ok = approved(res.text)
+        say("audit", " ".join(res.text.split())[:70])
         notes.append("audit: " + " ".join(res.text.split())[:60])
         rubric_score = rubric_mod.reply_score(
             vendor_objs["auditor"], active_rubric, res.text)
@@ -990,13 +1223,22 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         if rubric_regressed(rubric_score, best):
             notes.append(f"rubric regressed from {best['rubric']:.0f}")
             return "discard", metric, lesson_id
-        if needs_confirm(heavy, loop_cfg, sigma):
+        if needs_confirm(heavy, loop_cfg, sigma) and confirm_skippable(
+                metric, best["metric"], sigma, heavy, loop_cfg):
+            notes.append(f"confirm skipped: +{(metric - best['metric']) / sigma:.1f} sigma")
+            say("confirm", f"skipped: {metric:.6f} is over {loop_cfg['confirm_skip_z']:g} x the "
+                f"upper bound of sigma above best")
+        elif needs_confirm(heavy, loop_cfg, sigma):
             metric2, error = evaluate(part="u")
             forced["confirm_metric"] = metric2
             if metric2 is None or not beats(min(metric, metric2)):
                 notes.insert(1, unconfirmed_note(metric2, error))  # early: the ledger cuts at 240
+                say("confirm", (f"re-run {metric2:.6f}: below the bar" if metric2 is not None
+                                else f"re-run failed: {error[:60]}"))
+                say("DISCARD", "the gain did not survive a second measurement -> git reset")
                 return "discard", metric, lesson_id
             metric = min(metric, metric2)
+            say("confirm", f"re-run {metric2:.6f}: the lower score {metric:.6f} still clears the bar")
         failures = (guard("replay", lambda: lessons.replay(state, workspace, loop_cfg))
                     if loop_cfg["replay_on_keep"] else [])
         if failures:
@@ -1006,6 +1248,7 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
             return "discard", metric, failures[0][0]
 
         commit_keep(workspace, state, best, n, card1, metric, rubric_score)
+        say("KEEP", f"{metric:.6f} clears the bar -> git commit {best['commit'][:7]}")
         return "keep", metric, lesson_id
 
     consecutive_crashes = 0
@@ -1015,6 +1258,8 @@ def run(root: Path, *, mock: bool, iterations: int | None = None) -> int:
         if why := brake(best["metric"], loop_cfg, ledger.read_rows(state)):
             print(f"run: stopping — {why}")
             break
+        if narrate:
+            print(f"\ncycle {n}", flush=True)
         notes.clear()
         parsed.clear()
         forced.clear()
@@ -1141,8 +1386,10 @@ def main(argv: list[str] | None = None, root: Path | None = None) -> int:
     parser.add_argument("--iterations", type=int, default=None,
                         help="default: loop.max_iterations from team.yaml")
     parser.add_argument("--root", type=Path, default=root or Path(__file__).resolve().parent)
+    parser.add_argument("--narrate", action="store_true",
+                        help="print each step of a cycle: card, diff, score vs the keep bar, decision")
     args = parser.parse_args(argv)
-    return run(args.root, mock=args.mock, iterations=args.iterations)
+    return run(args.root, mock=args.mock, iterations=args.iterations, narrate=args.narrate)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,22 @@
+cycle	ts	role_vendors	metric	best_metric	status	tokens	lesson_id	description
+0	2026-11-09T21:58:48+00:00	analyst=mock,engineer=mock,auditor=mock	0.628667	0.628667	keep	0		baseline: untouched workspace
+1	2026-11-09T21:58:48+00:00	analyst=mock,engineer=mock,auditor=mock	0.676000	0.676000	keep	2582		card: A lower temperature (0.5) gives more consistent answers. | verdict: supported | tier: light | audit: APPROVED: diff matches the card; nothing else touched. | rubric: 76 | audit: fresh-context (same vendor)
+2	2026-11-09T21:58:48+00:00	analyst=mock,engineer=mock,auditor=mock	0.701000	0.676000	discard	1809		card: Three few-shot examples teach the answer format. | verdict: rejected | tier: light
+3	2026-11-09T21:58:48+00:00	analyst=mock,engineer=mock,auditor=mock	0.655000	0.676000	discard	1900		card: Smaller chunks (384 tokens) retrieve more precise passages. | verdict: rejected | tier: light
+4	2026-11-09T21:58:48+00:00	analyst=mock,engineer=mock,auditor=mock	0.658000	0.676000	discard	1968		card: Retrieving 8 passages instead of 5 finds more of the evidence. | verdict: rejected | tier: light
+5	2026-11-09T21:58:48+00:00	analyst=mock,engineer=mock,auditor=mock	0.696000	0.676000	discard	2039		card: Reranking the retrieved passages puts the evidence first. | verdict: rejected | tier: light
+6	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.650000	0.676000	discard	2103		card: A second retry recovers from malformed answers. | verdict: rejected | tier: light
+7	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.661000	0.676000	discard	2176		card: A longer answer budget (768 tokens) stops truncated answers. | verdict: rejected | tier: light
+8	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.706000	0.676000	discard	2252		card: A checklist-style prompt makes the model verify each answer. | verdict: rejected | tier: light
+9	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.665000	0.676000	discard	2313		card: An even lower temperature (0.3) removes guessing. | verdict: rejected | tier: light
+10	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.646000	0.676000	discard	2379		card: Larger chunks (768 tokens) keep context together. | verdict: rejected | tier: light
+11	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.710000	0.676000	discard	2417		card: Five few-shot examples cover more question types than three. | verdict: rejected | tier: light
+12	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.628000	0.676000	discard	2401		card: Fewer passages (3) cut distracting context. | verdict: rejected | tier: light
+13	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.662000	0.676000	discard	2423		card: A third retry catches the remaining format failures. | verdict: rejected | tier: light
+14	2026-11-09T21:58:49+00:00	analyst=mock,engineer=mock,auditor=mock	0.646000	0.676000	discard	2443		card: A 1024-token answer budget leaves room for reasoning. | verdict: rejected | tier: light
+15	2026-11-09T21:58:50+00:00	analyst=mock,engineer=mock,auditor=mock	0.645000	0.676000	discard	2463		card: An expert persona prompt raises answer confidence. | verdict: rejected | tier: light
+16	2026-11-09T21:58:50+00:00	analyst=mock,engineer=mock,auditor=mock	0.662000	0.676000	discard	2478		card: Greedy decoding (temperature 0) is the most accurate. | verdict: rejected | tier: light
+17	2026-11-09T21:58:50+00:00	analyst=mock,engineer=mock,auditor=mock	0.727000	0.676000	discard	3310		card: Eight few-shot examples beat five. | verdict: inconclusive | unconfirmed: re-run 0.706000 below the bar | tier: light | audit: APPROVED: diff matches the card; nothing else touched. | rubric: 76 | audit: fresh-context (same vendor)
+18	2026-11-09T21:58:50+00:00	analyst=mock,engineer=mock,auditor=mock	0.668000	0.676000	discard	2548		card: Whole-section chunks (1024 tokens) preserve tables. | verdict: rejected | tier: light
+19	2026-11-09T21:58:50+00:00	analyst=mock,engineer=mock,auditor=mock	0.639000	0.676000	discard	2561		card: Ten passages give the reranker more to choose from. | verdict: rejected | tier: light
+20	2026-11-09T21:58:50+00:00	analyst=mock,engineer=mock,auditor=mock	0.700000	0.676000	discard	2586		card: Two few-shot examples are enough and leave room for context. | verdict: rejected | tier: light

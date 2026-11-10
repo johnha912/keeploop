@@ -21,7 +21,75 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-09
+
 ### Added
+
+- The proof run (`docs/proof/`, `python tools/proof_run.py`): a naive keep-if-better
+  loop and keeploop on the same 20 proposals and the same deliberately noisy
+  evaluation (`examples/noisy-eval`: a random 1,000 of 10,000 dev cases per call,
+  plus a 5,000-case holdout the loop never sees), on 25 seeds fixed before running.
+  The means: 2.76 vs 0.44 changes kept with no true gain, and a loop score that
+  overstated the holdout by +0.017 vs +0.005. The price: 2.64 vs 1.28 true gains
+  discarded, and a lower holdout than naive on 9 of 25 seeds (seed 1 included).
+  `--check` re-runs it and must match `proof.json` exactly; CI and the release
+  workflow run it (the golden gate; never part of a cycle). A post-hoc sensitivity
+  run with `noise_runs: 10` is in `docs/proof/posthoc-noise_runs-10/`.
+- `run.py --narrate` (`kl run --narrate`): each step of a cycle on screen: the card,
+  the diff, the score against best and the keep bar, the decision. Off by default.
+- `kl report --html FILE` / `--svg FILE`: the ledger as one shareable page with a
+  summary line and a chart (kept filled, discarded hollow, running best, noise band;
+  `report.py`, stdlib, no model call).
+- `kl doctor`: runs `evaluate.py` N times before a project starts and says how noisy it
+  is, the smallest gain the keep bar lets through, and how many repeats a wanted gain
+  needs. Warns when `noise_runs` is below 5.
+- `kl quickstart tests|command|prompt|buildtime`: a control folder beside your repo
+  with an `evaluate.py` from a template and `workspace:` already set.
+- `kl import-lite LEDGER.md`: continue a keeploop-lite chat session in the CLI (best
+  version -> workspace, scorecard and gates -> a model-judge `evaluate.py`, lessons ->
+  `program.md`).
+- Opt-in lessons shared across projects: `kl lesson share L-ID` and `global_lessons:`
+  in `team.yaml` (off by default; at most 5 lessons within a token budget).
+- `loop.eval_cache` (off by default): reuse a score for identical workspace files and
+  `evaluate.py`, only when sigma is 0.
+- Cost-routing guidance in `team.yaml` (cheap models where a mistake is cheap, the
+  strongest for the Auditor). Text only.
+- The launch demo: `docs/assets/keeploop-demo.gif` / `.mp4` / `-poster.png`, rendered
+  by `tools/render_demo.py` (build-time only: Pillow + ffmpeg) from a re-run of seed 2
+  of the proof sweep, chosen by a rule fixed in the script.
+- `tools/bench_cycle.py`: per-cycle wall time and tokens of the mock loop; before and
+  after this release in `docs/proof/bench-*.json`.
+- The mock vendor can follow a `mock_script.json` (used by `examples/noisy-eval`); a
+  scripted engineer applies the patch named on the card, so a dropped duplicate card
+  never puts the analyst and engineer out of step.
+- AGENTS.md: run `kl doctor` before `kl begin` on a new project.
+- The CEO sizes the loop to the job. Its first-time interview also asks what a wrong change
+  would cost (a draft to redo, something others use, work to publish or ship), and
+  `kl level --stakes low|medium|high [--apply]` turns the answer and the score's noise into
+  `loop.profile`: `light` (at most 3 cycles, stop after 2 without a keep, one baseline run, no
+  re-run, fewer AI calls), `fast`, or `rigorous` (5 noise runs, a re-run and an Auditor
+  verdict on every keep). Lessons, the fence, the gates and the brakes stay on at every level.
+  keeploop-lite asks the same question in setup and starts in careful mode for something that
+  goes out once (en, vi, zh-CN, full and mini).
+- The fast path for your own AI: `kl next` (one brief instead of `status` + `recall`) and
+  `kl try card.md` (card, gates, evaluation, keep or discard in one command). A routine
+  cycle takes 2 `kl` commands instead of 6, and AGENTS.md opens with a fast-path section
+  of about 1,350 characters, so the AI need not read the whole 12,000-character file to
+  run a cycle (measured on the offline demo). `kl try` asks for an Auditor verdict on a
+  heavy change or a light gain that is not decisive, stricter than `kl keep` alone.
+- `kl handoff` / `kl apply` for chat AIs without repo access (ChatGPT, Gemini,
+  Perplexity): one packet out, one reply in, one round trip per cycle instead of one
+  command at a time. BOOTSTRAP.md uses them. `apply` never executes the reply and refuses
+  unsafe or unseen paths.
+- keeploop-lite fast mode (en, vi, zh-CN): a compact report per cycle with the full ledger
+  every 3 cycles, `run N cycles` (up to 5 in one reply), `save`, and `careful mode` for the
+  old pace. The full best version is no longer reprinted every cycle, so the chat uses
+  less of its context and the person sends fewer messages.
+- `lite/KEEPLOOP-LITE-MINI.md` (en, vi, zh-CN): the same loop in about 1,200 words for
+  small context windows and search assistants, and `llms.txt` at the repo root, an index
+  of these files for AIs that browse.
+- Claude Code permissions: `kl next`, `kl try` and `kl doctor` are allowed; `kl handoff`
+  and `kl apply` ask first.
 
 - Brakes against doing more than was asked, set by the human in
   `team.yaml`: `loop.target` (good enough; at or above it the job is done)
@@ -35,8 +103,34 @@ release. The one-time PyPI setup and the steps are in
   starts no cycle; it stops at a `STOP:` line even before 3 cycles; the
   first-time interview asks what score is good enough.
 
-### Changed
-
+- Animations in one light design system (`tools/figure/kl.css`: your AI as a team, each
+  role in its own colour), made by `tools/render_figure.py` from committed files only
+  (build-time only: Playwright's Chromium, ffmpeg, Pillow):
+  - `docs/assets/keeploop-team.gif`, the README hero: you and the CEO (your AI); the
+    first-time questions of AGENTS.md; the team it staffs (Analyst on a cheap model,
+    Engineer on your main model, Auditor on the strongest); a cycle in two commands with
+    real `kl next` / `kl try` output (`docs/assets/demo-run/fastpath.txt`); the measured
+    speed strip (`docs/proof/bench-latency-*.json`). Loops seamlessly.
+  - `docs/assets/keeploop-x.mp4`, a 54-second 16:9 video for X with the same story: give
+    your AI a team, it asks first (the illustrative lite example), it staffs the team, two
+    commands a cycle, it keeps only what clears the noise (with the price), fewer calls and
+    tokens, where it works.
+  - `docs/assets/keeploop-guide-chat.mp4` and `keeploop-guide-code.mp4` (+ GIFs), two
+    30-second step-by-step guides, one for chat apps (keeploop-lite: paste or save the file,
+    the setup questions, the scorecard, the team, "run 3 cycles", "save", on the lite
+    example) and one for coding agents (one prompt, the four questions, `kl level`, the
+    team, `kl next` / `kl try`, `kl report`, `kl handoff` / `kl apply`). Rendered by
+    `tools/render_guides.py`, which refuses to render if a quoted line is not word for word
+    in its source file or a `kl` command shown does not exist.
+  - `docs/assets/keeploop-gate.gif`, "the keep gate", in the README's new "Why trust the
+    keeps" section: three real changes from the proof run on one number line.
+- Measured speed of `profile: fast` on the offline demo with simulated call latency
+  (`docs/proof/bench-latency-default.json`, `-fast.json`): tokens per cycle 3390.8 to
+  2257.8 (-33%), time per cycle 7.81 s to 5.81 s (-26%), AI calls per cycle 2.7 to 1.7.
+- README (en, vi, zh-CN): opens on what keeploop is for: your AI as a team with a CEO
+  beside you, in order of what matters (easy, asks first and staffs the team, fast, saves
+  tokens, keeps only real gains). The noise proof and its trade-off moved to "Why trust
+  the keeps".
 - The version badge in the three READMEs reads PyPI and links to
   <https://pypi.org/project/keeploop/>, so it no longer needs a hand edit per
   release; the test now checks the PyPI badge instead of a version string.

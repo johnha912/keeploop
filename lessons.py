@@ -252,6 +252,81 @@ def recall(state_dir: Path, query: str, top: int = 5) -> list[tuple[float, dict]
     return [(s, r) for s, r in bm25.bm25_rank(query, memory_rows(state_dir)) if s > 0][:top]
 
 
+# --- the global lessons store (opt-in, team.yaml `global_lessons:`) ----------------
+# Lessons a human chose to share across projects: ~/.keeploop/lessons/lessons.jsonl
+# (or $KEEPLOOP_HOME/lessons). Read only when `enabled: true`; written only by
+# `kl lesson share L-ID`. Retrieval is capped: at most 5 lessons and max_tokens.
+
+GLOBAL_DEFAULT = {"enabled": False, "path": "", "max_lessons": 5, "max_tokens": 400}
+GLOBAL_CAP = 5
+
+
+def global_cfg(team: dict) -> dict:
+    raw = team.get("global_lessons") if isinstance(team.get("global_lessons"), dict) else {}
+    g = {**GLOBAL_DEFAULT, **{k: v for k, v in raw.items() if k in GLOBAL_DEFAULT}}
+    g["enabled"] = g["enabled"] is True
+    g["max_lessons"] = max(0, min(GLOBAL_CAP, int(g["max_lessons"] or 0)))
+    g["max_tokens"] = max(0, int(g["max_tokens"] or 0))
+    return g
+
+
+def global_store(g: dict) -> Path:
+    import os
+    if g.get("path"):
+        base = Path(os.path.expanduser(str(g["path"])))
+    else:
+        base = Path(os.environ.get("KEEPLOOP_HOME") or Path.home() / ".keeploop") / "lessons"
+    return base / "lessons.jsonl"
+
+
+def share(state_dir: Path, lesson_id: str, g: dict, project: str) -> dict:
+    """Copy one local lesson into the global store (a human decision, never the loop's)."""
+    lesson = next((l for l in load_lessons(state_dir) if l["id"] == lesson_id), None)
+    if lesson is None:
+        raise SystemExit(f"no lesson {lesson_id} in {state_dir}")
+    store = global_store(g)
+    rows = [json.loads(x) for x in store.read_text(encoding="utf-8").splitlines() if x.strip()] \
+        if store.exists() else []
+    for r in rows:
+        if r["guardrail"] == lesson["guardrail"]:
+            return r
+    row = {"id": f"G-{len(rows) + 1:03d}", "ts": _now(), "project": project,
+           "from": lesson_id, "what": lesson["what"], "root_cause": lesson["root_cause"],
+           "guardrail": lesson["guardrail"]}
+    store.parent.mkdir(parents=True, exist_ok=True)
+    with store.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row) + "\n")
+    return row
+
+
+def global_recall(query: str, g: dict) -> list[dict]:
+    """The most relevant shared lessons for `query`: at most max_lessons (<= 5), and
+    no more than max_tokens (characters / 4) in total. [] when disabled."""
+    store = global_store(g)
+    if not (g["enabled"] and query.strip() and store.exists() and g["max_lessons"]):
+        return []
+    rows = [{**r, "_text": f"{r['what']} {r['root_cause']} {r['guardrail']}"}
+            for r in (json.loads(x) for x in store.read_text(encoding="utf-8").splitlines() if x.strip())]
+    out, used = [], 0
+    for score, r in bm25.bm25_rank(query, rows):
+        if score <= 0 or len(out) >= g["max_lessons"]:
+            break
+        cost = len(r["guardrail"]) // 4 + 8
+        if used + cost > g["max_tokens"]:
+            break
+        out.append(r)
+        used += cost
+    return out
+
+
+def global_text(query: str, g: dict) -> str:
+    hits = global_recall(query, g)
+    if not hits:
+        return ""
+    return ("\n\nLessons from other projects (shared by a human; advice, not rules):\n"
+            + "\n".join(f"- {r['id']} ({r['project']}): {r['guardrail']}" for r in hits))
+
+
 def main(argv: list[str], state: Path | None = None, cfg: dict = CONFIG) -> int:
     state = state or STATE_DIR
     cut = argv.index("--") if "--" in argv else len(argv)

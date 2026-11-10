@@ -1,0 +1,22 @@
+[
+  {"hypothesis": "A lower temperature (0.5) gives more consistent answers.", "set": {"temperature": 0.5}},
+  {"hypothesis": "Three few-shot examples teach the answer format.", "set": {"few_shot": 3}},
+  {"hypothesis": "Smaller chunks (384 tokens) retrieve more precise passages.", "set": {"chunk_size": 384}},
+  {"hypothesis": "Retrieving 8 passages instead of 5 finds more of the evidence.", "set": {"top_k": 8}},
+  {"hypothesis": "Reranking the retrieved passages puts the evidence first.", "set": {"rerank": true}},
+  {"hypothesis": "A second retry recovers from malformed answers.", "set": {"retries": 2}},
+  {"hypothesis": "A longer answer budget (768 tokens) stops truncated answers.", "set": {"max_tokens": 768}},
+  {"hypothesis": "A checklist-style prompt makes the model verify each answer.", "set": {"prompt_style": "checklist"}},
+  {"hypothesis": "An even lower temperature (0.3) removes guessing.", "set": {"temperature": 0.3}},
+  {"hypothesis": "Larger chunks (768 tokens) keep context together.", "set": {"chunk_size": 768}},
+  {"hypothesis": "Five few-shot examples cover more question types than three.", "set": {"few_shot": 5}},
+  {"hypothesis": "Fewer passages (3) cut distracting context.", "set": {"top_k": 3}},
+  {"hypothesis": "A third retry catches the remaining format failures.", "set": {"retries": 3}},
+  {"hypothesis": "A 1024-token answer budget leaves room for reasoning.", "set": {"max_tokens": 1024}},
+  {"hypothesis": "An expert persona prompt raises answer confidence.", "set": {"prompt_style": "persona"}},
+  {"hypothesis": "Greedy decoding (temperature 0) is the most accurate.", "set": {"temperature": 0.0}},
+  {"hypothesis": "Eight few-shot examples beat five.", "set": {"few_shot": 8}},
+  {"hypothesis": "Whole-section chunks (1024 tokens) preserve tables.", "set": {"chunk_size": 1024}},
+  {"hypothesis": "Ten passages give the reranker more to choose from.", "set": {"top_k": 10}},
+  {"hypothesis": "Two few-shot examples are enough and leave room for context.", "set": {"few_shot": 2}}
+]

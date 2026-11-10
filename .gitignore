@@ -8,3 +8,6 @@ build/
 *.egg-info/
 .DS_Store
 .playwright-mcp/
+
+# agent worktrees (Claude Code isolation), never part of the repo
+.claude/worktrees/

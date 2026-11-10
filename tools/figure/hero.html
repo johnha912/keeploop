@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>keeploop: your AI as a team</title>
+<link rel="stylesheet" href="kl.css">
+<!-- README hero: "the team board". You and a CEO (your AI) agree on the goal; the CEO
+     staffs a team, each role on the model that fits; a cycle runs in two commands; a
+     change is committed only when the number clears the noise. tools/render_figure.py
+     fills DATA (the interview text from AGENTS.md, measured speed from docs/proof) and
+     screenshots render(t). Build-time only. No number is typed here. -->
+<style>
+body { width: 1280px; height: 720px; }
+.top { position: absolute; left: 40px; right: 40px; top: 26px; display: flex; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: center; gap: 9px; font: 800 22px Inter, sans-serif; letter-spacing: -0.4px; }
+h1 { position: absolute; left: 40px; top: 70px; margin: 0; font: 900 46px/1.02 Inter, sans-serif; letter-spacing: -1.6px; }
+h1 span { display: block; color: var(--ink2); font-weight: 800; }
+.card { position: absolute; background: var(--panel); border: 1.5px solid var(--ink); border-radius: 14px; padding: 12px 14px; }
+.card .t { font: 800 18px Inter, sans-serif; display: flex; justify-content: space-between; align-items: center; }
+.card .s { font: 13.5px/1.4 Inter, sans-serif; color: var(--ink2); margin-top: 6px; }
+.card .m { font: 600 12.5px "JetBrains Mono", monospace; margin-top: 8px; }
+#ceo { left: 352px; top: 248px; width: 196px; height: 172px; background: var(--ink); color: #fff; border-color: var(--ink); }
+#ceo .s { color: #c9cad0; }
+#ceo .m { color: #f2c230; }
+.role { width: 202px; height: 134px; }
+.card.on { box-shadow: 0 0 0 6px var(--glow, rgba(23,24,28,.10)); }
+.q { position: relative; width: 288px; font: 14.5px/1.35 Inter, sans-serif; padding: 9px 12px; border-radius: 12px;
+  background: var(--panel); border: 1.5px solid var(--ink); }
+.q i { font-style: normal; color: var(--keep); font-weight: 700; float: right; margin-left: 8px; }
+.q.ok { border-color: var(--keep); }
+.stat { position: absolute; top: 640px; font: 600 15px "JetBrains Mono", monospace; border: 1.5px solid var(--ink);
+  border-radius: 999px; padding: 7px 14px; background: var(--panel); }
+.stat b { font-weight: 800; }
+</style></head>
+<body>
+<div class="top">
+  <div class="brand"><svg width="26" height="26" viewBox="0 0 34 34"><path d="M24.5 8.5 A11 11 0 1 0 28 17" fill="none" stroke="#17181c" stroke-width="4.2" stroke-linecap="round"/><path d="M19 4.5 L25 8.5 L20 13.5" fill="none" stroke="#17181c" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29.5" cy="11" r="3.6" fill="#1e9e5a"/></svg>keeploop</div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--ceo)"></i>CEO · your AI</span>
+    <span><i class="sw" style="background:var(--analyst)"></i>analyst</span>
+    <span><i class="sw" style="background:var(--engineer)"></i>engineer</span>
+    <span><i class="sw" style="background:var(--auditor)"></i>auditor</span>
+    <span><i class="sw" style="background:var(--number)"></i>the number</span>
+  </div>
+</div>
+<h1><span style="color:var(--ink);font-weight:900">Your AI, as a team.</span><span id="sub"></span></h1>
+
+<div class="kick" style="position:absolute;left:40px;top:208px">you ↔ the CEO</div>
+<div id="qs" style="position:absolute;left:40px;top:236px;width:288px;display:flex;flex-direction:column;gap:8px"></div>
+<div class="kick" style="position:absolute;left:352px;top:208px">lead</div>
+<div class="card" id="ceo"><div class="t">CEO <span class="mono" style="font-size:12px;font-weight:600;color:#c9cad0">your AI</span></div>
+  <div class="s">asks you first, staffs the team, runs each cycle, reports in plain words</div>
+  <div class="m" id="ceoM"></div></div>
+<div class="kick" style="position:absolute;left:600px;top:208px">the team it staffs</div>
+<div class="card role" id="r0" style="left:600px;top:236px;border-color:var(--analyst);--glow:var(--analyst-soft)"><div class="t" style="color:var(--analyst)">Analyst</div>
+  <div class="s">one hypothesis card, its reject rule written first</div><div class="m" style="color:var(--analyst)">cheap, fast model</div></div>
+<div class="card role" id="r1" style="left:819px;top:236px;border-color:var(--engineer);--glow:var(--engineer-soft)"><div class="t" style="color:var(--engineer)">Engineer</div>
+  <div class="s">one small change, in a git workspace</div><div class="m" style="color:var(--engineer)">your main model</div></div>
+<div class="card role" id="r2" style="left:1038px;top:236px;border-color:var(--auditor);--glow:var(--auditor-soft)"><div class="t" style="color:var(--auditor)">Auditor</div>
+  <div class="s">reads the real diff before a commit, fresh context</div><div class="m" style="color:var(--auditor)">strongest model</div></div>
+<svg id="flow" width="1280" height="720"></svg>
+<div class="log" id="log" style="left:40px;top:540px;width:560px;font-size:12.5px;line-height:1.55"></div>
+<div id="stats"></div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const NS = "http://www.w3.org/2000/svg";
+const V = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function el(p, tag, a, txt) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]);
+  if (txt !== undefined) e.textContent = txt; p.appendChild(e); return e; }
+const ease = k => 1 - Math.pow(1 - Math.max(0, Math.min(1, k)), 3);
+const T = D.hero.timeline;
+
+/* the interview: the CEO's real first-time questions (AGENTS.md) */
+const qs = document.getElementById("qs");
+const Q = D.hero.questions.map((q, i) => {
+  const d = document.createElement("div"); d.className = "q";
+  d.innerHTML = `${q}<i>✓</i>`; qs.appendChild(d); return d;
+});
+const approve = document.createElement("div"); approve.className = "q";
+approve.style.borderStyle = "dashed"; approve.innerHTML = `→ picks the level (<b class="mono">kl level</b>) and <b class="mono">evaluate.py</b>; you approve<i>✓</i>`;
+qs.appendChild(approve); Q.push(approve);
+
+/* the line a change runs: evaluate.py -> the keep gate -> commit or reset */
+const F = document.getElementById("flow");
+const Y = 452;
+const box = (x, w, label, sub, col, soft) => {
+  const g = el(F, "g", {});
+  g.r = el(g, "rect", { x, y: Y - 34, width: w, height: 68, rx: 12, fill: soft, stroke: col, "stroke-width": 1.8 });
+  el(g, "text", { x: x + 14, y: Y - 7, "font-size": 15, "font-weight": 700, fill: "#17181c", "font-family": "Inter, sans-serif" }, label);
+  el(g, "text", { x: x + 14, y: Y + 15, "font-size": 12.5, fill: "#50525a" }, sub);
+  return g;
+};
+el(F, "path", { d: `M548,${Y} L600,${Y}`, stroke: "#17181c", "stroke-width": 2, fill: "none" });
+el(F, "path", { d: "M548,300 L600,300", stroke: "#17181c", "stroke-width": 2, fill: "none" });
+const ev = box(600, 196, "evaluate.py", "one number", V("--number"), V("--number-soft"));
+el(F, "path", { d: `M796,${Y} L830,${Y}`, stroke: "#17181c", "stroke-width": 2 });
+const gate = box(830, 214, "> best + 2σ ?", "beats the noise?", "#17181c", "#ffffff");
+el(F, "path", { d: `M1044,${Y} L1120,${Y} L1120,370`, stroke: "#17181c", "stroke-width": 2, fill: "none" });
+el(F, "text", { x: 1060, y: Y - 8, "font-size": 12, fill: "#50525a" }, "yes");
+el(F, "path", { d: `M1180,370 L1180,${Y + 84}`, stroke: V("--keep"), "stroke-width": 2, fill: "none" });
+el(F, "text", { x: 944, y: Y + 62, "font-size": 12, fill: V("--reset") }, "no");
+el(F, "path", { d: `M937,${Y + 34} L937,${Y + 84}`, stroke: V("--reset"), "stroke-width": 2, fill: "none" });
+const reset = el(F, "g", {});
+el(reset, "rect", { x: 830, y: Y + 84, width: 214, height: 46, rx: 12, fill: V("--reset-soft"), stroke: V("--reset"), "stroke-width": 1.8 });
+el(reset, "text", { x: 844, y: Y + 112, "font-size": 14.5, "font-weight": 700, fill: V("--reset"), "font-family": "Inter, sans-serif" }, "reset + lesson written");
+const commitTag = el(F, "g", {});
+el(commitTag, "rect", { x: 1060, y: Y + 84, width: 180, height: 46, rx: 12, fill: V("--keep-soft"), stroke: V("--keep"), "stroke-width": 1.8 });
+el(commitTag, "text", { x: 1074, y: Y + 112, "font-size": 14.5, "font-weight": 700, fill: V("--keep"), "font-family": "Inter, sans-serif" }, "kept: git commit");
+// the path a token takes: CEO -> analyst -> engineer -> evaluate -> gate -> auditor -> commit (or reset)
+const P = { ceo: [450, 334], an: [701, 300], en: [920, 300], ev: [698, Y], gate: [937, Y], reset: [937, Y + 107] };
+const tok = el(F, "circle", { r: 11, fill: V("--number"), stroke: "#17181c", "stroke-width": 2.5, opacity: 0 });
+function along(pts, k) {  // position along a polyline, k in 0..1
+  const seg = []; let L = 0;
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(d); L += d; }
+  let s = k * L;
+  for (let i = 0; i < seg.length; i++) { if (s <= seg[i]) { const f = s / seg[i] || 0;
+    return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } s -= seg[i]; }
+  return pts[pts.length - 1];
+}
+const RUN1 = [P.ceo, P.an, P.en, P.ev, P.gate, [1120, Y], [1120, 300], [1180, 300], [1180, Y + 107]],
+      RUN2 = [P.ceo, P.an, P.en, P.ev, P.gate, P.reset];
+
+/* measured strips (docs/proof/bench-*.json) */
+const stats = document.getElementById("stats");
+const S = D.hero.stats.map((s, i) => { const d = document.createElement("div"); d.className = "stat";
+  d.style.left = s.x + "px"; d.innerHTML = s.html; stats.appendChild(d); return d; });
+
+const log = document.getElementById("log");
+function render(t) {
+  const done = t < T.reset || t >= T.end;
+  const at = (a) => done || t >= a;
+  // headline second line
+  const subs = D.hero.subs; let sub = subs.done;
+  if (!done) sub = t < T.team ? subs.ask : t < T.cycle ? subs.team : t < T.stats ? subs.cycle : subs.fast;
+  document.getElementById("sub").textContent = sub;
+  // interview
+  Q.forEach((q, i) => { const a = T.ask + i * 0.75; q.style.opacity = at(a) ? 1 : 0;
+    q.classList.toggle("ok", at(a + 0.45)); q.querySelector("i").style.opacity = at(a + 0.45) ? 1 : 0;
+    const kq = ease((t - a) / 0.35); q.style.transform = done || kq >= 1 ? "none" : `translateX(${(1 - kq) * -24}px)`; });
+  // team
+  ["r0", "r1", "r2"].forEach((id, i) => { const a = T.team + 0.2 + i * 0.55, e = document.getElementById(id);
+    const kr = ease((t - a) / 0.4); e.style.opacity = at(a) ? 1 : 0; e.style.transform = done || kr >= 1 ? "none" : `translateY(${(1 - kr) * 30}px)`;
+    e.classList.remove("on"); });
+  document.getElementById("ceo").classList.toggle("on", !done && t >= T.ask && t < T.cycle);
+  // cycles
+  let ln = [], k1 = (t - T.cycle) / 2.6, k2 = (t - T.cycle - 3.0) / 1.9;
+  tok.setAttribute("opacity", 0); reset.style.opacity = 0; commitTag.style.opacity = 0;
+  [ev, gate].forEach(g => g.r.setAttribute("stroke-width", 1.8));
+  let cyc = D.hero.cycle0;
+  if (done) { commitTag.style.opacity = 1; ln = D.hero.log_done; cyc = D.hero.cycle0 + 2; }
+  else if (t >= T.cycle && t < T.stats) {
+    const run = k1 <= 1 ? RUN1 : RUN2, k = k1 <= 1 ? ease(k1) : ease(k2);
+    if (k1 <= 1 || (k2 >= 0 && k2 <= 1)) { const [x, y] = along(run, Math.max(0, k)); tok.setAttribute("cx", x); tok.setAttribute("cy", y); tok.setAttribute("opacity", 1); }
+    const where = (k1 <= 1 ? k1 : k2);
+    const hl = (id, a, b) => { if (where >= a && where < b) document.getElementById(id).classList.add("on"); };
+    hl("r0", 0.05, 0.25); hl("r1", 0.2, 0.42);
+    if (k1 <= 1) { hl("r2", 0.7, 0.92); }
+    ln = k1 <= 1 ? [D.hero.log[0], k1 > 0.35 ? D.hero.log[1] : ""] : [D.hero.log[2], k2 > 0.4 ? D.hero.log[3] : ""];
+    if (k1 > 1) commitTag.style.opacity = 1;
+    if (k2 > 0.95) reset.style.opacity = 1;
+    cyc = D.hero.cycle0 + (k1 > 1 ? 1 : 0) + (k2 > 0.95 ? 1 : 0);
+    tok.setAttribute("fill", k1 <= 1 ? (k1 > 0.9 ? V("--keep") : V("--number")) : (k2 > 0.8 ? V("--reset") : V("--number")));
+  } else if (t >= T.stats) { commitTag.style.opacity = 1; reset.style.opacity = 1; ln = D.hero.log_done; cyc = D.hero.cycle0 + 2; }
+  log.innerHTML = ln.filter(Boolean).map(s => `<div>${s}</div>`).join("");
+  log.style.opacity = ln.filter(Boolean).length ? 1 : 0;
+  document.getElementById("ceoM").textContent = `cycle ${cyc} · 2 commands each`;
+  // stats
+  S.forEach((s, i) => { const a = T.stats + 0.3 + i * 0.5; s.style.opacity = at(a) ? 1 : 0;
+    const ks = ease((t - a) / 0.3); s.style.transform = done || ks >= 1 ? "none" : `scale(${0.9 + 0.1 * ks})`; });
+}
+window.render = render;
+window.TOTAL = D.hero.total;
+render(0);
+</script>
+</body></html>

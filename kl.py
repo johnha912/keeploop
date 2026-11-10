@@ -4,6 +4,10 @@ reads AGENTS.md; kl only measures, gates, records and refuses. Stdlib only, and
 every command except `kl audit --vendor` runs with no AI CLI installed.
 
     python kl.py begin                  baseline, noise, fence snapshot
+    python kl.py next                   fast path: compact brief + card skeleton
+    python kl.py try [CARD]             fast path: card + check + eval + keep/discard
+    python kl.py handoff [--audit|--critic]  one packet for a chat AI with no repo access
+    python kl.py apply REPLY            write a chat AI's reply files, then the `try` flow
     python kl.py status                 what the CEO reads each cycle
     python kl.py card FILE|-            validate + register a hypothesis card
     python kl.py check                  deterministic gates on the workspace diff
@@ -31,7 +35,9 @@ changed evaluate.py, charter, team.yaml or best.json is detected and refused),
 not tamper-proof: an agent that rewrites the snapshot too is not stopped. Use
 the headless run.py, or an OS-level sandbox, when that matters.
 
-Exit codes: 0 ok, 1 refused (reason printed), 2 fence broken.
+Exit codes: 0 ok, 1 refused (reason printed), 2 fence broken; `try` and `apply`
+also 3 (waiting for a critic or auditor verdict, the cycle stays open; the next
+command is printed) and 4 (discarded).
 """
 
 import sys
@@ -40,6 +46,7 @@ sys.dont_write_bytecode = True  # a .pyc written under the project would trip th
 
 import argparse
 import contextlib
+import fnmatch
 import hashlib
 import html
 import io
@@ -55,6 +62,8 @@ import codemap
 import ledger
 import lessons
 import packs
+import report
+import quickstart
 import rubric as rubric_mod
 import run as R
 import scaffold
@@ -65,6 +74,10 @@ from prepare import ROOT, load_team, setup
 
 class Refuse(Exception):
     pass
+
+
+class BadVerdict(Refuse):
+    """The audit verdict is for another diff: audit again (`kl try` keeps the cycle open)."""
 
 
 def kl() -> str:
@@ -332,12 +345,14 @@ def _vet(c, parsed, n, best, log=True) -> None:
                      "or propose another hypothesis")
 
 
-def cmd_card(c, a) -> int:
+def _register(c, text: str, edited: bool = False) -> int:
+    """`kl card`'s rules: one open card, the brakes, the labelled format, the vet.
+    `edited`: `kl try` registers the card after the edit, so the workspace may be
+    dirty; the card is still fixed before the evaluation runs."""
     best = _best(c)
-    text = sys.stdin.read() if a.file == "-" else Path(a.file).read_text(encoding="utf-8")
     if "card" in _cycle(c):
         raise Refuse(f"card {_cycle(c)['n']} is still open: `kl keep` or `kl discard` it first")
-    if _dirty(c):
+    if not edited and _dirty(c):
         raise Refuse(f"workspace has uncommitted changes: run `{kl()} discard` first")
     if why := R.brake(best["metric"], c.loop_cfg, ledger.read_rows(c.state)):
         raise Refuse(f"{why}. Report with `{kl()} report`")
@@ -349,8 +364,20 @@ def cmd_card(c, a) -> int:
         raise Refuse("card needs HYPOTHESIS, CHANGE, REJECT IF and MISSING (label: text); "
                      f"logged as {lid}")
     _vet(c, parsed, n, best)
-    _put(c, n=n, card=text, parsed=parsed, fail=None, metric=None, t0=time.time())
+    t0 = time.time()
+    if edited:  # the cycle began at `kl next`, before the edit: keep `kl slow` honest
+        mark = _json(c.state / "next.json", {}).get("t0")
+        t0 = mark if isinstance(mark, (int, float)) and 0 <= t0 - mark < 86400 else t0
+    (c.state / "next.json").unlink(missing_ok=True)
+    _put(c, n=n, card=text, parsed=parsed, fail=None, metric=None, t0=t0)
     print(f"card {n} registered")
+    return n
+
+
+def cmd_card(c, a) -> int:
+    text = sys.stdin.read() if a.file == "-" else Path(a.file).read_text(encoding="utf-8")
+    n = _register(c, text)
+    parsed = _cycle(c)["parsed"]
     if R.declared_heavy(parsed, c.heavy_globs):
         print(f"heavy card: run the critic (fresh context) on it, then "
               f"`{kl()} debate {n} --critic FILE` (one round, see AGENTS.md)")
@@ -406,12 +433,12 @@ def cmd_check(c, a) -> int:
         _put(c, fail=list(fail))
         print(f"FAIL {fail[1]}")
         return 1
-    _put(c, fail=None)
+    _put(c, fail=None, gate={"heavy": heavy, "diff": _tag(diff)})  # read by `kl try`
     if R.is_measurement(cy["parsed"]):
         print("PASS measurement card, no diff expected")
         return 0
     print(f"PASS tier={'heavy' if heavy else 'light'} files={len(changed)} "
-          f"lines={R.diff_size(c.workspace)} diff={hashlib.sha256(diff.encode()).hexdigest()[:12]}")
+          f"lines={R.diff_size(c.workspace)} diff={_tag(diff)}")
     return 0
 
 
@@ -439,6 +466,17 @@ def _tag(diff: str) -> str:
     return hashlib.sha256(diff.encode()).hexdigest()[:12]
 
 
+def _standards(c) -> str:
+    return (f"{lessons.guardrails_text(c.state, cfg=c.loop_cfg)}\n\nCraft standards:\n"
+            f"{(c.pack or {}).get('taste', '')}")
+
+
+def _audit_prompt(c, cy, best, diff, heavy, metric) -> str:
+    """The one audit prompt, for `kl audit --vendor` and `kl handoff --audit`."""
+    return R.audit_prompt(cy["card"], diff, metric, best["metric"], _standards(c),
+                          c.criteria, packs.specialists_text(c.pack), heavy)
+
+
 def cmd_audit(c, a) -> int:
     best = _best(c)
     cy = _cycle(c)
@@ -460,10 +498,7 @@ def cmd_audit(c, a) -> int:
         v = vendors.get_vendor(a.vendor, timeout_s=c.loop_cfg["vendor_timeout_s"], model=a.model, **extra)
         if not v.available():
             raise vendors.VendorUnavailable(f"{a.vendor} is not installed")
-        prompt = R.audit_prompt(
-            cy["card"], diff, metric, best["metric"],
-            f"{lessons.guardrails_text(c.state, cfg=c.loop_cfg)}\n\nCraft standards:\n{(c.pack or {}).get('taste', '')}",
-            c.criteria, packs.specialists_text(c.pack), heavy)
+        prompt = _audit_prompt(c, cy, best, diff, heavy, metric)
         res = _timed(c, "audit_s", lambda: R.guarded(c.root, c.workspace, "auditor", lambda: v.complete(
             prompt, role="auditor", cwd=c.workspace,
             max_tokens=c.roles.get("auditor", {}).get("token_budget", c.loop_cfg["token_budget_per_role"]))))
@@ -495,9 +530,13 @@ def cmd_keep(c, a) -> int:
             if (c.state / "debate" / f"{n}.md").exists() else ""):
         print("kl: warning: heavy card kept without a recorded critique (kl debate); "
               "not blocking, the metric and the audit still decide")
-    metric, error = _timed(c, "eval_s", lambda: _evaluate(c))
-    if metric is None:
-        _stop_on_fail(c, ("crash", f"evaluation crashed: {error}", R.eval_crash_lesson(error)))
+    pre = getattr(a, "evaluated", None)  # `kl try`: (diff id, metric) it measured a moment ago
+    if pre and pre[0] == _tag(diff):
+        metric = pre[1]
+    else:
+        metric, error = _timed(c, "eval_s", lambda: _evaluate(c))
+        if metric is None:
+            _stop_on_fail(c, ("crash", f"evaluation crashed: {error}", R.eval_crash_lesson(error)))
     bar = _bar(c, best)
     _put(c, metric=metric)
     if not metric > bar:
@@ -508,7 +547,7 @@ def cmd_keep(c, a) -> int:
         text = Path(a.audit_verdict).read_text(encoding="utf-8")
         m = re.search(r"DIFF:\s*([0-9a-f]{12})", text)
         if not m or m.group(1) != _tag(diff):
-            raise Refuse("audit verdict is missing its `DIFF: <id>` line (printed by `kl check`) "
+            raise BadVerdict("audit verdict is missing its `DIFF: <id>` line (printed by `kl check`) "
                          "or is for a different diff: audit again")
         if not R.approved(text):
             _stop_on_fail(c, ("discard", "audit: " + " ".join(text.split())[:80], R.L_AUDIT))
@@ -627,6 +666,17 @@ def report_text(c) -> str:
 
 def cmd_report(c, a) -> int:
     print(report_text(c))
+    if a.html or a.svg:  # the shareable chart: ledger only, no model call
+        run = report.read_run(c.state)
+        title = f"keeploop run: {c.root.name}"
+        z = float(c.loop_cfg["noise_z"])
+        print("summary: " + report.summary(run))
+        if a.html:
+            Path(a.html).write_text(report.html_page(run, z, title), encoding="utf-8")
+            print(f"wrote {a.html}")
+        if a.svg:
+            Path(a.svg).write_text(report.chart_svg(run, z, title, auto_dark=True), encoding="utf-8")
+            print(f"wrote {a.svg}")
     if a.assert_cycle_under is not None:  # the attachable lesson check
         rows_t = _timings(c)
         if rows_t and _total(rows_t[-1]) > a.assert_cycle_under:
@@ -716,6 +766,421 @@ def cmd_cite(c, a) -> int:
             bad += 1
     print(f"cite: {len(urls)} urls checked, {bad} problems")
     return 1 if bad else 0
+
+
+# --- fast path: next, try, handoff, apply -------------------------------------
+# Fewer commands and less output for the same cycle. They call the commands above
+# (card, check, eval, keep, discard): the rules live there, not here.
+
+EXIT_WAIT, EXIT_DISCARDED = 3, 4  # `kl try` / `kl apply`: 0 kept, 1 refused, 2 fence
+DECISIVE_REL = 0.01  # a light gain skips the audit only if it also clears 1% of |best|
+LINE_CAP = 300  # `kl try` prints longer lines cut, with the path of the full text
+
+
+def _short(c, p: Path) -> str:
+    """A path relative to the project root when it is inside it (fewer characters to read)."""
+    try:
+        return p.relative_to(c.root).as_posix()
+    except ValueError:
+        return str(p)
+
+
+def _decisive(best: float, bar: float, metric: float) -> bool:
+    """Clears the keep bar by the bar's own margin again, and by DECISIVE_REL of |best|."""
+    return metric - bar >= max(bar - best, DECISIVE_REL * abs(best))
+
+
+def _critiqued(c, n) -> bool:
+    p = c.state / "debate" / f"{n}.md"
+    return p.exists() and "## Critique" in p.read_text(encoding="utf-8")
+
+
+def _memory(c, query: str, top: int = 3) -> list[str]:
+    """Lessons and rejected hypotheses that match `query` (what a card must not repeat)."""
+    out = []
+    for _, r in lessons.recall(c.state, query, 50):
+        verdict = re.search(r"\[(\w+)\]\s*$", r["_text"])
+        if r["kind"] == "lesson" or (r["kind"] == "hypothesis" and verdict
+                                     and verdict.group(1) in R.REJECTED + ("duplicate",)):
+            out.append(f"  {r['kind']} {r['ref']}: {' '.join(r['_text'].split())[:130]}")
+    return out[:top]
+
+
+def next_text(c) -> str:
+    best = R._read_json(c.state / "best.json")
+    if best.get("metric") is None:
+        return f"not started: run `{kl()} begin`"
+    bar = _bar(c, best)
+    cyc = [r for r in ledger.read_rows(c.state) if int(r["cycle"]) >= 1]
+    k = lambda s: sum(r["status"] == s for r in cyc)  # noqa: E731
+    out = [f"best {best['metric']:.6f}  bar {bar:.6f}  sigma {best.get('sigma') or 0:.6f}  "
+           f"| cycles {len(cyc)} (keep {k('keep')}, discard {k('discard')}, crash {k('crash')})",
+           f"workspace: {_short(c, c.workspace)}"]
+    if warn := R.ceiling_warning(best["metric"], bar, c.loop_cfg["metric_max"]):
+        out.append(warn)
+    if why := R.brake(best["metric"], c.loop_cfg, cyc):
+        return "\n".join(out + [f"STOP: {why}", f"Paste `{kl()} report` to the user; start no cycle."])
+    cy = _cycle(c)
+    if "card" in cy:
+        return "\n".join(out + [f"pending card {cy['n']}: {cy['parsed']['hypothesis'][:80]}",
+                                f"finish it: `{kl()} try` (continues it) or `{kl()} discard`"])
+    hyps = R.read_hypotheses(c.state)
+    nxt = R.human_hypotheses(c.root / "program.md", hyps)
+    out.append("next hypothesis: " + (nxt[0] if nxt else "none listed; propose your own"))
+    query = nxt[0] if nxt else " ".join(r["description"] for r in cyc[-3:]) or "metric"
+    mem = _memory(c, query)
+    out += (["memory (do not repeat):"] + mem) if mem else ["memory: nothing relevant"]
+    qs = c.state / "questions.md"
+    if nq := len(qs.read_text(encoding="utf-8").splitlines()) if qs.exists() else 0:
+        out.append(f"open questions: {nq} (ask the human; `{kl()} status` lists them)")
+    out += [f"card skeleton (fill, save outside this repo, edit, then `{kl()} try FILE`):",
+            "HYPOTHESIS: " + (nxt[0] if nxt else "?"), "ALTERNATIVES: ?", "CHANGE: ?",
+            "EXPECT: ?", f"REJECT IF: metric <= {bar:.6f}", "MISSING: none"]
+    return "\n".join(out)
+
+
+def cmd_next(c, a) -> int:
+    text = next_text(c)
+    if "card skeleton" in text:  # a cycle starts here; `kl try` dates the card from it
+        R._write_json(c.state / "next.json", {"t0": time.time()})
+    print(text)
+    return 0
+
+
+def _try_discard(c, a, reason: str) -> int:
+    cmd_discard(c, SimpleNamespace(reason=reason, refuted=False, tokens=a.tokens))
+    return EXIT_DISCARDED
+
+
+def _save_stderr(c) -> str:
+    """evaluate.py's full stderr (control characters stripped, secrets redacted) to a file."""
+    text = re.sub(r"(?![\n\t])" + R.CONTROL_RX, "", R.LAST_STDERR[0])
+    for kind, rx in R.SECRET_PATTERNS.items():
+        text = rx.sub(f"[{kind} redacted]", text)
+    path = c.state / "eval-stderr.txt"
+    path.write_text(text[-65536:], encoding="utf-8")
+    return str(path)
+
+
+def _try_open(c, a) -> int:
+    """Gates, evaluation and the decision for the open card, through cmd_check,
+    cmd_eval, cmd_keep and cmd_discard. Stops (EXIT_WAIT) for a missing verdict."""
+    cy = _cycle(c)
+    n, parsed = cy["n"], cy["parsed"]
+    if R.declared_heavy(parsed, c.heavy_globs) and not _critiqued(c, n):
+        print(f"WAIT heavy card {n}: the critic round comes first. A fresh-context Critic reads "
+              f"only the card; save its reply outside this repo, run `{kl()} debate {n} --critic "
+              f"FILE`, then `{kl()} try` again (no repo access: `{kl()} handoff --critic`)")
+        return EXIT_WAIT
+    if cmd_check(c, a) != 0:
+        return _try_discard(c, a, "a gate failed")
+    R.LAST_STDERR[0] = ""
+    if cmd_eval(c, a) != 0:
+        if R.LAST_STDERR[0].strip():
+            print(f"full evaluate.py stderr: {_save_stderr(c)}")
+        return _try_discard(c, a, "evaluation crashed")
+    cy, best = _cycle(c), _best(c)
+    metric, bar = cy["metric"], _bar(c, best)
+    if R.is_measurement(parsed):
+        return _try_discard(c, a, f"measurement: metric {metric:.6f}, keep-bar {bar:.6f}")
+    if not metric > bar:
+        return _try_discard(c, a, "metric did not beat the keep bar")
+    heavy, tag = cy["gate"]["heavy"], cy["gate"]["diff"]
+    why = "heavy change" if heavy else (
+        "this project audits every keep (loop.audit_every_keep)" if c.loop_cfg.get("audit_every_keep")
+        else None if _decisive(best["metric"], bar, metric) else "the gain is not decisive")
+    if why and not a.audit_verdict:
+        print(f"WAIT audit required ({why}): give a fresh-context Auditor the card, `git -C "
+              f"{_short(c, c.workspace)} diff`, metric {metric:.6f} and `DIFF: {tag}`; save its reply outside "
+              f"this repo, then `{kl()} try --audit-verdict FILE` (no repo access: "
+              f"`{kl()} handoff --audit`; another vendor: `{kl()} audit --vendor NAME`)")
+        return EXIT_WAIT
+    try:
+        cmd_keep(c, SimpleNamespace(card=None, audit_verdict=a.audit_verdict, tokens=a.tokens,
+                                    evaluated=(tag, metric)))
+    except BadVerdict:
+        raise  # the cycle stays open: audit this diff, then `kl try --audit-verdict FILE`
+    except Refuse as exc:
+        print(f"keep refused: {exc}")
+        return _try_discard(c, a, "keep refused")
+    return 0
+
+
+def _capped(c, fn) -> int:
+    """Run fn, printing each line cut at LINE_CAP; the full text goes to .keeploop/last-try.txt."""
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            return fn()
+    finally:
+        text = buf.getvalue()
+        lines = text.splitlines()
+        full = c.state / "last-try.txt"
+        if any(len(l) > LINE_CAP for l in lines):
+            full.write_text(text, encoding="utf-8")
+        for l in lines:
+            print(l if len(l) <= LINE_CAP else f"{l[:LINE_CAP]} ... [full: {full}]")
+
+
+def cmd_try(c, a) -> int:
+    def body():
+        cy = _cycle(c)
+        text = None if a.file is None else (
+            sys.stdin.read() if a.file == "-" else Path(a.file).read_text(encoding="utf-8"))
+        if "card" in cy:
+            if text is not None and text.strip() not in (cy["card"].strip(), cy.get("src", "")):
+                raise Refuse(f"card {cy['n']} is still open with another text: `{kl()} try` "
+                             f"(no FILE) continues it, `{kl()} discard` drops it")
+        elif text is None:
+            raise Refuse(f"no open card: `{kl()} try CARD`")
+        else:
+            _best(c)
+            _fence_check(c)
+            _register(c, text, edited=True)
+            _put(c, src=text.strip())
+        return _try_open(c, a)
+    return _capped(c, body)
+
+
+# handoff / apply: one paste each way for a chat AI with no repo access
+
+FILE_BLOCK = re.compile(r"^(`{3,})file:(.*)$")
+GIT_NAMES = {".git", ".gitattributes", ".gitignore", ".gitmodules"}
+APPLY_MAX_FILES, APPLY_MAX_BYTES = 50, 2_000_000
+
+
+def _section(path: Path, title: str) -> str:
+    if not path.exists():
+        return ""
+    m = re.search(rf"^## {re.escape(title)}\s*(.*?)(?=^## |\Z)", path.read_text(encoding="utf-8"),
+                  re.S | re.M)
+    return m.group(1).strip() if m else ""
+
+
+def _fence_for(text: str) -> str:
+    return "`" * max([3] + [len(m) + 1 for m in re.findall(r"`{3,}", text)])
+
+
+def _packet_files(c, globs: list[str] | None, max_chars: int) -> tuple[list[str], list[str], dict]:
+    """Whole tracked files that fit max_chars, as file blocks; what was left out, why;
+    and {path: sha256} of the files shown (`kl apply` overwrites only those)."""
+    tracked = sorted(f for f in R.git(c.workspace, "-c", "core.quotepath=off", "ls-files", "-z")
+                     .split("\0") if f)
+    if globs:
+        tracked = [f for f in tracked if any(fnmatch.fnmatch(f, g) or fnmatch.fnmatch(
+            Path(f).name, g) for g in globs)]
+    secret = {f for _, f in R.scan_secrets(c.workspace, tracked)}
+    blocks, left, used, shown = [], [], 0, {}
+    for f in tracked:
+        p = c.workspace / f
+        if f in secret:
+            left.append(f"{f} (looks like it holds a secret)")
+            continue
+        if p.is_symlink() or not p.is_file():
+            continue
+        data = p.read_bytes()
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            text = None
+        if text is None or "\0" in text:
+            left.append(f"{f} (binary)")
+            continue
+        fence = _fence_for(text)
+        tag = "(protected: read only)\n" if R.is_protected(f, c.protect) else ""
+        block = f"{tag}{fence}file:{f}\n{text}{'' if text.endswith(chr(10)) or not text else chr(10)}{fence}"
+        if used + len(block) > max_chars:
+            left.append(f"{f} ({len(text)} chars, over --max-chars)")
+            continue
+        blocks.append(block)
+        shown[f] = hashlib.sha256(data).hexdigest()
+        used += len(block)
+    return blocks, left, shown
+
+
+REPLY_FORMAT = """\
+## Your reply: exactly this format, nothing before the card
+
+HYPOTHESIS: what you believe and why
+ALTERNATIVES: a competing explanation this change tells apart
+CHANGE: the smallest change
+EXPECT: the expected effect on the metric
+REJECT IF: metric <= {bar} (or a stricter number with < > below or above)
+MISSING: what you do not know and need from the human, or none
+```file:relative/path/inside/the/workspace
+<the COMPLETE new content of that file>
+```
+
+Rules: one card, one idea. One block per file you change or create, with the
+whole new content (never a diff, never "..."), the path exactly as shown above.
+If the content holds ``` lines, open and close its block with more backticks.
+Never a protected path, never a path outside the workspace. Add `DIFFERENT:`
+only to re-propose a rejected hypothesis, `TIER: heavy` for a manifest, CI or
+migration change. Unknowns go under MISSING; never guess. Do not claim a
+result: keeploop applies your files, runs the gates and the fixed evaluation,
+and keeps the change only if the metric beats {bar}."""
+
+
+def handoff_text(c, globs, max_chars) -> str:
+    best = _best(c)
+    bar = _bar(c, best)
+    if why := R.brake(best["metric"], c.loop_cfg, ledger.read_rows(c.state)):
+        raise Refuse(f"{why}. Report with `{kl()} report`")
+    if "card" in _cycle(c):
+        raise Refuse(f"card {_cycle(c)['n']} is still open: `{kl()} try` or `{kl()} discard` it first")
+    if _dirty(c):
+        raise Refuse(f"workspace has uncommitted changes: run `{kl()} discard` first")
+    hyps = R.read_hypotheses(c.state)
+    cyc = [r for r in ledger.read_rows(c.state) if int(r["cycle"]) >= 1]
+    doc = (c.root / "evaluate.py").read_text(encoding="utf-8") if (c.root / "evaluate.py").exists() else ""
+    m = re.match(r'\s*(?:"""|\'\'\')(.*?)(?:"""|\'\'\')', doc, re.S)
+    how = f"eval_cmd: {c.team['eval_cmd']}" if c.team.get("eval_cmd") else (
+        " ".join(m.group(1).split())[:600] if m else "")
+    out = ["# keeploop handoff: one cycle (paste all of this into your chat AI)", "",
+           "You are the Analyst and the Engineer of keeploop for ONE cycle. You have no files "
+           "and no terminal: everything you know is below. Answer with the reply format at the "
+           "end and nothing else.", "", "## Mission", _section(c.root / "program.md", "Mission")
+           or "(none written)", "", "## Metric",
+           f"evaluate.py prints one number, higher is better. best {best['metric']:.6f}, "
+           f"sigma {best.get('sigma') or 0:.6f}, keep bar {bar:.6f}: a change is kept only if "
+           f"the metric is above the bar."]
+    out += [f"How it is measured: {how}"] if how else []
+    nxt = R.human_hypotheses(c.root / "program.md", hyps)
+    out += ["", "## Next hypothesis from the human (test it first)",
+            *([f"- {h}" for h in nxt[:3]] or ["none listed; propose your own"])]
+    out += ["", "## Recent cycles (newest last)",
+            *([f"{r['cycle']} {r['status']} {r['metric'] or '-'} {r['description'][:160]}"
+               for r in cyc[-8:]] or ["none yet"])]
+    tested = R.already_tested(hyps).splitlines()[:8]
+    out += ["", "## Rejected hypotheses (do not repeat without a DIFFERENT: line)",
+            *(tested or ["none"])]
+    open_l = [l for l in lessons.review(c.state, c.loop_cfg)
+              if l["standing"] in ("provisional", "ineffective")]
+    out += ["", "## Open lessons (rules to follow)",
+            *([f"- {l['id']}: {l['guardrail'][:200]}" for l in open_l[:8]] or ["none"])]
+    out += ["", "## Protected paths (never change)", ", ".join(c.protect) or "none"]
+    blocks, left, shown = _packet_files(c, globs, max_chars)
+    R._write_json(c.state / "handoff.json", {"commit": best["commit"], "files": shown})
+    out += ["", "## Workspace files (current, complete)", *blocks]
+    if left:
+        out += ["Not shown (do not write these): " + "; ".join(left[:30])]
+    out += ["", REPLY_FORMAT.format(bar=f"{bar:.6f}")]
+    return "\n".join(out) + "\n"
+
+
+def review_text(c, kind: str) -> str:
+    """The packet for an outside verdict on the open cycle: the critic or the auditor."""
+    cy = _cycle(c)
+    if "card" not in cy:
+        raise Refuse(f"no open card: `{kl()} handoff` starts a cycle")
+    head = ("# keeploop {} (paste into a NEW chat, or another AI: never the one that wrote "
+            "the {})\n\n")
+    if kind == "critic":
+        return (head.format("critic", "card") + R.critic_prompt(cy["card"], _standards(c))
+                + f"\n\nThen the user saves the reply to a file outside the repo and runs "
+                  f"`{kl()} debate {cy['n']} --critic FILE`, then `{kl()} try`.\n")
+    best = _best(c)
+    _fence_check(c)
+    changed, diff, heavy, fail = _gates(c, best, cy["parsed"])
+    if fail:
+        raise Refuse(f"{fail[1]}: `{kl()} try` discards it; nothing to audit")
+    metric = cy.get("metric")
+    if metric is None:
+        raise Refuse(f"no metric yet: run `{kl()} try` first")
+    return (head.format("audit", "change") + _audit_prompt(c, cy, best, diff, heavy, metric)
+            + f"\n\nEnd your reply with this exact last line:\nDIFF: {_tag(diff)}\n\n"
+              f"Then the user saves the reply to a file outside the repo and runs "
+              f"`{kl()} try --audit-verdict FILE`.\n")
+
+
+def cmd_handoff(c, a) -> int:
+    if a.audit or a.critic:
+        print(review_text(c, "audit" if a.audit else "critic"), end="")
+    else:
+        print(handoff_text(c, a.files, a.max_chars), end="")
+    return 0
+
+
+def parse_reply(text: str) -> tuple[str, list[tuple[str, str]]]:
+    """A chat AI's reply -> (card text, [(path, content)]). Data only: nothing in it runs."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    card, files, i = [], [], 0
+    while i < len(lines):
+        m = FILE_BLOCK.match(lines[i])
+        if not m:
+            if not files:  # the card is everything before the first file block
+                card.append(lines[i])
+            i += 1
+            continue
+        fence, path, j = m.group(1), m.group(2).strip(), i + 1
+        while j < len(lines) and lines[j].rstrip() != fence:
+            j += 1
+        if j == len(lines):
+            raise Refuse(f"the file block for {path[:80]!r} is never closed with {fence}")
+        body = lines[i + 1:j]
+        files.append((path, "\n".join(body) + "\n" if body else ""))
+        i = j + 1
+    return "\n".join(card), files
+
+
+def safe_rel(c, raw: str) -> str:
+    """A plain relative path inside the workspace that no rule protects, or Refuse."""
+    p = raw.strip()
+    bad = (not p or len(p) > 240 or "\\" in p or ":" in p or "~" in p or p.startswith("/")
+           or any(ord(ch) < 32 or ord(ch) == 127 for ch in p))
+    parts = p.split("/")
+    bad = bad or any(s in ("", ".", "..") or s != s.rstrip(". ") or s.casefold() in GIT_NAMES
+                     for s in parts)
+    if bad:
+        raise Refuse(f"refused path {raw[:80]!r}: only plain relative paths inside the workspace "
+                     "(no absolute path, .., backslash, drive, ~ or .git file)")
+    if R.is_protected(p, c.protect):
+        raise Refuse(f"refused path {p!r}: protected")
+    cur = c.workspace
+    for s in parts:
+        cur = cur / s
+        if cur.is_symlink():
+            raise Refuse(f"refused path {p!r}: goes through a symlink")
+    if cur.is_dir() or not cur.resolve().is_relative_to(c.workspace.resolve()):
+        raise Refuse(f"refused path {p!r}: not a file inside the workspace")
+    return p
+
+
+def cmd_apply(c, a) -> int:
+    def body():
+        try:
+            text = Path(a.file).read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            raise Refuse("the reply is not UTF-8 text")
+        card, files = parse_reply(text)
+        rels = [safe_rel(c, p) for p, _ in files]  # every path, before anything is written
+        if len({r.casefold() for r in rels}) != len(rels):
+            raise Refuse("the reply writes the same file twice")
+        if len(files) > APPLY_MAX_FILES or sum(len(b) for _, b in files) > APPLY_MAX_BYTES:
+            raise Refuse(f"the reply is too big (at most {APPLY_MAX_FILES} files, "
+                         f"{APPLY_MAX_BYTES} chars)")
+        _best(c)
+        _fence_check(c)
+        if "card" in _cycle(c):
+            raise Refuse(f"card {_cycle(c)['n']} is still open: `{kl()} try` or `{kl()} discard` it first")
+        if _dirty(c):
+            raise Refuse(f"workspace has uncommitted changes: run `{kl()} discard` first")
+        shown = _json(c.state / "handoff.json", {}).get("files", {})
+        for rel in rels:  # a full-file block replaces the whole file: it must have been shown whole
+            t = c.workspace / rel
+            if t.exists() and shown.get(rel) != _sha_file(t):
+                raise Refuse(f"refused path {rel!r}: the last `{kl()} handoff` did not show this "
+                             "file whole as it is now; run handoff again (with --files) and reply again")
+        _register(c, card)  # pre-registered: the card is fixed before any file is written
+        for rel, content in zip(rels, (b for _, b in files)):
+            safe_rel(c, rel)
+            target = c.workspace / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("w", encoding="utf-8", newline="") as f:
+                f.write(content)
+        print(f"applied {len(rels)} file(s): " + (", ".join(rels)[:200] or "none"))
+        return _try_open(c, a)
+    return _capped(c, body)
 
 
 # --- staffing ---------------------------------------------------------------
@@ -820,6 +1285,9 @@ def _recall_lines(c, q, top) -> list[str]:
 
 def cmd_recall(c, a) -> int:
     hits = _recall_lines(c, a.query, a.top)
+    g = lessons.global_cfg(c.team)
+    hits += [f"  global lesson {r['id']} ({r['project']}): {r['guardrail'][:160]}"
+             for r in lessons.global_recall(a.query, g)]
     print("\n".join(hits) if hits else "nothing in memory matches; it is new")
     return 0
 
@@ -948,6 +1416,22 @@ def parser() -> argparse.ArgumentParser:
     sub.add_parser("begin", help="baseline + noise + fence snapshot").add_argument(
         "--accept-changes", action="store_true", help="human: re-snapshot after a legit change")
     sub.add_parser("status", help="compact state for the CEO")
+    sub.add_parser("next", help="fast path: compact brief, memory and a card skeleton")
+    s = sub.add_parser("try", help="fast path: card + check + eval + keep or discard (exit 3: "
+                       "needs a verdict, 4: discarded)")
+    s.add_argument("file", nargs="?", help="the card (omit to continue the open card)")
+    s.add_argument("--audit-verdict", metavar="FILE")
+    s.add_argument("--tokens", type=int, default=0)
+    s = sub.add_parser("handoff", help="one packet to paste into a chat AI with no repo access")
+    s.add_argument("--files", nargs="+", metavar="GLOB", help="workspace files to include")
+    s.add_argument("--max-chars", type=int, default=24000, help="cap on included file text")
+    g = s.add_mutually_exclusive_group()
+    g.add_argument("--audit", action="store_true", help="the auditor packet for the open cycle")
+    g.add_argument("--critic", action="store_true", help="the critic packet for the open card")
+    s = sub.add_parser("apply", help="write a chat AI's reply (card + files), then the try flow")
+    s.add_argument("file")
+    s.add_argument("--audit-verdict", metavar="FILE", help=argparse.SUPPRESS)
+    s.add_argument("--tokens", type=int, default=0)
     sub.add_parser("card", help="validate + register a hypothesis card").add_argument("file")
     sub.add_parser("check", help="deterministic gates on the workspace diff")
     sub.add_parser("eval", help="fenced evaluate.py vs the keep bar")
@@ -969,6 +1453,8 @@ def parser() -> argparse.ArgumentParser:
     g.add_argument("--critic", metavar="FILE")
     g.add_argument("--reply", metavar="FILE")
     s = sub.add_parser("report", help="run facts from the ledger (paste verbatim)")
+    s.add_argument("--html", metavar="FILE", help="also write a self-contained HTML page: summary + chart")
+    s.add_argument("--svg", metavar="FILE", help="also write the chart alone as an SVG (README-ready)")
     s.add_argument("--assert-cycle-under", type=float, metavar="SECONDS",
                    help="exit 1 if the last cycle took longer (a lesson check)")
     sub.add_parser("cite", help="opt-in, network: dead links and quotes missing from pages").add_argument("file")
@@ -985,6 +1471,16 @@ def parser() -> argparse.ArgumentParser:
     s = sub.add_parser("recall", help="BM25 over lessons, hypotheses, debates, questions, ledger")
     s.add_argument("query")
     s.add_argument("--top", type=int, default=5)
+    s = sub.add_parser("level", help="the CEO's choice of light / fast / rigorous from the stakes and the noise")
+    s.add_argument("--stakes", required=True, choices=list(STAKES),
+                   help="what a wrong change costs: " + "; ".join(f"{k} = {v}" for k, v in STAKES.items()))
+    s.add_argument("--apply", action="store_true", help="write loop.profile in team.yaml")
+    s = sub.add_parser("doctor", help="init-time: run evaluate.py N times, report sigma and what it means")
+    s.add_argument("--runs", type=int, default=5)
+    s.add_argument("--want", type=float, metavar="GAIN", help="the smallest real gain you care about")
+    sub.add_parser("quickstart", help="tests | command | prompt | buildtime: a control folder "
+                   "with that evaluate.py for your repo")
+    sub.add_parser("import-lite", help="continue a keeploop-lite session: LEDGER.md [DIR]")
     s = sub.add_parser("pack", help="pack new NAME")
     s.add_argument("action", choices=["new"])
     s.add_argument("name")
@@ -1032,10 +1528,156 @@ def cmd_init(argv: list[str]) -> int:
     return 0
 
 
+def doctor_text(runs: list[float], loop_cfg: dict, want: float | None, secs: float) -> list[str]:
+    """What the measured noise means for this loop (kl doctor)."""
+    mean, sd = statistics.fmean(runs), statistics.stdev(runs)
+    z, th, n0 = float(loop_cfg["noise_z"]), float(loop_cfg["keep_threshold"]), int(loop_cfg["noise_runs"])
+    smallest = max(abs(mean) * th, z * sd)
+    out = [f"evaluate.py, {len(runs)} runs on the current workspace: " + ", ".join(f"{x:.6f}" for x in runs),
+           f"mean {mean:.6f}  sigma {sd:.6f} (sample stdev)  range {max(runs) - min(runs):.6f}"
+           f"  {secs:.1f}s per run"]
+    if sd == 0:
+        out.append("deterministic: no noise. A change is kept when it beats the best by more than "
+                   f"keep_threshold ({th:g} x best = {abs(mean) * th:.6f}); light changes skip the "
+                   "confirm re-run.")
+        return out
+    out.append(f"a change must gain more than {smallest:.6f} to be kept "
+               f"({'noise_z ' + format(z, 'g') + ' x sigma' if z * sd >= abs(mean) * th else 'keep_threshold'}"
+               + (f", {smallest / abs(mean):.1%} of the mean" if mean else "") + ")")
+    if n0 < 5:
+        out.append(f"warning: loop.noise_runs is {n0}: the baseline estimates sigma from {n0} runs, "
+                   "and that estimate swings widely (docs/proof/sweep.tsv: 3-run sigmas from "
+                   "0.0017 to 0.026 for an evaluation whose sigma is about 0.014). Set noise_runs: 5 or more in team.yaml.")
+    if want is not None and want > 0:
+        k = math.ceil((z * sd / want) ** 2) if z * sd > want else 1
+        out.append(f"to keep a real gain of {want:g}: " + (
+            "already detectable." if k == 1 else
+            f"the noise is too large. Average {k} repeats inside evaluate.py (sigma falls as "
+            f"1/sqrt(repeats); use the median for timings with outliers), fix seeds, or score "
+            f"more cases."))
+    elif mean and smallest / abs(mean) > 0.01:
+        out.append("warning: gains under that are invisible to the loop: real but small "
+                   "improvements will be discarded. Reduce the noise in evaluate.py (repeats + "
+                   "mean or median, fixed seeds, more cases), or say which gain matters with "
+                   "`--want GAIN`.")
+    return out
+
+
+STAKES = {
+    "low": "a draft or a personal file you can redo",
+    "medium": "something other people use, that you can still roll back",
+    "high": "work people rely on, or a result you will publish or ship",
+}
+
+
+def level_for(stakes: str, sigma: float) -> tuple[str, list[str]]:
+    """The CEO's choice of `loop.profile` -> (profile, reasons). Pure: the user's answer
+    about stakes, and the evaluation's measured noise."""
+    if stakes == "high":
+        return "rigorous", ["a wrong keep is costly: 5 noise runs, a re-run before every keep, "
+                            "an Auditor verdict on every keep, the full Analyst"]
+    if stakes == "low" and sigma == 0:
+        return "light", ["a wrong keep is cheap to undo and the score does not move between runs: "
+                         "at most 3 cycles, stop after 2 without a keep, one baseline run, "
+                         "no re-run, fewer AI calls"]
+    why = ["fewer AI calls and shorter prompts, the full keep law"]
+    if stakes == "low":
+        why.append(f"not light: the score moves between runs (sigma {sigma:.6f}), so the noise "
+                   "is still measured and a keep is re-run")
+    return "fast", why
+
+
+def _set_profile(team: Path, name: str) -> None:
+    text = team.read_text(encoding="utf-8")
+    if re.search(r"^  profile:.*$", text, re.M):
+        text = re.sub(r"^  profile:.*$", f"  profile: {name}", text, count=1, flags=re.M)
+    elif re.search(r"^loop:[ \t]*$", text, re.M):
+        text = re.sub(r"^loop:[ \t]*\n", f"loop:\n  profile: {name}\n", text, count=1, flags=re.M)
+    else:
+        text = text.rstrip("\n") + f"\n\nloop:\n  profile: {name}\n"
+    team.write_text(text, encoding="utf-8")
+
+
+def cmd_level(c, a) -> int:
+    best = R._read_json(c.state / "best.json")
+    if best.get("metric") is not None:
+        sigma, src = float(best.get("sigma") or 0.0), f"baseline ({c.loop_cfg['noise_runs']} runs)"
+    else:  # not begun: measure, like kl doctor, without logging anything
+        if problem := R.workspace_error(c.root, c.workspace):
+            raise Refuse(problem)
+        runs = []
+        for _ in range(3):
+            metric, error = _evaluate(c)
+            if metric is None:
+                raise Refuse(f"evaluate.py failed: {error}")
+            runs.append(metric)
+        sigma, src = statistics.pstdev(runs), "3 runs just now"
+    name, why = level_for(a.stakes, sigma)
+    print(f"stakes: {a.stakes} ({STAKES[a.stakes]}); score noise: sigma {sigma:.6f} from {src}")
+    print(f"level: {name}")
+    print("\n".join(f"  {w}" for w in why))
+    print("  always on: lessons (a mistake is never repeated), the fence, the gates, "
+          "loop.target and loop.stall_cycles")
+    cur = (c.team.get("loop") or {}).get("profile")
+    if a.apply:
+        _set_profile(c.root / "team.yaml", name)
+        print(f"team.yaml: loop.profile {cur or '(none)'} -> {name}"
+              + ("; run `" + kl() + " begin --accept-changes` if a fence is set" if (c.state / "fence.json").exists() else ""))
+    else:
+        print(f"to use it: `{kl()} level --stakes {a.stakes} --apply` (writes loop.profile in team.yaml)"
+              + (f"; now: {cur}" if cur else ""))
+    return 0
+
+
+def cmd_doctor(c, a) -> int:
+    if problem := R.workspace_error(c.root, c.workspace):
+        raise Refuse(problem)
+    runs, start = [], time.monotonic()
+    for i in range(max(3, a.runs)):
+        metric, error = _evaluate(c)
+        if metric is None:
+            raise Refuse(f"evaluate.py failed on run {i + 1}: {error}")
+        runs.append(metric)
+    print("\n".join(doctor_text(runs, c.loop_cfg, a.want, (time.monotonic() - start) / len(runs))))
+    print("nothing was logged: kl doctor only measures (the baseline is `" + kl() + " begin`)")
+    return 0
+
+
+def cmd_quickstart(argv: list[str]) -> int:
+    p = argparse.ArgumentParser(prog=f"{kl()} quickstart", description=(
+        "Write a keeploop control folder for your git repo, with an evaluate.py from a "
+        "template. Existing files are never overwritten."))
+    p.add_argument("template", choices=list(quickstart.TEMPLATES))
+    p.add_argument("dir", nargs="?", type=Path, help="default: <repo>-keeploop beside the repo")
+    p.add_argument("--workspace", type=Path, help="the repo the loop may change (default: cwd)")
+    a = p.parse_intermixed_args(argv[1:])  # DIR may follow --workspace (Python < 3.12 too)
+    try:
+        print("\n".join(quickstart.quickstart(a.template, a.workspace, a.dir, rewrite=kl() == "kl",
+                                              src=scaffold.source())))
+    except SystemExit as exc:
+        raise Refuse(str(exc).removeprefix("refused: "))
+    return 0
+
+
+def cmd_import_lite(argv: list[str]) -> int:
+    p = argparse.ArgumentParser(prog=f"{kl()} import-lite", description=(
+        "Continue a keeploop-lite chat session in the CLI: LEDGER.md is the saved ledger block."))
+    p.add_argument("ledger", type=Path)
+    p.add_argument("dir", nargs="?", type=Path, help="a new folder (default: keeploop-from-lite)")
+    a = p.parse_args(argv)
+    try:
+        print("\n".join(quickstart.import_lite(a.ledger, a.dir or Path("keeploop-from-lite"),
+                                               rewrite=kl() == "kl", src=scaffold.source())))
+    except (SystemExit, OSError) as exc:
+        raise Refuse(str(exc).removeprefix("refused: "))
+    return 0
+
+
 COMMANDS = {"begin": cmd_begin, "status": cmd_status, "card": cmd_card, "check": cmd_check,
             "eval": cmd_eval, "audit": cmd_audit, "keep": cmd_keep, "discard": cmd_discard,
             "staff": cmd_staff, "pack": cmd_pack, "report": cmd_report, "slow": cmd_slow, "debate": cmd_debate, "cite": cmd_cite,
-            "map": cmd_map, "recall": cmd_recall}
+            "map": cmd_map, "recall": cmd_recall, "doctor": cmd_doctor, "level": cmd_level, "next": cmd_next,
+            "try": cmd_try, "handoff": cmd_handoff, "apply": cmd_apply}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1049,9 +1691,25 @@ def main(argv: list[str] | None = None) -> int:
         except Refuse as exc:
             print(f"kl: REFUSED: {exc}")
             return 1
+    if argv[:1] in (["quickstart"], ["import-lite"]):
+        try:
+            return cmd_quickstart(argv) if argv[0] == "quickstart" else cmd_import_lite(argv[1:])
+        except Refuse as exc:
+            print(f"kl: REFUSED: {exc}")
+            return 1
     if argv[:1] == ["run"]:  # passthrough: run.py's own parser, the project kl resolved
         return R.main(argv[1:], root=root)
     try:
+        if argv[:2] == ["lesson", "share"]:  # a human copies one lesson to the global store
+            if len(argv) != 3:
+                raise Refuse(f"usage: {kl()} lesson share L-ID")
+            c = load(root)
+            g = lessons.global_cfg(c.team)
+            row = lessons.share(c.state, argv[2], g, c.root.name)
+            print(f"shared {argv[2]} as {row['id']} in {lessons.global_store(g)}"
+                  + ("" if g["enabled"] else "  (reading it is off: set global_lessons: enabled: "
+                                             "true in team.yaml to use shared lessons here)"))
+            return 0
         if argv[:1] in (["lesson"], ["scout"]):  # passthrough: their own parsers, '--' intact
             c = load(root)
             return (lessons.main(argv[1:], c.state, c.loop_cfg) if argv[0] == "lesson"
