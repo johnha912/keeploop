@@ -68,8 +68,10 @@ keeploop biến AI bạn đang dùng thành một đội nhỏ, có một CEO l�
 - **Nhanh.** Hai lệnh mỗi chu kỳ trong agent viết code (`kl next`, `kl try`); một lần
   dán đi, một lần dán về cho AI chat không thấy được repo của bạn.
 - **Tiết kiệm token.** Với `profile: fast`, Engineer tự viết thẻ và các ý bạn đã liệt kê
-  không cần lượt gọi Analyst: −33% token và −26% thời gian mỗi chu kỳ trong
-  benchmark offline của chúng tôi.
+  không cần lượt gọi Analyst: −33% token và −26% thời gian mỗi chu kỳ trên bản mock
+  offline chạy theo kịch bản, với độ trễ gọi AI giả lập. Token ở đây là kích thước
+  prompt (số ký tự / 4); chất lượng câu trả lời của AI thật với prompt ngắn hơn thì
+  chưa được đo.
 - **Chỉ giữ cải thiện thật.** Một thay đổi chỉ được commit khi vượt điểm tốt nhất nhiều
   hơn độ nhiễu đo được của chính bài đánh giá (best + 2σ). Mọi thứ khác bị reset, và lý
   do được ghi lại ([đã đo](#vì-sao-tin-được-các-lần-giữ)).

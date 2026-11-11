@@ -69,8 +69,10 @@ beside you.
 - **Fast.** Two commands a cycle in a coding agent (`kl next`, `kl try`); one paste
   each way for a chat AI that cannot see your repo.
 - **Saves tokens.** With `profile: fast` the Engineer writes its own card and the
-  ideas you listed need no Analyst call: −33% tokens and −26% time per cycle in
-  our offline benchmark.
+  ideas you listed need no Analyst call: −33% tokens and −26% time per cycle on
+  our scripted offline mock, with simulated call latency. Tokens there are prompt
+  size (characters / 4); whether a real AI's answers stay as good with the shorter
+  prompts has not been measured.
 - **Keeps only real gains.** A change is committed only if it beats the best score
   by more than the evaluation's own measured noise (best + 2σ). Everything else is
   reset, and the reason is written down ([measured](#why-trust-the-keeps)).
