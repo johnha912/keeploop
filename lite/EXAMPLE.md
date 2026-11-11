@@ -164,7 +164,7 @@ this**, or **new baseline**.
 
 ---
 
-**Mai:** run 2 cycles
+**Mai:** next cycle
 
 **AI:**
 
@@ -192,11 +192,69 @@ Need from you: nothing (you gave the detail in cycle 2)
 **KEEP.** The gate passes and 19 beats the best so far (10). The
 discarded 20 from cycle 2 does not count.
 
+This was cycle 3, so here is the full ledger:
+
 ```
-| 3 | Grandma's recipe as one short first line | 19/30 | KEEP |
+KEEPLOOP-LITE LEDGER
+Artifact: Facebook post selling homemade banana bread, neighbourhood group
+Scorecard (locked since cycle 0, max 30):
+1. Hook: the first line makes a neighbour stop scrolling
+2. Clear offer: price, size, pickup day and how to order are all stated
+3. Trust: a concrete, true detail shows it is homemade and fresh
+Gates (pass/fail): under 30 words
+Team: Local marketer (propose), Copywriter (make), Busy neighbour (check)
 Best so far: cycle 3, 19/30 (Hook 5, Clear offer 8, Trust 6)
-No new lesson.
+
+| # | Change | Score | Verdict |
+|---|---|---|---|
+| 0 | Baseline (as pasted) | 4/30 | baseline |
+| 1 | Added price, size and pickup line | 10/30 | KEEP |
+| 2 | Opened with the grandma story (two sentences) | 20/30, gate FAIL | DISCARD |
+| 3 | Grandma's recipe as one short first line | 19/30 | KEEP |
+
+Lessons:
+- L1 (cycle 2): The family story raised Trust from 0 to 7 but took the
+  post to 36 words. Next time, try it in one short line.
+
+Best version (cycle 3):
+My grandma's recipe, baked every week for 10 years. Banana bread for sale. $8 a loaf, pickup Saturday 9–12. DM me to order.
 ```
+
+Say **next cycle**, **run 3 cycles**, **status**, **save**, **audit
+this**, or **new baseline**.
+
+---
+
+**Mai:** I'll go on tomorrow. save
+
+**AI:**
+
+```
+KEEPLOOP-LITE STATE (after cycle 3)
+Score (locked since cycle 0, max 30): Hook: the first line makes a neighbour stop scrolling; Clear offer: price, size, pickup day and how to order are all stated; Trust: a concrete, true detail shows it is homemade and fresh; Gates: under 30 words
+Best so far: cycle 3, 19/30 (Hook 5, Clear offer 8, Trust 6)
+Best version: My grandma's recipe, baked every week for 10 years. Banana bread for sale. $8 a loaf, pickup Saturday 9–12. DM me to order.
+Discarded:
+- cycle 2: Opened with the grandma story (two sentences) (20/30, gate FAIL: 36 words)
+Lessons:
+- L1 (cycle 2): The family story raised Trust from 0 to 7 but took the post to 36 words. Next time, try it in one short line.
+```
+
+To continue: open a new chat and paste this file, then this block.
+
+*(The AI suggests this move by itself after about 6 cycles in one chat.
+Mai saves after cycle 3 because she stops for the day. Every value in the
+block comes from cycles 0 to 3 above.)*
+
+---
+
+*Next day, a new chat.* Mai pastes `KEEPLOOP-LITE.md`, then only the
+state block above, and writes "next cycle".
+
+**AI:** Picked up from the state block: the scorecard is locked (Hook,
+Clear offer, Trust; gate under 30 words; max 30), the best is 19/30 from
+cycle 3, one idea is discarded (cycle 2) and there is one lesson (L1).
+Cycle 4 next.
 
 ```
 CARD 4 (Local marketer): Change "DM me to order." to "Comment or DM me to order."
@@ -220,48 +278,33 @@ Need from you: nothing
 | Total | 19/30 | |
 
 **DISCARD.** 19 ties the best so far, and a tie is a discard. We go back
-to the best version (cycle 3). New lesson L2 below.
-
-The batch is done, so here is the full ledger:
+to the best version (cycle 3).
 
 ```
-KEEPLOOP-LITE LEDGER
-Artifact: Facebook post selling homemade banana bread, neighbourhood group
-Scorecard (locked since cycle 0, max 30):
-1. Hook: the first line makes a neighbour stop scrolling
-2. Clear offer: price, size, pickup day and how to order are all stated
-3. Trust: a concrete, true detail shows it is homemade and fresh
-Gates (pass/fail): under 30 words
-Team: Local marketer (propose), Copywriter (make), Busy neighbour (check)
-Best so far: cycle 3, 19/30 (Hook 5, Clear offer 8, Trust 6)
-
-| # | Change | Score | Verdict |
-|---|---|---|---|
-| 0 | Baseline (as pasted) | 4/30 | baseline |
-| 1 | Added price, size and pickup line | 10/30 | KEEP |
-| 2 | Opened with the grandma story (two sentences) | 20/30, gate FAIL | DISCARD |
-| 3 | Grandma's recipe as one short first line | 19/30 | KEEP |
 | 4 | "Comment or DM me to order" | 19/30, tie | DISCARD |
-
-Lessons:
-- L1 (cycle 2): The family story raised Trust from 0 to 7 but took the
-  post to 36 words. Next time, try it in one short line.
-- L2 (cycle 4): Clear offer stays at 8 while the size is only "a loaf".
-  Raising it needs Mai's real loaf size.
-
-Best version (cycle 3):
-My grandma's recipe, baked every week for 10 years. Banana bread for sale. $8 a loaf, pickup Saturday 9–12. DM me to order.
+Best so far: cycle 3, 19/30 (Hook 5, Clear offer 8, Trust 6)
+- L2 (cycle 4): Clear offer stays at 8 while the size is only "a loaf". Raising it needs Mai's real loaf size.
 ```
 
-The stronger option is to say **audit this**, so a new chat scores the
-best version without knowing what we hoped for.
+```
+KEEPLOOP-LITE STATE (after cycle 4)
+Score (locked since cycle 0, max 30): Hook: the first line makes a neighbour stop scrolling; Clear offer: price, size, pickup day and how to order are all stated; Trust: a concrete, true detail shows it is homemade and fresh; Gates: under 30 words
+Best so far: cycle 3, 19/30 (Hook 5, Clear offer 8, Trust 6)
+Best version: My grandma's recipe, baked every week for 10 years. Banana bread for sale. $8 a loaf, pickup Saturday 9–12. DM me to order.
+Discarded:
+- cycle 2: Opened with the grandma story (two sentences) (20/30, gate FAIL: 36 words)
+- cycle 4: "Comment or DM me to order" (19/30, tie)
+Lessons:
+- L1 (cycle 2): The family story raised Trust from 0 to 7 but took the post to 36 words. Next time, try it in one short line.
+- L2 (cycle 4): Clear offer stays at 8 while the size is only "a loaf". Raising it needs Mai's real loaf size.
+```
 
 Say **next cycle**, **run 3 cycles**, **status**, **save**, **audit
 this**, or **new baseline**.
 
 ---
 
-Mai copies the ledger into her notes (later, **save** prints it again).
-Next week she pastes it into a new chat, together with `KEEPLOOP-LITE.md`,
-and says "run 3 cycles". Following lesson L2, the Local marketer's first
-card asks her for the real size of a loaf.
+Cycle 4 ran in a new chat on the state block alone: the same locked
+scorecard, the best of 19/30 to beat, the discarded idea of cycle 2 not
+tried again. Following lesson L2, the Local marketer's next card asks Mai
+for the real size of a loaf.

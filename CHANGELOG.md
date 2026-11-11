@@ -21,6 +21,44 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-11-11
+
+### Fixed
+
+A context-hygiene patch: long runs no longer degrade quietly. No new features; the
+`evaluate.py` contract, `team.yaml` semantics and the `results.tsv` / `lessons.jsonl`
+formats are unchanged.
+
+- **The driving agent is told to start fresh every ~5 cycles.** All loop state is on
+  disk and `kl next` resumes it, but nothing told the agent to rotate, so in one long
+  session every `kl next` / `kl try` output piled up in its context. AGENTS.md, the
+  `/keeploop` skill and BOOTSTRAP.md (chat mode: a new chat and a fresh `kl handoff`
+  packet) now say: finish the cycle, stop, ask the user to start a fresh session,
+  resume with `kl next`. docs/GUIDE.md explains it to the user in plain words ("Long
+  runs: a fresh session every ~5 cycles").
+- **`kl next` nudges at every 5th completed cycle.** One `session:` line, derived from
+  the ledger's completed-cycle count (no new state). It says kl counts cycles and
+  cannot see sessions. Not printed after a `STOP:` line or while a card is pending.
+- **keeploop-lite carries a run to a new chat** (en, vi, zh-CN; full and mini). A fixed
+  state block of about 300 words (the locked scorecard, the best score, the best
+  version or where it is, the discarded ideas, the lessons) is refreshed every cycle
+  and is what **save** prints, with one resume line. About every 6 cycles the AI
+  suggests saving and moving, with one sentence on why: a long chat slowly loses the
+  locked scorecard and the ideas already discarded. Each EXAMPLE now moves to a new
+  chat after cycle 3 and runs cycle 4 from the block alone.
+- **Token savings are stated as what was measured.** The README's −33% tokens and −26%
+  time per cycle are prompt size (characters / 4) and wall time on the scripted
+  offline mock; a real AI's answer quality with shorter prompts has not been measured,
+  and the README (en, vi, zh-CN) now says so.
+
+### Changed
+
+- README (en, vi) and llms.txt state the MINI skill's size as measured again: about
+  1,600 words in English (the state block added about 330).
+- Per-cycle cost (`tools/bench_cycle.py`, mock demo, median of 7 reps x 6 cycles): the
+  headless cycle runs unchanged code (run.py and everything it imports are untouched);
+  tokens and AI calls per cycle are identical (3390.8 tokens; 1.0 / 1.167 / 0.5 calls).
+
 ## [0.3.1] - 2026-11-10
 
 ### Fixed

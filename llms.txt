@@ -7,7 +7,7 @@ Which file to use: a chat AI that cannot run code uses KEEPLOOP-LITE.md; with a 
 ## keeploop-lite (chat only, no code)
 
 - [KEEPLOOP-LITE.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md): the full lite skill in English: setup interview, locked scorecard, the cycle, fast and careful modes, the ledger
-- [KEEPLOOP-LITE-MINI.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE-MINI.md): the short lite skill (about 1,200 words), same loop and ledger, for small contexts, free tiers and Perplexity
+- [KEEPLOOP-LITE-MINI.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE-MINI.md): the short lite skill (about 1,600 words), same loop, ledger and state block, for small contexts, free tiers and Perplexity
 - [KEEPLOOP-LITE.vi.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.vi.md): full lite skill, Vietnamese
 - [KEEPLOOP-LITE-MINI.vi.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE-MINI.vi.md): short lite skill, Vietnamese
 - [KEEPLOOP-LITE.zh-CN.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.zh-CN.md): full lite skill, Simplified Chinese

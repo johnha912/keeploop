@@ -76,6 +76,16 @@ a `STOP:` line (the target is reached, or the loop stalled), report and
 stop, even before 3 cycles. Never invent another card to keep going; `kl
 card` and `kl try` refuse it anyway.
 
+**Start a fresh session every ~5 cycles.** Every `kl next` and `kl try`
+output you have read stays in your context, and a long session lets your
+judgement drift without any warning. After about 5 cycles in one session,
+finish the cycle you are in (until `kl try` has kept or discarded it), then
+stop and ask the user to start a fresh session (in Claude Code: `/clear`,
+then `/keeploop`). There, `python kl.py next` resumes exactly where the run
+stopped: the best, the keep bar, the memory and any pending card are on disk,
+so nothing is lost. Never carry a number across sessions in your head; quote
+only what `kl` prints.
+
 ## Fast path (one cycle, three steps)
 
 1. `python kl.py next` - best, keep bar, any `STOP:` line, a pending card, the next hypothesis, the 3 most relevant memories (do not repeat them) and a card skeleton.
@@ -232,6 +242,13 @@ In this interactive mode you have the same file rights as `kl`. Its fence snapsh
 10. **Without `handoff`** (first setup, `begin`, a lesson, a report): give
     one command at a time as a code block starting with `python kl.py`,
     and wait for the pasted output.
+11. **A new chat every ~5 cycles.** This chat keeps every packet and reply,
+    and a long chat lets your judgement drift without any warning. After
+    about 5 cycles here, finish the cycle you are in, then ask the human
+    to open a NEW chat, paste this file again, and paste a fresh
+    `python kl.py handoff` packet. The packet carries the state from disk
+    (best, keep bar, recent cycles, rejected hypotheses, open lessons), so
+    nothing is lost.
 
 ## 5. How to regenerate this file
 

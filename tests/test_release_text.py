@@ -40,5 +40,25 @@ class TestNoVersionPromises(unittest.TestCase):
         self.assertEqual(bad, [])
 
 
+class TestTokenClaimsAreScoped(unittest.TestCase):
+    """0.3.2: the token and time savings were measured as prompt size (characters / 4) and
+    wall time on the scripted offline mock, never as a real AI's answer quality. Wherever a
+    README states them, it says so."""
+
+    SCOPE = {"README.md": ("characters / 4", "has not been measured"),
+             "README.vi.md": ("số ký tự / 4", "chưa được đo"),
+             "README.zh-CN.md": ("字符数 / 4", "尚未测量")}
+
+    def test_every_readme_states_what_was_measured(self):
+        for name, (size, not_measured) in self.SCOPE.items():
+            text = re.sub(r"\s+", " ", (ROOT / name).read_text(encoding="utf-8"))
+            i = text.index("−33%")
+            claim = text[i - 200:i + 400]
+            with self.subTest(readme=name):
+                self.assertIn("mock", claim)
+                self.assertIn(size, claim)
+                self.assertIn(not_measured, claim)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -16,6 +16,7 @@ You are the CEO. AGENTS.md is the full procedure; its "Fast path" section is all
    - Exit 3: it prints the next command. Heavy card: Critic (subagent `keeploop-critic`), `python kl.py debate N --critic FILE`, `python kl.py try`. Audit required (heavy change, or a gain that is not decisive): Auditor (subagent `keeploop-auditor`, fresh context) with the card, the workspace `git diff`, the metric and the `DIFF:` id from the WAIT line; save its reply, then `python kl.py try --audit-verdict FILE`.
    - Any refusal or user correction: `python kl.py lesson add ...` (with a check command when possible). Gate failures and crashes already got their lesson from `kl try`.
 3. Every ~5 cycles: `python kl.py staff`. Asked only where things stand? Measure and report; run no cycle.
+   After about 5 cycles in this session (N above 5, or a second `/keeploop` in the same session): finish the cycle you are in, run step 4, then stop and ask the user to `/clear` and run `/keeploop` again. A long session lets your judgement drift silently; `python kl.py next` resumes from disk, so nothing is lost.
 4. Finish with `python kl.py report` and paste its output verbatim into your reply. Quote no number from memory.
 
 Never commit by hand, never edit protected paths, evaluate.py, program.md, team.yaml or .keeploop/. Put every unknown under MISSING.
