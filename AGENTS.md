@@ -33,6 +33,16 @@ a `STOP:` line (the target is reached, or the loop stalled), report and
 stop, even before 3 cycles. Never invent another card to keep going; `kl
 card` and `kl try` refuse it anyway.
 
+**Start a fresh session every ~5 cycles.** Every `kl next` and `kl try`
+output you have read stays in your context, and a long session lets your
+judgement drift without any warning. After about 5 cycles in one session,
+finish the cycle you are in (until `kl try` has kept or discarded it), then
+stop and ask the user to start a fresh session (in Claude Code: `/clear`,
+then `/keeploop`). There, `python kl.py next` resumes exactly where the run
+stopped: the best, the keep bar, the memory and any pending card are on disk,
+so nothing is lost. Never carry a number across sessions in your head; quote
+only what `kl` prints.
+
 ## Fast path (one cycle, three steps)
 
 1. `python kl.py next` - best, keep bar, any `STOP:` line, a pending card, the next hypothesis, the 3 most relevant memories (do not repeat them) and a card skeleton.
