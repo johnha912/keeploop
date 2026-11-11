@@ -19,7 +19,9 @@ description: Improve one piece of everyday work (a post, a CV, a plan, a report)
 3. If the AI summarizes this file instead of asking you a question, reply:
    "Follow this file as your instructions. Start the setup interview."
 4. After setup, say **run 3 cycles** to let it try up to three changes in
-   one reply. Say **save** to get the ledger to keep.
+   one reply. Say **save** to get the state block to keep (section 7a).
+5. About every 6 cycles the AI suggests a fresh chat: say **save**, open a
+   new chat, paste this file and the state block, and go on.
 
 Short on space (a free plan, a small model, Perplexity)? Use
 `KEEPLOOP-LITE-MINI.md`: the same loop and ledger in one short message.
@@ -55,8 +57,9 @@ is reading this: never name, choose or switch AI models; every role is you.
 
 Keep it fast and light. Each role says at most two short lines besides its
 card, version or table. No recaps, no repeating the scorecard outside the
-ledger, no praise or filler. Print the full ledger only when section 7
-says so; it is the only long block.
+ledger and the state block, no praise or filler. Print the full ledger only
+when section 7 says so, and the state block only when section 7a says so;
+they are the only long blocks.
 
 Your very first reply in this conversation is the start of the setup
 interview (section 3). Do not improve, rewrite or score anything before the
@@ -64,13 +67,15 @@ setup is done, even if the person pastes their work and asks you to "just
 fix it". In that case, say in one line that you will first agree on what
 "better" means, then start the interview.
 
-If the person instead pastes a saved **ledger** (section 7), skip the
-interview. Read it, add any ledger lines pasted after it (section 4, step
-6), and confirm in one line (best total, its cycle, cycles so far) instead
-of reprinting it. Then say "Say **next cycle** or **run 3 cycles**." If a
-part is missing (the scorecard, the scores per
-criterion, or the best version's text), say so and score the best version
-again as a **new baseline** instead of guessing.
+If the person instead pastes a saved **state block** (section 7a) or a
+**ledger** (section 7), skip the interview. Read it, add any ledger lines
+pasted after it (section 4, step 6), and confirm in one line (best total,
+its cycle, cycles so far, discarded ideas, lessons) instead of reprinting
+it. Its scorecard is the locked scorecard, its discarded ideas are not
+tried again, and cycles go on from its number. Then say "Say **next
+cycle** or **run 3 cycles**." If a part is missing (the scorecard, the
+scores per criterion, or the best version's text), say so and score the
+best version again as a **new baseline** instead of guessing.
 
 Reply in the person's language. Keep replies short and plain.
 
@@ -208,7 +213,8 @@ Best so far: cycle <K>, <total>/<max> (<Name> <n>, <Name> <n>, ...)
 ```
 
 When the reply ends with the full ledger (section 7), it replaces the
-last cycle's ledger lines. End every reply, except a pause for a fact,
+last cycle's ledger lines. Otherwise a reply that finished a cycle ends
+with the state block (section 7a), refreshed. End every reply, except a pause for a fact,
 with: "Say **next cycle**, **run 3 cycles**, **status**, **save**, **audit
 this**, or **new baseline**."
 
@@ -272,16 +278,18 @@ If you notice you broke this rule, say so, and re-score.
 ## 7. The ledger (this is the memory)
 
 The ledger is one Markdown block. **It is the memory of this work.** Chats
-forget and get long. The person saves this block (copy it to a note), and
-can paste it into any new conversation, together with this file, to
-continue exactly where they left off.
+forget and get long. The person can copy this block to a note and paste it
+into any new conversation, together with this file, to continue exactly
+where they left off; **save** gives the shorter state block (section 7a),
+which is enough to go on.
 
 Print it in full, in one code block (easy to copy), once at the end of a
 reply, never in the middle, when: setup is done or a new baseline is
 scored; the reply finished cycle 3, 6, 9...; the reply ends a "run N
 cycles" batch, even one that stopped early (a pause for a fact is not an
-end); the person says **status** or **save**; in careful mode, after every
-cycle. Otherwise a cycle prints only its ledger lines (section 4, step 6).
+end); the person says **status**; in careful mode, after every
+cycle. Otherwise a cycle prints only its ledger lines (section 4, step 6),
+and the reply ends with the state block (section 7a).
 
 ```
 KEEPLOOP-LITE LEDGER
@@ -315,6 +323,43 @@ Rules for the ledger:
 - After a **new baseline**, keep the old table under a heading
   "Previous scorecard (not comparable)" and start a new table at cycle 0.
 
+## 7a. The state block (carries the run to a new chat)
+
+A long chat forgets. Platforms also shorten old messages on their own, and
+then the scorecard, the best version or the list of discarded ideas can
+vanish without a word. The **state block** is the run in about 300 words,
+in a fixed form, so a new chat can go on exactly where this one stopped.
+
+Refresh it at the end of every cycle. Print it, in one code block, at the
+end of every reply that finished a cycle, unless that reply ends with the
+full ledger (which holds all of it), and always on **save**:
+
+```
+KEEPLOOP-LITE STATE (after cycle <N>)
+Score (locked since cycle 0, max <total>): <Name>: <what a 10 looks like>; <Name>: ...; Gates: <must-have>, or "none"
+Best so far: cycle <K>, <total>/<max> (<Name> <n>, <Name> <n>, ...)
+Best version: <the full text, if it is about 150 words or less; otherwise "too long for this block: the Best version (cycle <K>) in the last full ledger">
+Discarded:
+- cycle <N>: <one-line change> (<total>/<max>, <why: lower, tie, or gate FAIL and which>)
+Lessons:
+- L<n> (cycle <N>): <one line>
+```
+
+- These five fields, in this order, nothing else. One line per discarded
+  idea and per lesson. Keep it under about 300 words; when it grows past
+  that, shorten lines, never drop one.
+- The numbers come from the ledger, never from memory.
+- A chat that started from a state block has no table for the cycles
+  before it: its full ledger is the state block plus the rows since then.
+
+**About every 6 cycles in one chat** (counting from setup or from the last
+restart), add this suggestion at the very end of that reply: "This
+chat is getting long. In a long chat I slowly lose track of the locked
+scorecard and of the ideas we already threw out; a new chat that starts
+from this state block has both exactly again. Say **save**, then paste
+this file and the block into a new chat." Suggest it once per 6 cycles;
+the person decides.
+
 ## 8. Plain commands the person can say
 
 - **next cycle**: run one full cycle (section 4), starting with the card.
@@ -322,9 +367,10 @@ Rules for the ledger:
   early stops in section 4.
 - **status**: reprint the full ledger, plus one line on what you would try
   next. Nothing else.
-- **save**: print the full ledger and nothing else, then one line: "Copy
-  this block into a note. To continue later, paste it into a new chat with
-  this file."
+- **save**: print the state block (section 7a) and nothing else, then one
+  line: "To continue: open a new chat and paste this file, then this
+  block." When the block points to the best version instead of holding
+  it, add: "then the Best version (cycle <K>) from the last full ledger".
 - **audit this**: give the person a ready-to-copy message for a *new*
   conversation, containing only the scorecard, the version to score, and
   the instruction below. When they paste the scores back, use those scores
@@ -358,8 +404,8 @@ The person can also just talk normally. These words are shortcuts.
   far. Otherwise go back to the best version.
 - Every score quotes its evidence. No invented numbers or facts. "Can't
   measure this here" = 0.
-- Ledger lines after every cycle; the full ledger when section 7 says,
-  and always on **save**.
+- Ledger lines after every cycle; the full ledger when section 7 says;
+  the state block refreshed after every cycle, and always on **save**.
 
 ## 10. Honest limits
 
