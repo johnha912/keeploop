@@ -806,6 +806,19 @@ def _memory(c, query: str, top: int = 3) -> list[str]:
     return out[:top]
 
 
+ROTATE_EVERY = 5  # AGENTS.md: a fresh driving session about every 5 cycles
+
+
+def rotate_nudge(done: int) -> str | None:
+    """One line when the completed-cycle count (ledger rows with cycle >= 1) is a positive
+    multiple of ROTATE_EVERY. kl cannot see sessions, so it only counts cycles and says so."""
+    if done <= 0 or done % ROTATE_EVERY:
+        return None
+    return (f"session: {done} cycles are done. If this run has been one session all along, "
+            f"start a fresh one now (kl counts cycles; it cannot see sessions): the state is on "
+            f"disk and `{kl()} next` resumes it there.")
+
+
 def next_text(c) -> str:
     best = R._read_json(c.state / "best.json")
     if best.get("metric") is None:
@@ -824,6 +837,8 @@ def next_text(c) -> str:
     if "card" in cy:
         return "\n".join(out + [f"pending card {cy['n']}: {cy['parsed']['hypothesis'][:80]}",
                                 f"finish it: `{kl()} try` (continues it) or `{kl()} discard`"])
+    if nudge := rotate_nudge(len(cyc)):
+        out.append(nudge)
     hyps = R.read_hypotheses(c.state)
     nxt = R.human_hypotheses(c.root / "program.md", hyps)
     out.append("next hypothesis: " + (nxt[0] if nxt else "none listed; propose your own"))
