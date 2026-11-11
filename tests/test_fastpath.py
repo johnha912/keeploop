@@ -399,6 +399,45 @@ class TestHandoffApply(Base):
         self.assertIn("debate 1 --critic", p.out)
 
 
+class TestRotateNudge(Base):
+    """0.3.2: `kl next` prints one line suggesting a fresh session when the completed-cycle
+    count (results.tsv rows with cycle >= 1) is a multiple of 5, and nothing at other
+    counts. It says it counts cycles: kl cannot see sessions."""
+
+    def test_the_nudge_at_multiples_of_5_only(self):
+        import ledger
+        p = self.started()
+        seen = {}
+        for done in range(0, 12):
+            if done:  # one more completed cycle, in the ledger's own format
+                ledger.append_row(p.state, {"cycle": done, "ts": "t", "role_vendors": "mock",
+                                            "metric": "0.8", "best_metric": "0.828178",
+                                            "status": "discard", "tokens": 0, "lesson_id": "",
+                                            "description": f"cycle {done}"})
+            self.assertEqual(p.kl("next"), 0, p.out)
+            self.assertIn(f"| cycles {done} ", p.out)
+            seen[done] = [ln for ln in p.out.splitlines() if ln.startswith("session:")]
+        self.assertEqual([n for n, lines in seen.items() if lines], [5, 10])
+        for n in (5, 10):
+            self.assertEqual(len(seen[n]), 1)  # one line, no more
+            line = seen[n][0]
+            self.assertIn(f"{n} cycles are done", line)
+            self.assertIn("cannot see sessions", line)  # never claims to detect a session
+            self.assertIn("kl.py next", line)
+
+    def test_no_nudge_mid_cycle_or_after_a_stop(self):
+        import ledger
+        p = self.started(team_extra="loop:\n  stall_cycles: 5")
+        for done in range(1, 6):
+            ledger.append_row(p.state, {"cycle": done, "ts": "t", "role_vendors": "mock",
+                                        "metric": "0.8", "best_metric": "0.828178",
+                                        "status": "discard", "tokens": 0, "lesson_id": "",
+                                        "description": f"cycle {done}"})
+        self.assertEqual(p.kl("next"), 0, p.out)
+        self.assertIn("STOP:", p.out)  # the brake speaks; no new cycle, no rotation line
+        self.assertNotIn("session:", p.out)
+
+
 class TestDocs(unittest.TestCase):
     def test_fast_path_is_near_the_top_and_names_the_new_commands(self):
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
