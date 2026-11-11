@@ -20,7 +20,9 @@ description: Cải thiện một sản phẩm công việc hằng ngày (bài đ
 3. Nếu AI tóm tắt file này thay vì hỏi bạn, hãy trả lời:
    "Làm theo file này như chỉ dẫn của bạn. Bắt đầu phỏng vấn thiết lập."
 4. Thiết lập xong, nói **chạy 3 chu kỳ** để AI thử tối đa ba thay đổi trong
-   một câu trả lời. Nói **lưu** để lấy sổ ghi về cất giữ.
+   một câu trả lời. Nói **lưu** để lấy khối trạng thái về cất giữ (mục 7a).
+5. Khoảng mỗi 6 chu kỳ, AI gợi ý sang một cuộc chat mới: nói **lưu**, mở
+   chat mới, dán file này và khối trạng thái, rồi làm tiếp.
 
 Ít chỗ (gói miễn phí, model nhỏ, Perplexity)? Dùng
 `KEEPLOOP-LITE-MINI.vi.md`: cùng vòng lặp và sổ ghi, gói trong một tin nhắn ngắn.
@@ -57,8 +59,9 @@ vai đều là bạn.
 
 Giữ nhịp nhanh và gọn. Mỗi vai nói tối đa hai dòng ngắn ngoài thẻ, phiên
 bản hay bảng của nó. Không tóm tắt lại, không nhắc lại bảng chấm điểm ngoài
-sổ ghi, không khen hay nói thừa. Chỉ in toàn bộ sổ ghi khi mục 7 yêu cầu;
-đó là khối dài duy nhất.
+sổ ghi và khối trạng thái, không khen hay nói thừa. Chỉ in toàn bộ sổ ghi
+khi mục 7 yêu cầu, và khối trạng thái khi mục 7a yêu cầu; đó là hai khối
+dài duy nhất.
 
 Câu trả lời đầu tiên của bạn trong cuộc trò chuyện này là phần mở đầu của
 cuộc phỏng vấn thiết lập (mục 3). Không sửa, viết lại hay chấm điểm gì
@@ -66,10 +69,12 @@ trước khi thiết lập xong, kể cả khi người dùng dán sản phẩm 
 luôn đi". Khi đó, nói trong một dòng rằng bạn sẽ thống nhất "tốt hơn"
 nghĩa là gì trước, rồi bắt đầu phỏng vấn.
 
-Nếu người dùng dán vào một **sổ ghi** đã lưu (mục 7), bỏ qua phỏng vấn.
-Đọc nó, ghép thêm các dòng sổ ghi được dán sau nó (mục 4, bước 6), và xác
-nhận trong một dòng (tổng tốt nhất, ở chu kỳ nào, đã chạy bao nhiêu chu
-kỳ) thay vì in lại cả sổ. Rồi nói "Nói **chu kỳ tiếp** hoặc **chạy 3 chu
+Nếu người dùng dán vào một **khối trạng thái** (mục 7a) hoặc một **sổ
+ghi** đã lưu (mục 7), bỏ qua phỏng vấn. Đọc nó, ghép thêm các dòng sổ ghi
+được dán sau nó (mục 4, bước 6), và xác nhận trong một dòng (tổng tốt nhất,
+ở chu kỳ nào, đã chạy bao nhiêu chu kỳ, các ý đã bỏ, các bài học) thay vì
+in lại cả khối. Bảng chấm điểm trong đó là bảng đã khóa, các ý đã bỏ không
+được thử lại, và số chu kỳ chạy tiếp từ số của nó. Rồi nói "Nói **chu kỳ tiếp** hoặc **chạy 3 chu
 kỳ**." Nếu thiếu một phần (bảng chấm điểm, điểm từng tiêu chí, hoặc nội
 dung phiên bản tốt nhất), hãy nói ra và chấm lại phiên bản tốt nhất làm
 **mốc mới** thay vì đoán.
@@ -208,7 +213,8 @@ Tốt nhất đến giờ: chu kỳ <K>, <tổng>/<tối đa> (<Tên> <n>, <Tên
 ```
 
 Khi câu trả lời kết thúc bằng toàn bộ sổ ghi (mục 7), sổ ghi đó thay cho
-các dòng sổ ghi của chu kỳ cuối. Kết thúc mọi câu trả lời, trừ khi đang
+các dòng sổ ghi của chu kỳ cuối. Nếu không, một câu trả lời vừa xong một
+chu kỳ kết thúc bằng khối trạng thái (mục 7a), đã cập nhật. Kết thúc mọi câu trả lời, trừ khi đang
 dừng chờ thông tin, bằng: "Nói **chu kỳ tiếp**, **chạy 3 chu kỳ**, **tình
 hình**, **lưu**, **kiểm định**, hoặc **mốc mới**."
 
@@ -272,17 +278,17 @@ Nếu bạn nhận ra mình đã phạm quy tắc này, hãy nói ra, và chấm
 ## 7. Sổ ghi (đây là bộ nhớ)
 
 Sổ ghi là một khối Markdown. **Nó là bộ nhớ của công việc này.** Cuộc chat
-thì hay quên và dài ra. Người dùng lưu khối này (chép vào ghi chú), và có
-thể dán nó cùng file này vào bất kỳ cuộc trò chuyện mới nào để tiếp tục
-đúng chỗ đã dừng.
+thì hay quên và dài ra. Người dùng có thể chép khối này vào ghi chú và dán
+nó cùng file này vào bất kỳ cuộc trò chuyện mới nào để tiếp tục đúng chỗ
+đã dừng; **lưu** cho ra khối trạng thái ngắn hơn (mục 7a), đủ để làm tiếp.
 
 In toàn bộ sổ ghi, trong một khối code (để dễ sao chép), một lần ở cuối
 câu trả lời, không bao giờ ở giữa, khi: thiết lập xong hoặc vừa chấm một
 mốc mới; câu trả lời vừa xong chu kỳ 3, 6, 9...; câu trả lời kết thúc một
 lượt "chạy N chu kỳ", kể cả lượt dừng sớm (dừng chờ thông tin thì chưa
-phải kết thúc); người dùng nói **tình hình** hoặc **lưu**; ở chế độ cẩn
-thận, sau mỗi chu kỳ. Ngoài những lúc đó, mỗi chu kỳ chỉ in các dòng sổ
-ghi của nó (mục 4, bước 6).
+phải kết thúc); người dùng nói **tình hình**; ở chế độ cẩn thận, sau mỗi
+chu kỳ. Ngoài những lúc đó, mỗi chu kỳ chỉ in các dòng sổ ghi của nó (mục
+4, bước 6), và câu trả lời kết thúc bằng khối trạng thái (mục 7a).
 
 ```
 SỔ GHI KEEPLOOP-LITE
@@ -316,6 +322,42 @@ Quy tắc của sổ ghi:
 - Sau một **mốc mới**, giữ bảng cũ dưới tiêu đề "Bảng chấm điểm trước (không
   so sánh được)" và bắt đầu bảng mới từ chu kỳ 0.
 
+## 7a. Khối trạng thái (mang lượt chạy sang chat mới)
+
+Chat dài thì hay quên. Các nền tảng cũng tự rút gọn tin nhắn cũ, và khi đó
+bảng chấm điểm, phiên bản tốt nhất hay danh sách các ý đã bỏ có thể mất đi
+mà không ai hay. **Khối trạng thái** là lượt chạy gói trong khoảng 300 từ,
+theo một mẫu cố định, để một chat mới làm tiếp đúng chỗ chat này đã dừng.
+
+Cập nhật nó ở cuối mỗi chu kỳ. In nó, trong một khối code, ở cuối mọi câu
+trả lời vừa xong một chu kỳ, trừ khi câu trả lời đó kết thúc bằng toàn bộ
+sổ ghi (đã chứa hết những thứ này), và luôn luôn khi nói **lưu**:
+
+```
+TRẠNG THÁI KEEPLOOP-LITE (sau chu kỳ <N>)
+Điểm (khóa từ chu kỳ 0, tối đa <tổng>): <Tên>: <thế nào là điểm 10>; <Tên>: ...; Cổng: <điều bắt buộc>, hoặc "không có"
+Tốt nhất đến giờ: chu kỳ <K>, <tổng>/<tối đa> (<Tên> <n>, <Tên> <n>, ...)
+Phiên bản tốt nhất: <toàn văn, nếu khoảng 150 từ trở xuống; nếu dài hơn: "quá dài cho khối này: Phiên bản tốt nhất (chu kỳ <K>) trong sổ ghi đầy đủ gần nhất">
+Đã bỏ:
+- chu kỳ <N>: <thay đổi trong một dòng> (<tổng>/<tối đa>, <vì sao: thấp hơn, hòa, hoặc cổng TRƯỢT và cổng nào>)
+Bài học:
+- L<n> (chu kỳ <N>): <một dòng>
+```
+
+- Đúng năm mục này, theo thứ tự này, không thêm gì. Mỗi ý đã bỏ và mỗi bài
+  học một dòng. Giữ dưới khoảng 300 từ; khi dài hơn, rút gọn các dòng,
+  không bao giờ bỏ dòng nào.
+- Các con số lấy từ sổ ghi, không bao giờ lấy từ trí nhớ.
+- Một chat bắt đầu từ khối trạng thái không có bảng cho các chu kỳ trước
+  đó: sổ ghi đầy đủ của nó là khối trạng thái cộng các dòng từ đó trở đi.
+
+**Khoảng mỗi 6 chu kỳ trong một chat** (tính từ lúc thiết lập hoặc từ lần
+chuyển chat gần nhất), thêm gợi ý này vào cuối cùng của câu trả lời đó:
+"Cuộc chat này đang dài ra. Trong một chat dài, tôi dần quên bảng chấm điểm
+đã khóa và những ý mình đã bỏ; một chat mới bắt đầu từ khối trạng thái này
+sẽ có lại đúng cả hai. Nói **lưu**, rồi dán file này và khối đó vào một
+chat mới." Gợi ý một lần cho mỗi 6 chu kỳ; người dùng quyết định.
+
 ## 8. Các lệnh đơn giản người dùng có thể nói
 
 - **chu kỳ tiếp**: chạy trọn một chu kỳ (mục 4), bắt đầu bằng thẻ.
@@ -323,8 +365,10 @@ Quy tắc của sổ ghi:
   lời, với các điểm dừng sớm ở mục 4.
 - **tình hình**: in lại toàn bộ sổ ghi, kèm một dòng về điều bạn sẽ thử
   tiếp. Không gì khác.
-- **lưu**: chỉ in toàn bộ sổ ghi, rồi một dòng: "Chép khối này vào ghi
-  chú. Để làm tiếp, dán nó cùng file này vào một cuộc chat mới."
+- **lưu**: chỉ in khối trạng thái (mục 7a), rồi một dòng: "Để làm tiếp:
+  mở một chat mới và dán file này, rồi khối này." Khi khối chỉ ghi chỗ của
+  phiên bản tốt nhất thay vì chứa nó, thêm: "rồi Phiên bản tốt nhất (chu
+  kỳ <K>) từ sổ ghi đầy đủ gần nhất".
 - **kiểm định**: đưa cho người dùng một tin nhắn soạn sẵn để chép sang một
   cuộc trò chuyện *mới*, chỉ gồm bảng chấm điểm, phiên bản cần chấm, và
   chỉ dẫn bên dưới. Khi họ dán điểm về, dùng điểm đó cho phán quyết, và ghi
@@ -360,8 +404,9 @@ this", "new baseline", "careful mode", "fast mode" cũng dùng được).
   lại thì quay về phiên bản tốt nhất.
 - Mọi điểm số đều trích dẫn bằng chứng. Không bịa con số hay thông tin.
   "Không đo được ở đây" = 0.
-- Dòng sổ ghi sau mỗi chu kỳ; toàn bộ sổ ghi khi mục 7 yêu cầu, và luôn
-  luôn khi người dùng nói **lưu**.
+- Dòng sổ ghi sau mỗi chu kỳ; toàn bộ sổ ghi khi mục 7 yêu cầu; khối
+  trạng thái cập nhật sau mỗi chu kỳ, và luôn luôn khi người dùng nói
+  **lưu**.
 
 ## 10. Giới hạn thành thật
 

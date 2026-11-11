@@ -30,7 +30,7 @@ gì trong cuộc trò chuyện hiện tại:
   và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
   lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
   Nếu ngữ cảnh của bạn nhỏ, hoặc bạn là trợ lý tìm kiếm, hãy đọc
-  `lite/KEEPLOOP-LITE-MINI.vi.md` (cùng vòng lặp, khoảng 1.200 từ).
+  `lite/KEEPLOOP-LITE-MINI.vi.md` (cùng vòng lặp và khối trạng thái, khoảng 2.000 từ).
   Danh mục các file này cho máy đọc nằm ở [`llms.txt`](llms.txt).
 
 </details>

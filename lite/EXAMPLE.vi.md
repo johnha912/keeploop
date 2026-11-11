@@ -163,7 +163,7 @@ Nói **chu kỳ tiếp**, **chạy 3 chu kỳ**, **tình hình**, **lưu**, **ki
 
 ---
 
-**Mai:** chạy 2 chu kỳ
+**Mai:** chu kỳ tiếp
 
 **AI:**
 
@@ -191,11 +191,68 @@ Cần bạn cho biết: không cần (bạn đã kể ở chu kỳ 2)
 **GIỮ.** Cổng đạt và 19 cao hơn mức tốt nhất đến giờ (10). Con số 20 của
 chu kỳ 2 đã bị bỏ nên không tính.
 
+Đây là chu kỳ 3, nên đây là toàn bộ sổ ghi:
+
 ```
-| 3 | Chuyện công thức của bà gói trong một dòng mở đầu ngắn | 19/30 | GIỮ |
+SỔ GHI KEEPLOOP-LITE
+Sản phẩm: Bài đăng Facebook bán bánh chuối nhà làm, nhóm khu phố
+Bảng chấm điểm (khóa từ chu kỳ 0, tối đa 30):
+1. Gây chú ý: dòng đầu khiến hàng xóm dừng lướt
+2. Thông tin rõ: có đủ giá, kích cỡ, ngày nhận bánh và cách đặt
+3. Đáng tin: một chi tiết cụ thể, có thật cho thấy bánh nhà làm và còn tươi
+Cổng (đạt/trượt): dưới 30 chữ
+Nhóm: Chuyên gia marketing địa phương (đề xuất), Người viết quảng cáo (làm), Hàng xóm bận rộn (chấm)
 Tốt nhất đến giờ: chu kỳ 3, 19/30 (Gây chú ý 5, Thông tin rõ 8, Đáng tin 6)
-Không có bài học mới.
+
+| # | Thay đổi | Điểm | Phán quyết |
+|---|---|---|---|
+| 0 | Mốc ban đầu (như đã dán) | 4/30 | mốc ban đầu |
+| 1 | Thêm dòng giá, kích cỡ và ngày nhận bánh | 10/30 | GIỮ |
+| 2 | Mở đầu bằng chuyện công thức của bà (hai câu) | 20/30, cổng TRƯỢT | BỎ |
+| 3 | Chuyện công thức của bà gói trong một dòng mở đầu ngắn | 19/30 | GIỮ |
+
+Bài học:
+- L1 (chu kỳ 2): Chuyện gia đình nâng Đáng tin từ 0 lên 7 nhưng làm bài
+  đăng dài tới 36 chữ. Lần sau, thử gói nó trong một dòng ngắn.
+
+Phiên bản tốt nhất (chu kỳ 3):
+Công thức bà ngoại, tuần nào cũng nướng suốt 10 năm. Cần bán bánh chuối. $8 một ổ, nhận thứ Bảy 9–12h. Inbox đặt nha.
 ```
+
+Nói **chu kỳ tiếp**, **chạy 3 chu kỳ**, **tình hình**, **lưu**, **kiểm
+định**, hoặc **mốc mới**.
+
+---
+
+**Mai:** Để mai làm tiếp nha. lưu
+
+**AI:**
+
+```
+TRẠNG THÁI KEEPLOOP-LITE (sau chu kỳ 3)
+Điểm (khóa từ chu kỳ 0, tối đa 30): Gây chú ý: dòng đầu khiến hàng xóm dừng lướt; Thông tin rõ: có đủ giá, kích cỡ, ngày nhận bánh và cách đặt; Đáng tin: một chi tiết cụ thể, có thật cho thấy bánh nhà làm và còn tươi; Cổng: dưới 30 chữ
+Tốt nhất đến giờ: chu kỳ 3, 19/30 (Gây chú ý 5, Thông tin rõ 8, Đáng tin 6)
+Phiên bản tốt nhất: Công thức bà ngoại, tuần nào cũng nướng suốt 10 năm. Cần bán bánh chuối. $8 một ổ, nhận thứ Bảy 9–12h. Inbox đặt nha.
+Đã bỏ:
+- chu kỳ 2: Mở đầu bằng chuyện công thức của bà (hai câu) (20/30, cổng TRƯỢT: 36 chữ)
+Bài học:
+- L1 (chu kỳ 2): Chuyện gia đình nâng Đáng tin từ 0 lên 7 nhưng làm bài đăng dài tới 36 chữ. Lần sau, thử gói nó trong một dòng ngắn.
+```
+
+Để làm tiếp: mở một chat mới và dán file này, rồi khối này.
+
+*(AI tự gợi ý chuyển chat sau khoảng 6 chu kỳ trong một chat. Mai lưu sau
+chu kỳ 3 vì chị nghỉ trong ngày. Mọi giá trị trong khối đều lấy từ chu kỳ
+0 đến 3 ở trên.)*
+
+---
+
+*Hôm sau, một chat mới.* Mai dán `KEEPLOOP-LITE.vi.md`, rồi chỉ khối trạng
+thái ở trên, và viết "chu kỳ tiếp".
+
+**AI:** Đã nhận lại từ khối trạng thái: bảng chấm điểm đã khóa (Gây chú ý,
+Thông tin rõ, Đáng tin; cổng dưới 30 chữ; tối đa 30), tốt nhất 19/30 ở chu
+kỳ 3, một ý đã bỏ (chu kỳ 2) và một bài học (L1). Tiếp theo là chu kỳ 4.
 
 ```
 THẺ 4 (Chuyên gia marketing địa phương): Đổi "Inbox đặt nha." thành "Bình luận hoặc inbox đặt nha."
@@ -219,48 +276,33 @@ Cần bạn cho biết: không cần
 | Tổng | 19/30 | |
 
 **BỎ.** 19 bằng mức tốt nhất đến giờ, và hòa điểm là bỏ. Ta quay về phiên
-bản tốt nhất (chu kỳ 3). Bài học mới L2 ở bên dưới.
-
-Lượt chạy đã xong, nên đây là toàn bộ sổ ghi:
+bản tốt nhất (chu kỳ 3).
 
 ```
-SỔ GHI KEEPLOOP-LITE
-Sản phẩm: Bài đăng Facebook bán bánh chuối nhà làm, nhóm khu phố
-Bảng chấm điểm (khóa từ chu kỳ 0, tối đa 30):
-1. Gây chú ý: dòng đầu khiến hàng xóm dừng lướt
-2. Thông tin rõ: có đủ giá, kích cỡ, ngày nhận bánh và cách đặt
-3. Đáng tin: một chi tiết cụ thể, có thật cho thấy bánh nhà làm và còn tươi
-Cổng (đạt/trượt): dưới 30 chữ
-Nhóm: Chuyên gia marketing địa phương (đề xuất), Người viết quảng cáo (làm), Hàng xóm bận rộn (chấm)
-Tốt nhất đến giờ: chu kỳ 3, 19/30 (Gây chú ý 5, Thông tin rõ 8, Đáng tin 6)
-
-| # | Thay đổi | Điểm | Phán quyết |
-|---|---|---|---|
-| 0 | Mốc ban đầu (như đã dán) | 4/30 | mốc ban đầu |
-| 1 | Thêm dòng giá, kích cỡ và ngày nhận bánh | 10/30 | GIỮ |
-| 2 | Mở đầu bằng chuyện công thức của bà (hai câu) | 20/30, cổng TRƯỢT | BỎ |
-| 3 | Chuyện công thức của bà gói trong một dòng mở đầu ngắn | 19/30 | GIỮ |
 | 4 | "Bình luận hoặc inbox đặt nha" | 19/30, hòa | BỎ |
-
-Bài học:
-- L1 (chu kỳ 2): Chuyện gia đình nâng Đáng tin từ 0 lên 7 nhưng làm bài
-  đăng dài tới 36 chữ. Lần sau, thử gói nó trong một dòng ngắn.
-- L2 (chu kỳ 4): Thông tin rõ đứng ở 8 khi kích cỡ chỉ là "một ổ". Muốn
-  tăng thì cần kích cỡ ổ bánh thật từ Mai.
-
-Phiên bản tốt nhất (chu kỳ 3):
-Công thức bà ngoại, tuần nào cũng nướng suốt 10 năm. Cần bán bánh chuối. $8 một ổ, nhận thứ Bảy 9–12h. Inbox đặt nha.
+Tốt nhất đến giờ: chu kỳ 3, 19/30 (Gây chú ý 5, Thông tin rõ 8, Đáng tin 6)
+- L2 (chu kỳ 4): Thông tin rõ đứng ở 8 khi kích cỡ chỉ là "một ổ". Muốn tăng thì cần kích cỡ ổ bánh thật từ Mai.
 ```
 
-Cách mạnh hơn là nói **kiểm định**, để một cuộc trò chuyện mới chấm phiên
-bản tốt nhất mà không biết ta mong gì.
+```
+TRẠNG THÁI KEEPLOOP-LITE (sau chu kỳ 4)
+Điểm (khóa từ chu kỳ 0, tối đa 30): Gây chú ý: dòng đầu khiến hàng xóm dừng lướt; Thông tin rõ: có đủ giá, kích cỡ, ngày nhận bánh và cách đặt; Đáng tin: một chi tiết cụ thể, có thật cho thấy bánh nhà làm và còn tươi; Cổng: dưới 30 chữ
+Tốt nhất đến giờ: chu kỳ 3, 19/30 (Gây chú ý 5, Thông tin rõ 8, Đáng tin 6)
+Phiên bản tốt nhất: Công thức bà ngoại, tuần nào cũng nướng suốt 10 năm. Cần bán bánh chuối. $8 một ổ, nhận thứ Bảy 9–12h. Inbox đặt nha.
+Đã bỏ:
+- chu kỳ 2: Mở đầu bằng chuyện công thức của bà (hai câu) (20/30, cổng TRƯỢT: 36 chữ)
+- chu kỳ 4: "Bình luận hoặc inbox đặt nha" (19/30, hòa)
+Bài học:
+- L1 (chu kỳ 2): Chuyện gia đình nâng Đáng tin từ 0 lên 7 nhưng làm bài đăng dài tới 36 chữ. Lần sau, thử gói nó trong một dòng ngắn.
+- L2 (chu kỳ 4): Thông tin rõ đứng ở 8 khi kích cỡ chỉ là "một ổ". Muốn tăng thì cần kích cỡ ổ bánh thật từ Mai.
+```
 
 Nói **chu kỳ tiếp**, **chạy 3 chu kỳ**, **tình hình**, **lưu**, **kiểm
 định**, hoặc **mốc mới**.
 
 ---
 
-Mai chép sổ ghi vào ghi chú (sau này nói **lưu** là AI in lại). Tuần sau,
-chị dán nó vào một cuộc trò chuyện mới, cùng với `KEEPLOOP-LITE.vi.md`, và
-nói "chạy 3 chu kỳ". Theo bài học L2, thẻ đầu tiên của Chuyên gia
-marketing địa phương sẽ hỏi chị kích cỡ thật của một ổ bánh.
+Chu kỳ 4 chạy trong một chat mới chỉ với khối trạng thái: vẫn bảng chấm
+điểm đã khóa, vẫn mức tốt nhất 19/30 phải vượt qua, và ý đã bỏ ở chu kỳ 2
+không được thử lại. Theo bài học L2, thẻ tiếp theo của Chuyên gia
+marketing địa phương sẽ hỏi Mai kích cỡ thật của một ổ bánh.
