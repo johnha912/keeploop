@@ -219,6 +219,21 @@ The other half is a rule in AGENTS.md: when the user asks where things stand
 no cycle. A report that says "75%" is a finished job; turning it into "100%"
 is a separate request with its own acceptance test.
 
+### Long runs: a fresh session every ~5 cycles
+
+Your AI reads every `kl` output into its working memory, and nothing ever
+leaves it during one session. After many cycles that memory is full of old
+results, and the AI's judgement can drift without any sign that it has: it
+may lean on a number from an early cycle, or forget an idea it already
+ruled out. Starting a fresh session costs nothing. Everything the loop needs
+is on disk (the best version, the keep bar, the ledger, the lessons), and in
+the new session `kl next` picks the run up exactly where it stopped.
+
+Rule of thumb: a fresh session about every 5 cycles. Your AI is told to stop
+and ask you at that point; in Claude Code that is `/clear`, then `/keeploop`.
+In a chat app with `kl handoff`, open a new chat, paste BOOTSTRAP.md and a
+new packet.
+
 ## Hypotheses, not prompts
 
 A better prompt makes an answer read better. It does not give the model

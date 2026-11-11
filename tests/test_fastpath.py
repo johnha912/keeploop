@@ -412,6 +412,22 @@ class TestDocs(unittest.TestCase):
         boot = (ROOT / "BOOTSTRAP.md").read_text(encoding="utf-8")
         self.assertIn("python kl.py apply FILE", boot.split("<!-- END AGENTS.md -->")[1])
 
+    def test_every_driving_surface_says_to_rotate_sessions(self):
+        """0.3.2: a long driving session drifts silently; every shipped surface that
+        instructs the driving agent says to start fresh about every 5 cycles, and the
+        user guide says why."""
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("**Start a fresh session every ~5 cycles.**", agents)
+        self.assertLess(agents.index("Start a fresh session"), agents.index("## Fast path"))
+        skill = (ROOT / ".claude/skills/keeploop/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("After about 5 cycles in this session", skill)
+        boot = (ROOT / "BOOTSTRAP.md").read_text(encoding="utf-8").split("<!-- END AGENTS.md -->")[1]
+        self.assertIn("**A new chat every ~5 cycles.**", boot)
+        guide = (ROOT / "docs" / "GUIDE.md").read_text(encoding="utf-8")
+        self.assertIn("### Long runs: a fresh session every ~5 cycles", guide)
+        for text in (agents, skill, boot, guide):
+            self.assertIn("kl next" if text is not boot else "kl.py handoff", text)
+
     def test_every_command_the_docs_name_exists(self):
         names = set(kl.parser()._subparsers._group_actions[0].choices)
         for cmd in ("next", "try", "handoff", "apply"):
