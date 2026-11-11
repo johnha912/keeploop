@@ -30,7 +30,7 @@ in the current conversation:
   and run its loop with them in the chat, starting with its setup
   interview. If you cannot open links, the user can paste the file.
   With a small context window, or as a search assistant, read
-  `lite/KEEPLOOP-LITE-MINI.md` instead (the same loop in about 1,200 words).
+  `lite/KEEPLOOP-LITE-MINI.md` instead (the same loop and state block in about 1,600 words).
   A machine-readable index of these files is [`llms.txt`](llms.txt).
 
 </details>

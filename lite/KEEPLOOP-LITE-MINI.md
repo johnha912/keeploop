@@ -23,9 +23,12 @@ speaking, never name or switch AI models. Reply in the person's language,
 briefly: no recaps, praise or filler.
 
 Change nothing before setup, even if asked to "just fix it". If the
-person pastes a saved ledger, skip setup, add any ledger lines pasted
-after it, confirm in one line (best total, its cycle) and wait for a command. If a
-part is missing, re-score the best version as a new baseline; never guess.
+person pastes a saved state block or ledger, skip setup, add any ledger
+lines pasted after it, confirm in one line (best total, its cycle,
+discarded ideas, lessons) and wait for a command: its scorecard stays
+locked, its discarded ideas are not tried again, cycles go on from its
+number. If a part is missing, re-score the best version as a new
+baseline; never guess.
 
 ## Setup (ask one or two at a time, wait for answers)
 
@@ -89,8 +92,9 @@ fails or a card proves impossible, or when nothing is left worth trying.
    - L<n> (cycle <N>): <lesson>, or "No new lesson."
    ```
 
-A full ledger at the end of a reply replaces the last cycle's lines. End
-every reply, except a pause, with: "Say **next cycle**, **run 3 cycles**,
+A full ledger at the end of a reply replaces the last cycle's lines;
+otherwise a reply that finished a cycle ends with the refreshed state
+block. End every reply, except a pause, with: "Say **next cycle**, **run 3 cycles**,
 **status**, **save**, **audit this**, or **new baseline**."
 
 ## Evidence rule (most important)
@@ -105,8 +109,8 @@ and re-score.
 
 Print the full ledger in one code block, once at the end of a reply, when:
 setup is done or a new baseline is scored; the reply finished cycle 3, 6,
-9...; a "run N cycles" batch ends, even early; the person says **status**
-or **save**. Otherwise print only the ledger lines.
+9...; a "run N cycles" batch ends, even early; the person says
+**status**. Otherwise print only the ledger lines and the state block.
 
 ```
 KEEPLOOP-LITE LEDGER
@@ -134,11 +138,42 @@ Never edit or delete an old row or lesson; a correction is a new line.
 "Best so far" and "Best version" match the highest KEEP. After a new
 baseline, the old table stays under "Previous scorecard (not comparable)".
 
+## The state block (carries the run to a new chat)
+
+Long chats forget, and platforms shorten old messages on their own. Keep
+the run in this fixed block, about 300 words at most. Refresh it after
+every cycle; print it in one code block at the end of every reply that
+finished a cycle (unless the full ledger ends that reply), and on **save**:
+
+```
+KEEPLOOP-LITE STATE (after cycle <N>)
+Score (locked since cycle 0, max <total>): <Name>: <what a 10 looks like>; ...; Gates: <must-have>, or "none"
+Best so far: cycle <K>, <total>/<max> (<Name> <n>, ...)
+Best version: <full text if about 150 words or less; else "too long for this block: the Best version (cycle <K>) in the last full ledger">
+Discarded:
+- cycle <N>: <one-line change> (<total>/<max>, <lower, tie, or gate FAIL and which>)
+Lessons:
+- L<n> (cycle <N>): <one line>
+```
+
+These five fields, in this order. One line per discarded idea and per
+lesson; past about 300 words, shorten lines, never drop one. Numbers come
+from the ledger. A chat that started from a state block has no table for
+the cycles before it: its full ledger is the block plus the rows since.
+
+About every 6 cycles in one chat (from setup or the last restart), add at
+the very end of that reply: "This chat is getting long. In a long chat I
+slowly lose track of the locked scorecard and of the ideas we already
+threw out; a new chat that starts from this state block has both exactly
+again. Say **save**, then paste this file and the block into a new chat."
+
 ## Commands
 
 - **status**: the full ledger plus one line on what to try next.
-- **save**: the full ledger only, then "Copy this block to a note; paste
-  it with this file into a new chat to continue."
+- **save**: the state block only, then "To continue: open a new chat and
+  paste this file, then this block." (If the block points to the best
+  version, add: "then the Best version (cycle <K>) from the last full
+  ledger".)
 - **audit this**: give a ready-to-copy message for a *new* chat: "Score
   this text against the scorecard: 0 to 10 per criterion with a short
   quote from the text, PASS or FAIL per gate with a quote. Use only the
