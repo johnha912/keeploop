@@ -1,6 +1,6 @@
 <p align="center">
   <!-- 语言行：要添加新语言，请在此处以及每个 README.*.md 中追加 ` | <a href="README.xx.md">名称</a>` -->
-  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <b>简体中文</b>
+  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <b>简体中文</b> | <a href="README.es.md">Español</a>
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@ keeploop 有两个版本。哪个合适，取决于你在当前对话里能做�
 - **做不到这些的聊天助手**（即使它能上网或在沙箱里运行代码）：keeploop-lite，
   一个由简单指令组成的 Markdown 文件：
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.zh-CN.md
-  （英文：`KEEPLOOP-LITE.md`，越南语：`KEEPLOOP-LITE.vi.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
+  （英文：`KEEPLOOP-LITE.md`，越南语：`KEEPLOOP-LITE.vi.md`，西班牙语：`KEEPLOOP-LITE.es.md`）。它是一个 skill，不是软件：没有东西需要安装或克隆。
   如果用户想用，你可以读这个文件，在聊天里和用户一起跑它的循环，从设置访谈开始。
   如果你打不开链接，用户可以把文件粘贴进来。
   如果你的上下文较小，或者你是搜索助手，请改读 `lite/KEEPLOOP-LITE-MINI.zh-CN.md`
@@ -74,7 +74,7 @@ Gemini CLI。keeploop 本身不是 AI：它是一个小巧的 Python 工具，�
 没有依赖，不发送 telemetry，也不需要 API key。
 
 > **只有聊天应用**（ChatGPT、Claude、Gemini，不写代码）？请用
-> [**keeploop-lite**](lite/KEEPLOOP-LITE.zh-CN.md)（另有 [English](lite/KEEPLOOP-LITE.md)、[Tiếng Việt](lite/KEEPLOOP-LITE.vi.md) 版）：
+> [**keeploop-lite**](lite/KEEPLOOP-LITE.zh-CN.md)（另有 [English](lite/KEEPLOOP-LITE.md)、[Tiếng Việt](lite/KEEPLOOP-LITE.vi.md)、[Español](lite/KEEPLOOP-LITE.es.md) 版）：
 > 把一个文件粘贴进聊天，就能对一篇帖子、一份简历或一个计划跑同样的保留/丢弃循环
 > （[示例](lite/EXAMPLE.zh-CN.md)）。默认快速模式：说**运行 3 轮**，一条回复最多尝试五处
 > 修改；说**保存**拿到记录本。空间不够（免费套餐、Perplexity）？用

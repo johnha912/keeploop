@@ -43,6 +43,12 @@ LANG = {
               "six": "大约每 6 轮", "cap": "300 词", "best_line": "目前最佳：第 3 轮，",
               "ledger_head": "KEEPLOOP-LITE 记录本", "ledger_best": "最佳版本（第 3 轮）：",
               "pass": "通过", "fail": "不通过"},
+    "es": {"head": "ESTADO KEEPLOOP-LITE", "after": "(después del ciclo {n})",
+           "fields": ["Puntuación (fija desde el ciclo 0", "Lo mejor hasta ahora:", "Mejor versión:", "Descartados:", "Lecciones:"],
+           "save": "**guardar**: imprime el bloque de estado", "save_mini": "**guardar**: solo el bloque de estado",
+           "six": "cada 6 ciclos", "cap": "300 palabras", "best_line": "Lo mejor hasta ahora: ciclo 3,",
+           "ledger_head": "REGISTRO KEEPLOOP-LITE", "ledger_best": "Mejor versión (ciclo 3):",
+           "pass": "PASA", "fail": "NO PASA"},
 }
 
 
