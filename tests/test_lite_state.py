@@ -49,6 +49,12 @@ LANG = {
            "six": "cada 6 ciclos", "cap": "300 palabras", "best_line": "Lo mejor hasta ahora: ciclo 3,",
            "ledger_head": "REGISTRO KEEPLOOP-LITE", "ledger_best": "Mejor versión (ciclo 3):",
            "pass": "PASA", "fail": "NO PASA"},
+    "pt-BR": {"head": "ESTADO KEEPLOOP-LITE", "after": "(depois do ciclo {n})",
+              "fields": ["Pontuação (travada desde o ciclo 0", "Melhor até agora:", "Melhor versão:", "Descartados:", "Lições:"],
+              "save": "**salvar**: mostre o bloco de estado", "save_mini": "**salvar**: só o bloco de estado",
+              "six": "cada 6 ciclos", "cap": "300 palavras", "best_line": "Melhor até agora: ciclo 3,",
+              "ledger_head": "REGISTRO KEEPLOOP-LITE", "ledger_best": "Melhor versão (ciclo 3):",
+              "pass": "PASSA", "fail": "NÃO PASSA"},
 }
 
 

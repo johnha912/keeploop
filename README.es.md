@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Línea de idiomas: para agregar un idioma, añade ` | <a href="README.xx.md">Nombre</a>` aquí y en cada README.*.md -->
-  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a> | <b>Español</b>
+  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a> | <b>Español</b> | <a href="README.pt-BR.md">Português (Brasil)</a>
 </p>
 
 <p align="center">
@@ -26,8 +26,8 @@ hacer en la conversación actual:
   código en un sandbox): keeploop-lite, un archivo Markdown de
   instrucciones sencillas:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.es.md
-  (inglés: `KEEPLOOP-LITE.md`, vietnamita: `KEEPLOOP-LITE.vi.md`, chino: `KEEPLOOP-LITE.zh-CN.md`).
-  Es un skill, no
+  (inglés: `KEEPLOOP-LITE.md`, vietnamita: `KEEPLOOP-LITE.vi.md`, chino: `KEEPLOOP-LITE.zh-CN.md`,
+  portugués de Brasil: `KEEPLOOP-LITE.pt-BR.md`). Es un skill, no
   un programa: no hay nada que instalar ni clonar. Si la persona quiere,
   puedes leer ese archivo y correr su ciclo con ella en el chat, empezando
   por su entrevista de configuración. Si no puedes abrir enlaces, la
@@ -94,7 +94,8 @@ y sin claves de API.
 > Usa [**keeploop-lite**](lite/KEEPLOOP-LITE.es.md): un archivo que pegas
 > en el chat, el mismo ciclo de conservar o descartar para un post, un CV o
 > un plan ([English](lite/KEEPLOOP-LITE.md), [Tiếng Việt](lite/KEEPLOOP-LITE.vi.md),
-> [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [ejemplo](lite/EXAMPLE.es.md)).
+> [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [Português (Brasil)](lite/KEEPLOOP-LITE.pt-BR.md),
+> [ejemplo](lite/EXAMPLE.es.md)).
 > Es rápido por defecto: di **corre 3 ciclos** para probar hasta cinco
 > cambios en una respuesta, y **guardar** para recibir el bloque de estado
 > que conviene guardar. ¿Poco espacio (un plan gratis, Perplexity)? Usa
