@@ -37,6 +37,12 @@ LANG = {
            "six": "hoảng mỗi 6 chu kỳ", "cap": "300 từ", "best_line": "Tốt nhất đến giờ: chu kỳ 3,",
            "ledger_head": "SỔ GHI KEEPLOOP-LITE", "ledger_best": "Phiên bản tốt nhất (chu kỳ 3):",
            "pass": "ĐẠT", "fail": "TRƯỢT"},
+    "es": {"head": "ESTADO KEEPLOOP-LITE", "after": "(después del ciclo {n})",
+           "fields": ["Puntuación (fija desde el ciclo 0", "Lo mejor hasta ahora:", "Mejor versión:", "Descartados:", "Lecciones:"],
+           "save": "**guardar**: imprime el bloque de estado", "save_mini": "**guardar**: solo el bloque de estado",
+           "six": "cada 6 ciclos", "cap": "300 palabras", "best_line": "Lo mejor hasta ahora: ciclo 3,",
+           "ledger_head": "REGISTRO KEEPLOOP-LITE", "ledger_best": "Mejor versión (ciclo 3):",
+           "pass": "PASA", "fail": "NO PASA"},
 }
 
 
