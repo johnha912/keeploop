@@ -147,7 +147,9 @@ class TestFigure(unittest.TestCase):
 class TestReadmeLinks(unittest.TestCase):
     def test_every_local_link_in_the_readmes_exists(self):
         import re
-        for name in ("README.md", "README.vi.md", "README.zh-CN.md"):
+        names = sorted(p.name for p in ROOT.glob("README*.md"))  # every language's README, discovered
+        self.assertGreaterEqual(len(names), 3)
+        for name in names:
             text = re.sub(r"<!--.*?-->", "", (ROOT / name).read_text(encoding="utf-8"), flags=re.S)
             links = re.findall(r'(?:\]\(|src="|href="|srcset=")([^)"\s#]+)', text)
             for link in links:
