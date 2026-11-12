@@ -21,6 +21,36 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-11-12
+
+### Added
+
+keeploop-lite in three more languages. The CLI package does not change: `kl.py`,
+`run.py` and `prepare.py` (apart from the version) are untouched, and so are the
+English, Vietnamese and Chinese lite files.
+
+- **Spanish, Brazilian Portuguese and Indonesian lite skills.** `lite/KEEPLOOP-LITE.es.md`,
+  `.pt-BR.md` and `.id.md`, and their MINI versions, follow the English skill section for
+  section: the same setup, cycle, ledger, the same five-field state block (about 300
+  words) and the same suggestion of a fresh chat about every 6 cycles, with its reason.
+- **A worked example written in each language, not translated.** Lupita sells Oaxacan
+  tamales in Puebla (a WhatsApp broadcast), Juliana sells frozen pão de queijo in Belo
+  Horizonte (an Instagram caption that sends buyers to WhatsApp), Bu Sari sells sambal
+  bawang in Bandung (a TikTok Shop description). Each runs the same arc as the English
+  example: a locked scorecard with a gate, a gate failure, a save after cycle 3 and
+  cycle 4 in a new chat from the state block alone. They are written illustrations,
+  not recorded chats.
+- **README.es.md, README.pt-BR.md, README.id.md** translate the top of the README
+  (intro, quick start, the lite section with each MINI's measured word count) and link
+  the English README for the CLI sections. Every README and `llms.txt` now name all six
+  lite languages.
+- **The tests discover the languages.** `tests/test_lite_state.py` reads the language
+  set from `lite/KEEPLOOP-LITE*.md`: a language needs all three lite files, the state
+  block in order, an example whose state blocks trace to its own cycles and whose cycle 4
+  keeps the locked scorecard, the best and the discarded idea, a README with the lite
+  section's structure and its `llms.txt` entries. The README badge and link checks cover
+  every `README*.md`.
+
 ## [0.3.2] - 2026-11-11
 
 ### Fixed
