@@ -55,6 +55,12 @@ LANG = {
               "six": "cada 6 ciclos", "cap": "300 palavras", "best_line": "Melhor até agora: ciclo 3,",
               "ledger_head": "REGISTRO KEEPLOOP-LITE", "ledger_best": "Melhor versão (ciclo 3):",
               "pass": "PASSA", "fail": "NÃO PASSA"},
+    "id": {"head": "STATUS KEEPLOOP-LITE", "after": "(setelah siklus {n})",
+           "fields": ["Skor (dikunci sejak siklus 0", "Terbaik sejauh ini:", "Versi terbaik:", "Dibuang:", "Pelajaran:"],
+           "save": "**simpan**: tampilkan blok status", "save_mini": "**simpan**: hanya blok status",
+           "six": "setiap 6 siklus", "cap": "300 kata", "best_line": "Terbaik sejauh ini: siklus 3,",
+           "ledger_head": "CATATAN KEEPLOOP-LITE", "ledger_best": "Versi terbaik (siklus 3):",
+           "pass": "LOLOS", "fail": "GAGAL"},
 }
 
 

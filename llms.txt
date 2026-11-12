@@ -16,6 +16,8 @@ Which file to use: a chat AI that cannot run code uses KEEPLOOP-LITE.md; with a 
 - [KEEPLOOP-LITE-MINI.es.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE-MINI.es.md): short lite skill, Spanish
 - [KEEPLOOP-LITE.pt-BR.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.pt-BR.md): full lite skill, Brazilian Portuguese
 - [KEEPLOOP-LITE-MINI.pt-BR.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE-MINI.pt-BR.md): short lite skill, Brazilian Portuguese
+- [KEEPLOOP-LITE.id.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.id.md): full lite skill, Indonesian
+- [KEEPLOOP-LITE-MINI.id.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE-MINI.id.md): short lite skill, Indonesian
 
 ## Full keeploop (runs code)
 
@@ -29,7 +31,9 @@ Which file to use: a chat AI that cannot run code uses KEEPLOOP-LITE.md; with a 
 - [EXAMPLE.zh-CN.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/EXAMPLE.zh-CN.md): the same example, Simplified Chinese
 - [EXAMPLE.es.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/EXAMPLE.es.md): a worked example written in Spanish (its own seller and numbers, not a translation)
 - [EXAMPLE.pt-BR.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/EXAMPLE.pt-BR.md): a worked example written in Brazilian Portuguese (its own seller and numbers, not a translation)
+- [EXAMPLE.id.md](https://raw.githubusercontent.com/johnha912/keeploop/main/lite/EXAMPLE.id.md): a worked example written in Indonesian (its own seller and numbers, not a translation)
 - [README.vi.md](https://raw.githubusercontent.com/johnha912/keeploop/main/README.vi.md): README, Vietnamese
 - [README.zh-CN.md](https://raw.githubusercontent.com/johnha912/keeploop/main/README.zh-CN.md): README, Simplified Chinese
 - [README.es.md](https://raw.githubusercontent.com/johnha912/keeploop/main/README.es.md): README (lite part), Spanish
 - [README.pt-BR.md](https://raw.githubusercontent.com/johnha912/keeploop/main/README.pt-BR.md): README (lite part), Brazilian Portuguese
+- [README.id.md](https://raw.githubusercontent.com/johnha912/keeploop/main/README.id.md): README (lite part), Indonesian
