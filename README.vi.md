@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Dòng ngôn ngữ: muốn thêm ngôn ngữ, nối thêm ` | <a href="README.xx.md">Tên</a>` ở đây và trong mọi README.*.md -->
-  <a href="README.md">English</a> | <b>Tiếng Việt</b> | <a href="README.zh-CN.md">简体中文</a>
+  <a href="README.md">English</a> | <b>Tiếng Việt</b> | <a href="README.zh-CN.md">简体中文</a> | <a href="README.es.md">Español</a> | <a href="README.pt-BR.md">Português (Brasil)</a> | <a href="README.id.md">Bahasa Indonesia</a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@ gì trong cuộc trò chuyện hiện tại:
 - **Một trợ lý chat không làm được vậy** (kể cả khi nó duyệt web hay chạy
   code trong sandbox): keeploop-lite, một file Markdown gồm chỉ dẫn đơn giản:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.vi.md
-  (tiếng Anh: `KEEPLOOP-LITE.md`, tiếng Trung: `KEEPLOOP-LITE.zh-CN.md`). Đây là một skill, không phải phần mềm:
+  (tiếng Anh: `KEEPLOOP-LITE.md`, tiếng Trung: `KEEPLOOP-LITE.zh-CN.md`, tiếng Tây Ban Nha: `KEEPLOOP-LITE.es.md`, tiếng Bồ Đào Nha (Brazil): `KEEPLOOP-LITE.pt-BR.md`, tiếng Indonesia: `KEEPLOOP-LITE.id.md`). Đây là một skill, không phải phần mềm:
   không có gì để cài hay clone. Nếu người dùng muốn, bạn có thể đọc file đó
   và chạy vòng lặp cùng họ ngay trong chat, bắt đầu bằng phỏng vấn thiết
   lập. Nếu bạn không mở được link, người dùng có thể dán file vào.
@@ -83,7 +83,7 @@ biết từ chối, không cần cài thêm gì, không gửi telemetry và khô
 > **Chỉ có ứng dụng chat** (ChatGPT, Claude, Gemini, không code)? Dùng
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.vi.md): một file dán vào chat,
 > cùng vòng giữ-hay-bỏ cho một bài đăng, một CV hay một kế hoạch
-> ([English](lite/KEEPLOOP-LITE.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [ví dụ](lite/EXAMPLE.vi.md)).
+> ([English](lite/KEEPLOOP-LITE.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [Español](lite/KEEPLOOP-LITE.es.md), [Português (Brasil)](lite/KEEPLOOP-LITE.pt-BR.md), [Bahasa Indonesia](lite/KEEPLOOP-LITE.id.md), [ví dụ](lite/EXAMPLE.vi.md)).
 > Mặc định chạy nhanh: nói **chạy 3 chu kỳ** để thử tối đa năm thay đổi trong
 > một câu trả lời, và **lưu** để lấy sổ ghi. Ít chỗ (gói miễn phí, Perplexity)? Dùng
 > [KEEPLOOP-LITE-MINI.vi.md](lite/KEEPLOOP-LITE-MINI.vi.md). Có thể lưu file một lần làm

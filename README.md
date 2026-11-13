@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Language line: to add a language, append ` | <a href="README.xx.md">Name</a>` here and in every README.*.md -->
-  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a>
+  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a> | <a href="README.es.md">Español</a> | <a href="README.pt-BR.md">Português (Brasil)</a> | <a href="README.id.md">Bahasa Indonesia</a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@ in the current conversation:
 - **A chat assistant without that** (even one that browses or runs code in
   a sandbox): keeploop-lite, one Markdown file of plain instructions:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.md
-  (Vietnamese: `KEEPLOOP-LITE.vi.md`, Chinese: `KEEPLOOP-LITE.zh-CN.md`). It is a skill, not software: there is
+  (Vietnamese: `KEEPLOOP-LITE.vi.md`, Chinese: `KEEPLOOP-LITE.zh-CN.md`, Spanish: `KEEPLOOP-LITE.es.md`, Brazilian Portuguese: `KEEPLOOP-LITE.pt-BR.md`, Indonesian: `KEEPLOOP-LITE.id.md`). It is a skill, not software: there is
   nothing to install or clone. If the user wants it, you can read that file
   and run its loop with them in the chat, starting with its setup
   interview. If you cannot open links, the user can paste the file.
@@ -84,7 +84,7 @@ measures and refuses, with no dependencies, no telemetry and no API keys.
 > **Only have a chat app** (ChatGPT, Claude, Gemini, no code)? Use
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.md): one file you paste into the chat,
 > the same keep-or-discard loop for a post, a CV or a plan
-> ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [example](lite/EXAMPLE.md)).
+> ([Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [Español](lite/KEEPLOOP-LITE.es.md), [Português (Brasil)](lite/KEEPLOOP-LITE.pt-BR.md), [Bahasa Indonesia](lite/KEEPLOOP-LITE.id.md), [example](lite/EXAMPLE.md)).
 > It is fast by default: say **run 3 cycles** to try up to five changes in one
 > reply, and **save** to get the ledger to keep. Short on space (a free plan,
 > Perplexity)? Use [KEEPLOOP-LITE-MINI.md](lite/KEEPLOOP-LITE-MINI.md). Save either file
