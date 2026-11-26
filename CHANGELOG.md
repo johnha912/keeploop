@@ -21,6 +21,17 @@ release. The one-time PyPI setup and the steps are in
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-11-26
+
+### Removed
+
+- **Simplified Chinese (zh-CN).** `README.zh-CN.md`, `lite/KEEPLOOP-LITE.zh-CN.md`,
+  `lite/KEEPLOOP-LITE-MINI.zh-CN.md`, `lite/EXAMPLE.zh-CN.md` and the `README.zh-CN.md`
+  of the three example packs are gone, and so is every link to them (the language bars,
+  the lite lists in the other READMEs, `llms.txt`). Raw links to these files on `main`
+  now return 404; the 0.3.3 release still has them. keeploop-lite ships in English,
+  Vietnamese, Spanish, Brazilian Portuguese and Indonesian. No code changes.
+
 ## [0.3.3] - 2026-11-12
 
 ### Added
