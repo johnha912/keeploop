@@ -1,4 +1,4 @@
-<p align="center"><b>English</b> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a></p>
+<p align="center"><b>English</b> | <a href="README.vi.md">Tiếng Việt</a></p>
 
 # Example: a noisy evaluation (the proof run)
 

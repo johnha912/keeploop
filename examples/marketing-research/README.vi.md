@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.md">English</a> | <b>Tiếng Việt</b> | <a href="README.zh-CN.md">简体中文</a>
+  <a href="README.md">English</a> | <b>Tiếng Việt</b>
 </p>
 
 # Người mua thời trang nhanh thuộc Gen Z (thế hệ trẻ nhất) và Millennial (thế hệ trước đó) nói gì về năm thương hiệu, và keeploop đã siết chặt báo cáo như thế nào

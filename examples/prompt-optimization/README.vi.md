@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.md">English</a> | <b>Tiếng Việt</b> | <a href="README.zh-CN.md">简体中文</a>
+  <a href="README.md">English</a> | <b>Tiếng Việt</b>
 </p>
 
 # Một đội AI chỉnh sửa một prompt trong 8 chu kỳ: hai chỉnh sửa được giữ lại, sáu bị từ chối

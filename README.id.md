@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Baris bahasa: untuk menambah bahasa, sambungkan ` | <a href="README.xx.md">Nama</a>` di sini dan di setiap README.*.md -->
-  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a> | <a href="README.es.md">Español</a> | <a href="README.pt-BR.md">Português (Brasil)</a> | <b>Bahasa Indonesia</b>
+  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.es.md">Español</a> | <a href="README.pt-BR.md">Português (Brasil)</a> | <b>Bahasa Indonesia</b>
 </p>
 
 <p align="center">
@@ -26,7 +26,7 @@ lakukan di percakapan ini:
   menjalankan kode di sandbox): keeploop-lite, satu file Markdown berisi
   instruksi sederhana:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.id.md
-  (Inggris: `KEEPLOOP-LITE.md`, Vietnam: `KEEPLOOP-LITE.vi.md`, Mandarin: `KEEPLOOP-LITE.zh-CN.md`, Spanyol: `KEEPLOOP-LITE.es.md`, Portugis Brasil: `KEEPLOOP-LITE.pt-BR.md`).
+  (Inggris: `KEEPLOOP-LITE.md`, Vietnam: `KEEPLOOP-LITE.vi.md`, Spanyol: `KEEPLOOP-LITE.es.md`, Portugis Brasil: `KEEPLOOP-LITE.pt-BR.md`).
   Ini sebuah skill, bukan software: tidak ada yang perlu diinstal atau
   di-clone. Kalau pengguna mau, kamu bisa membaca file itu dan menjalankan
   loop-nya bersama mereka langsung di chat, dimulai dari wawancara setup-nya.
@@ -92,7 +92,7 @@ API key.
 > **Cuma punya aplikasi chat** (ChatGPT, Claude, Gemini, tanpa kode)? Pakai
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.id.md): satu file yang kamu tempel ke
 > chat, loop pertahankan-atau-buang yang sama untuk postingan, CV atau rencana
-> ([English](lite/KEEPLOOP-LITE.md), [Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [Español](lite/KEEPLOOP-LITE.es.md), [Português (Brasil)](lite/KEEPLOOP-LITE.pt-BR.md), [contoh](lite/EXAMPLE.id.md)).
+> ([English](lite/KEEPLOOP-LITE.md), [Tiếng Việt](lite/KEEPLOOP-LITE.vi.md), [Español](lite/KEEPLOOP-LITE.es.md), [Português (Brasil)](lite/KEEPLOOP-LITE.pt-BR.md), [contoh](lite/EXAMPLE.id.md)).
 > Secara bawaan dia cepat: bilang **jalankan 3 siklus** untuk mencoba sampai
 > lima perubahan dalam satu balasan, dan **simpan** untuk mendapat blok status
 > yang bisa disimpan. Ruang terbatas (paket gratis, Perplexity)? Pakai

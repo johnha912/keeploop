@@ -1,4 +1,4 @@
-<p align="center"><a href="README.md">English</a> | <b>Tiếng Việt</b> | <a href="README.zh-CN.md">简体中文</a></p>
+<p align="center"><a href="README.md">English</a> | <b>Tiếng Việt</b></p>
 
 # Ví dụ: một bài đánh giá nhiễu (proof run)
 

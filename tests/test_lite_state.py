@@ -37,12 +37,6 @@ LANG = {
            "six": "hoảng mỗi 6 chu kỳ", "cap": "300 từ", "best_line": "Tốt nhất đến giờ: chu kỳ 3,",
            "ledger_head": "SỔ GHI KEEPLOOP-LITE", "ledger_best": "Phiên bản tốt nhất (chu kỳ 3):",
            "pass": "ĐẠT", "fail": "TRƯỢT"},
-    "zh-CN": {"head": "KEEPLOOP-LITE 状态", "after": "（第 {n} 轮之后）",
-              "fields": ["评分（自第 0 轮起锁定", "目前最佳：", "最佳版本：", "已舍弃：", "经验："],
-              "save": "**保存**：只输出状态块", "save_mini": "**保存**：只输出状态块",
-              "six": "大约每 6 轮", "cap": "300 词", "best_line": "目前最佳：第 3 轮，",
-              "ledger_head": "KEEPLOOP-LITE 记录本", "ledger_best": "最佳版本（第 3 轮）：",
-              "pass": "通过", "fail": "不通过"},
     "es": {"head": "ESTADO KEEPLOOP-LITE", "after": "(después del ciclo {n})",
            "fields": ["Puntuación (fija desde el ciclo 0", "Lo mejor hasta ahora:", "Mejor versión:", "Descartados:", "Lecciones:"],
            "save": "**guardar**: imprime el bloque de estado", "save_mini": "**guardar**: solo el bloque de estado",
@@ -94,8 +88,6 @@ def blocks(text: str, head: str, after: str) -> dict[int, str]:
     out = {}
     for n in (3, 4):
         m = re.search(r"```\n(" + re.escape(head + " " + after.format(n=n)) + r".*?)```", text, re.S)
-        if m is None and after.startswith("（"):  # Chinese: no space before the full-width paren
-            m = re.search(r"```\n(" + re.escape(head + after.format(n=n)) + r".*?)```", text, re.S)
         assert m, (head, n)
         out[n] = m.group(1)
     return out
@@ -183,12 +175,11 @@ class TestExampleRestart(unittest.TestCase):
                 self.assertIn(change, disc[0])
                 self.assertIn(f"{total}/{mx}", disc[0])
                 l1 = next(ln for ln in lines if "L1" in ln)
-                body = l1.split("：", 1)[-1] if lang == "zh-CN" else l1.split("): ", 1)[1]
+                body = l1.split("): ", 1)[1]
                 self.assertIn(fold(body), fold(ledger))
                 for n in re.findall(r"\d+", b[3]):
                     self.assertIn(n, before, f"{lang}: {n} in the cycle-3 block is not in cycles 0-3")
-                words = len(b[3].split()) if lang != "zh-CN" else len(re.sub(r"\s", "", b[3]))
-                self.assertLessEqual(words, 300 if lang != "zh-CN" else 500)
+                self.assertLessEqual(len(b[3].split()), 300)
                 # after cycle 4 (in the new chat): the same block plus cycle 4 and L2 only
                 kept = [ln for ln in b[3].strip().splitlines()[1:]]
                 after4 = b[4].strip().splitlines()[1:]
@@ -207,7 +198,7 @@ class TestExampleRestart(unittest.TestCase):
                 ledger3 = ledger3[ledger3.rindex(L["ledger_head"]):]
                 restart = text[text.index(b[3]) + len(b[3]):text.index(b[4])]
                 self.assertNotIn(L["ledger_head"], restart, "the new chat must start from the block alone")
-                locked = [re.split(r"[:：]", c, maxsplit=1)[0] for c in re.findall(r"^\d\. (.+)$", ledger3, re.M)]
+                locked = [c.split(":", 1)[0] for c in re.findall(r"^\d\. (.+)$", ledger3, re.M)]
                 scores, gates, (total, mx) = checker_table(restart, L)
                 self.assertEqual([c for c, _ in scores], locked)  # the locked criteria, in order
                 self.assertEqual(sum(s for _, s in scores), total)
@@ -265,11 +256,10 @@ class TestEveryReadmeNamesEveryLanguage(unittest.TestCase):
                 mini = LITE / f"KEEPLOOP-LITE-MINI{sfx}.md"
                 at = ai.index(f"lite/KEEPLOOP-LITE-MINI{sfx}.md")
                 words = len(mini.read_text(encoding="utf-8").split())
-                if words >= 1000:  # a space-separated language: the stated size is measured
-                    claim = re.search(r"\d{1,3}(?:[.,  ]\d{3})+|\d{3,}", ai[at:at + 200])
-                    self.assertIsNotNone(claim, f"{path.name}: no word count for the MINI")
-                    self.assertLessEqual(abs(number(claim.group(0)) - words), words * 0.05,
-                                         f"{path.name}: says {claim.group(0)} words, the MINI has {words}")
+                claim = re.search(r"\d{1,3}(?:[.,  ]\d{3})+|\d{3,}", ai[at:at + 200])  # the stated size is measured
+                self.assertIsNotNone(claim, f"{path.name}: no word count for the MINI")
+                self.assertLessEqual(abs(number(claim.group(0)) - words), words * 0.05,
+                                     f"{path.name}: says {claim.group(0)} words, the MINI has {words}")
                 # the lite box: every lite language, its own example and MINI, then the chat guide
                 box = text[text.index("](lite/KEEPLOOP-LITE"):]
                 box = box[:box.index("keeploop-guide-chat.gif")]

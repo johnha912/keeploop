@@ -46,8 +46,7 @@ class TestTokenClaimsAreScoped(unittest.TestCase):
     README states them, it says so."""
 
     SCOPE = {"README.md": ("characters / 4", "has not been measured"),
-             "README.vi.md": ("số ký tự / 4", "chưa được đo"),
-             "README.zh-CN.md": ("字符数 / 4", "尚未测量")}
+             "README.vi.md": ("số ký tự / 4", "chưa được đo")}
 
     def test_every_readme_states_what_was_measured(self):
         for name, (size, not_measured) in self.SCOPE.items():

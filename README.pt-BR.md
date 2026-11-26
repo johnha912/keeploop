@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Linha de idiomas: para incluir um idioma, acrescente ` | <a href="README.xx.md">Nome</a>` aqui e em todo README.*.md -->
-  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a> | <a href="README.es.md">Español</a> | <b>Português (Brasil)</b> | <a href="README.id.md">Bahasa Indonesia</a>
+  <a href="README.md">English</a> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.es.md">Español</a> | <b>Português (Brasil)</b> | <a href="README.id.md">Bahasa Indonesia</a>
 </p>
 
 <p align="center">
@@ -26,8 +26,7 @@ na conversa atual:
   código numa sandbox): o keeploop-lite, um arquivo Markdown de instruções
   simples:
   https://raw.githubusercontent.com/johnha912/keeploop/main/lite/KEEPLOOP-LITE.pt-BR.md
-  (inglês: `KEEPLOOP-LITE.md`, vietnamita: `KEEPLOOP-LITE.vi.md`, chinês: `KEEPLOOP-LITE.zh-CN.md`,
-  espanhol: `KEEPLOOP-LITE.es.md`, indonésio: `KEEPLOOP-LITE.id.md`). É uma skill, não um software:
+  (inglês: `KEEPLOOP-LITE.md`, vietnamita: `KEEPLOOP-LITE.vi.md`, espanhol: `KEEPLOOP-LITE.es.md`, indonésio: `KEEPLOOP-LITE.id.md`). É uma skill, não um software:
   não há nada para instalar nem clonar. Se a pessoa quiser, você pode ler
   esse arquivo e rodar o ciclo dele com ela no chat, começando pela
   entrevista de configuração. Se você não consegue abrir links, a pessoa
@@ -94,7 +93,7 @@ sem chaves de API.
 > [**keeploop-lite**](lite/KEEPLOOP-LITE.pt-BR.md): um arquivo que você cola
 > no chat, o mesmo ciclo de manter ou descartar para um post, um currículo
 > ou um plano ([English](lite/KEEPLOOP-LITE.md), [Tiếng Việt](lite/KEEPLOOP-LITE.vi.md),
-> [简体中文](lite/KEEPLOOP-LITE.zh-CN.md), [Español](lite/KEEPLOOP-LITE.es.md),
+> [Español](lite/KEEPLOOP-LITE.es.md),
 > [Bahasa Indonesia](lite/KEEPLOOP-LITE.id.md), [exemplo](lite/EXAMPLE.pt-BR.md)).
 > Ele é rápido por padrão: diga **rode 3 ciclos** para testar até cinco
 > mudanças numa resposta, e **salvar** para receber o bloco de estado e

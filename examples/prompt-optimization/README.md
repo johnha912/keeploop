@@ -1,5 +1,5 @@
 <p align="center">
-  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a> | <a href="README.zh-CN.md">简体中文</a>
+  <b>English</b> | <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
 # An AI team edited a prompt for 8 cycles: two edits kept, six refused
