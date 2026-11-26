@@ -179,8 +179,7 @@ class TestExampleRestart(unittest.TestCase):
                 self.assertIn(fold(body), fold(ledger))
                 for n in re.findall(r"\d+", b[3]):
                     self.assertIn(n, before, f"{lang}: {n} in the cycle-3 block is not in cycles 0-3")
-                words = len(b[3].split()) if lang != "zh-CN" else len(re.sub(r"\s", "", b[3]))
-                self.assertLessEqual(words, 300 if lang != "zh-CN" else 500)
+                self.assertLessEqual(len(b[3].split()), 300)
                 # after cycle 4 (in the new chat): the same block plus cycle 4 and L2 only
                 kept = [ln for ln in b[3].strip().splitlines()[1:]]
                 after4 = b[4].strip().splitlines()[1:]
@@ -257,11 +256,10 @@ class TestEveryReadmeNamesEveryLanguage(unittest.TestCase):
                 mini = LITE / f"KEEPLOOP-LITE-MINI{sfx}.md"
                 at = ai.index(f"lite/KEEPLOOP-LITE-MINI{sfx}.md")
                 words = len(mini.read_text(encoding="utf-8").split())
-                if words >= 1000:  # a space-separated language: the stated size is measured
-                    claim = re.search(r"\d{1,3}(?:[.,  ]\d{3})+|\d{3,}", ai[at:at + 200])
-                    self.assertIsNotNone(claim, f"{path.name}: no word count for the MINI")
-                    self.assertLessEqual(abs(number(claim.group(0)) - words), words * 0.05,
-                                         f"{path.name}: says {claim.group(0)} words, the MINI has {words}")
+                claim = re.search(r"\d{1,3}(?:[.,  ]\d{3})+|\d{3,}", ai[at:at + 200])  # the stated size is measured
+                self.assertIsNotNone(claim, f"{path.name}: no word count for the MINI")
+                self.assertLessEqual(abs(number(claim.group(0)) - words), words * 0.05,
+                                     f"{path.name}: says {claim.group(0)} words, the MINI has {words}")
                 # the lite box: every lite language, its own example and MINI, then the chat guide
                 box = text[text.index("](lite/KEEPLOOP-LITE"):]
                 box = box[:box.index("keeploop-guide-chat.gif")]
